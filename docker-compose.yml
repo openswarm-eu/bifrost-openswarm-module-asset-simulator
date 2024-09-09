@@ -1,0 +1,12 @@
+version: '3'
+services:
+    moduletemplate:
+        build:
+            context: ../../
+            dockerfile: ./bifrost-zero-modules/ModuleTemplate/Dockerfile-module
+        image: moduletemplate:latest
+        environment:
+            BIFROST_URL: 'http://host.docker.internal:9091'
+            MODULE_URL: 'http://host.docker.internal:1809'
+        ports:
+            - '1809:1809'

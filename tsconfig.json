@@ -1,0 +1,17 @@
+{
+    "extends": "@tsconfig/node16/tsconfig.json",
+    "files" :["./src/ModuleTemplate.ts","./src/BifrostZeroModule.ts"],
+     "compilerOptions": {
+        "outDir": "./build/src",
+        "noImplicitAny": false,
+        "declaration": true,
+        "allowSyntheticDefaultImports": true,
+        "allowJs": false,
+        "sourceMap": true,
+        "esModuleInterop": true
+     },
+    "ts-node": { 
+        "esm": true
+    },
+     "include": ["src/","./src/BifrostZeroModule.ts"], "exclude": ["node_modules/","build/"]
+}
