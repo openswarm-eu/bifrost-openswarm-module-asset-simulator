@@ -4,7 +4,7 @@
 for your module. 
 */ 
 import { DataFrame, TModuleContext, TState } from 'bifrost-zero-common'
-import { BifrostZeroModule } from './tools/BifrostZeroModule.js'
+import { BifrostZeroModule } from 'bifrost-zero-sdk'
 
 interface Dictionary<T> {
     [Key: string]: T;
@@ -135,7 +135,7 @@ const m = new BifrostZeroModule({
     about: 'ZERO Module Template',
     initCallback: logic.initFn,
     updateCallback: logic.updateFn,
-    fragmentFile: './data/ModuleTemplateFragment.yaml',
+    fragmentFile: './data/ModuleTemplate.Fragment.yaml',
     subscriptions: [
                     T_FLOW_REVENUE, T_FLOW_ENERGY, T_FLOW_PEOPLE
                     ],
