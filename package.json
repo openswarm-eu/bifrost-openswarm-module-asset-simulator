@@ -16,7 +16,7 @@
     "dependencies": {
         "@tsconfig/node16": "^16.1.1",
         "bifrost-zero-common": "^1.0.1",
-        "bifrost-zero-sdk": "^1.0.8",
+        "bifrost-zero-sdk": "^1.0.10",
         "js-yaml": "^4.1.0",
         "node-fetch": "^3.3.2",
         "socket.io-client": "^4.5.3"
