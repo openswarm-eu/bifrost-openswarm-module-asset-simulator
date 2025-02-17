@@ -5,18 +5,22 @@
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/src/ModuleTemplate.js",
+        "start": "node ./build/ModuleTemplate.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/ModuleTemplate.js",
+        "moduletemplate": "node ./build/ModuleTemplate.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "ts-node ./src/ModuleTemplate.ts"
+        "debug": "tsx ./src/ModuleTemplate.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./src/ModuleTemplate.ts"
     },
-    "main": "./build/src/ModuleTemplate.js",
+    "main": "./build/ModuleTemplate.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {
         "@tsconfig/node16": "^16.1.1",
         "bifrost-zero-common": "^1.0.1",
         "bifrost-zero-sdk": "^1.0.10",
+        "cross-env": "^7.0.3",
         "js-yaml": "^4.1.0",
         "node-fetch": "^3.3.2",
         "socket.io-client": "^4.5.3"

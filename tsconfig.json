@@ -2,7 +2,7 @@
     "extends": "@tsconfig/node16/tsconfig.json",
     "files" :["./src/ModuleTemplate.ts"],
      "compilerOptions": {
-        "outDir": "./build/src",
+        "outDir": "./build",
         "noImplicitAny": false,
         "declaration": true,
         "allowSyntheticDefaultImports": true,

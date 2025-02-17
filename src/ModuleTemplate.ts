@@ -141,7 +141,8 @@ const m = new BifrostZeroModule({
                     ],
     samplingRate:900,
     docURL: '',
-    moduleURL: 'http://host.docker.internal:1809',
+    moduleURL: process.env.MODULE_URL || 'http://localhost:1809',
+    bifrostURL: process.env.BIFROST_URL || 'http://localhost:9091',
     hook: [100]
 })
 m.start()
