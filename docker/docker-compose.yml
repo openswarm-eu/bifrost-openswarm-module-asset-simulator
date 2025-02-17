@@ -1,0 +1,31 @@
+name: moduletemplate_dockerfile
+services:
+    influxdb:
+        image: influxdb:2.7.5-alpine
+        environment:
+            DOCKER_INFLUXDB_INIT_MODE: 'setup'
+            DOCKER_INFLUXDB_INIT_USERNAME: 'howto_user'
+            DOCKER_INFLUXDB_INIT_PASSWORD: 'howto_str0ng_passw0rd'
+            DOCKER_INFLUXDB_INIT_ORG: 'howto_company'
+            DOCKER_INFLUXDB_INIT_BUCKET: 'howto_company'
+            DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: 'C8TXsDAjcGfCKqZJY6fI+u268gUMdRWhj6MpbZexj38='
+
+    bifrost-core:
+        image: cr.siemens.com/bifrost/bifrost-zero:latest
+        environment:
+            BIFROST__server_host: '"::"'
+            BIFROST__cdl_url: '"http://influxdb:8086"'
+            BIFROST__cdl_org: '"howto_company"'
+            BIFROST__cdl_user: '"howto_user"'
+            BIFROST__cdl_token: '"C8TXsDAjcGfCKqZJY6fI+u268gUMdRWhj6MpbZexj38="'
+        ports:
+            - '9091:9091'
+    
+    moduletemplate:
+        build:
+            context: ../
+            dockerfile: ./docker/Dockerfile-module
+        image: moduletemplate:latest
+        environment:
+            BIFROST_URL: 'http://bifrost-core:9091'
+            MODULE_URL: 'http://moduletemplate:1809'
