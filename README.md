@@ -9,14 +9,14 @@
 npm install
 ```
 
-3. Start BIFROST ZERO.
+3. Start BIFROST ZERO
 
 4. Run the module
 ```sh
 npm run start
 ```
 
-This will also compile your typescript files into your local build directory. You can change your compiler preferences by editing 'tsconfig.json'.
+This will also compile your typescript files into your local build directory. You can change your compiler preferences by editing `tsconfig.json`.
 
 ## Docker
 
