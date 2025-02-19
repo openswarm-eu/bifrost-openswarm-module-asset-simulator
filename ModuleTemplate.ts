@@ -10,17 +10,20 @@ import  {
         } from 'bifrost-zero-common'
 import  { 
     Dictionary, 
-    oStruct 
+    localStorageType, 
+    occupancyStructType 
         } from './src/types.js';
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { TYPEID_LOCAL } from './data/fragment/local_types.js';
 import  { generators } from './src/tools.js';
 
+const localStorage : localStorageType = {}
+
 const logic = { 
 
     noiseLevelDynamics     : {} as Dictionary<string[]>,
     politicalModelDynamics : {} as Dictionary<string[]>,
-    occupancyStruct        : {} as Dictionary<oStruct>,
+    occupancyStruct        : {} as Dictionary<occupancyStructType>,
     politicalModelEnums    : {},
     generateNoiseLevel     : true,
     generatePoliticalModel : true,
@@ -29,43 +32,60 @@ const logic = {
     flowEnergyDynamics     : {} as Dictionary<string[]>,
     flowPeopleDynamics     : {} as Dictionary<string[]>,
 
+    // Insert expensive setup calculations and static state query expressions here.
+    // Store the instance IDs of the dynamics this module and
+    // provide locally this information for later use during the update function.
     initFn: (storyId: string, experimentId: string, state: TState, context: TModuleContext) => { 
+        
         context.log.write(`Init from [${storyId}/${experimentId}]`)
-        // Insert expensive setup calculations and static state query expressions here.
-        // Store the instance IDs of the dynamics this module
-        // provides locally for later access during the update function.
-        logic.noiseLevelDynamics[experimentId] = state.dynamics.ids.filter(entry => entry.includes(TYPEID_LOCAL.AMBIENT_NOISE_LEVEL))
-        logic.politicalModelDynamics[experimentId] = state.dynamics.ids.filter(entry => entry.includes(TYPEID_LOCAL.POLITICAL_MODEL))
+        
+        // initialize the local storage for this experiment
+        localStorage[experimentId] = {
+            noiseLevelDynamics: [],
+            politicalModelDynamics: [],
+            occupancyStruct: { ids: [], min: 0, max: 0 }
+        }	
+        
+        localStorage[experimentId].noiseLevelDynamics = state.dynamics.ids.filter(entry => entry.includes(TYPEID_LOCAL.AMBIENT_NOISE_LEVEL))
+        localStorage[experimentId].politicalModelDynamics = state.dynamics.ids.filter(entry => entry.includes(TYPEID_LOCAL.POLITICAL_MODEL))
         logic.politicalModelEnums = state.directory.dynamics.entities[TYPEID_LOCAL.POLITICAL_MODEL].schema.enum
-        const occupancyIds = state.dynamics.ids.filter(entry => entry.includes(TYPEID_LOCAL.OCCUPANCY))
-        const occuMinMax = state.directory.dynamics.entities[TYPEID_LOCAL.OCCUPANCY].schema.items
-        logic.occupancyStruct[experimentId] = { ids: occupancyIds, min: occuMinMax.minimum, max: occuMinMax.maximum }
+        localStorage[experimentId].occupancyStruct = { 
+            ids: state.dynamics.ids.filter(entry => entry.includes(TYPEID_LOCAL.OCCUPANCY)), 
+            min: state.directory.dynamics.entities[TYPEID_LOCAL.OCCUPANCY].schema.items.minimum, 
+            max: state.directory.dynamics.entities[TYPEID_LOCAL.OCCUPANCY].schema.items.maximum 
+        }
         
         return new DataFrame()
     },
     updateFn: (storyId: string, experimentId: string, startAt:number, simulationAt: number, replayAt: number, data: DataFrame, context: TModuleContext) => {
+        
         context.log.write(`\nUpdate from [${storyId}/${experimentId}] @ ${simulationAt}`)
+        
         const result: DataFrame = new DataFrame()
         result.setTime(simulationAt)
+        
         // Insert your module update logic here.
         // Generate some random data values and add them as time series to the DataFrame result
         if(logic.generateNoiseLevel) {
-            for (const dynamicId of logic.noiseLevelDynamics[experimentId]) {
+            for (const dynamicId of localStorage[experimentId].noiseLevelDynamics) {
                 result.addSeries({dynamicId, values: [generators.randFloat()]})
             }
         }
         if (logic.generatePoliticalModel) {
-            for (const dynamicId of logic.politicalModelDynamics[experimentId]) {
+            for (const dynamicId of localStorage[experimentId].politicalModelDynamics) {
                 result.addSeries({dynamicId, values:[generators.pickStr(logic.politicalModelEnums as string[])]})
             } 
         }
         if (logic.generateOccupancy) {
-            const occupancyStruct = logic.occupancyStruct[experimentId]
+            const occupancyStruct = localStorage[experimentId].occupancyStruct
             for (const dynamicId of occupancyStruct.ids) {
-                result.addSeries({dynamicId, values: [[generators.randInt(occupancyStruct.min,occupancyStruct.max),
-                                                       generators.randInt(occupancyStruct.min,occupancyStruct.max),
-                                                       generators.randInt(occupancyStruct.min,occupancyStruct.max),
-                                                       generators.randInt(occupancyStruct.min,occupancyStruct.max)]]})
+                result.addSeries({dynamicId, values: 
+                    [[
+                    generators.randInt(occupancyStruct.min,occupancyStruct.max),
+                    generators.randInt(occupancyStruct.min,occupancyStruct.max),
+                    generators.randInt(occupancyStruct.min,occupancyStruct.max),
+                    generators.randInt(occupancyStruct.min,occupancyStruct.max)
+                ]]})
             }
         }
 
@@ -76,21 +96,30 @@ const logic = {
                 case TYPEID_LOCAL.FLOW_REVENUE:
                     let rvalue = seriesElement.values[0] as number
                     if (simulationAt % 5 === 0) {
-                        rvalue = generators.clamp(generators.inc(rvalue, 0.1), [-1, 1])
+                        rvalue = generators.clamp(generators.inc(rvalue, 0.01), [-1, 1])
+                        if (rvalue >= 1) {
+                            rvalue = -1
+                        }
                     }
                     result.addSeries({ dynamicId: seriesElement.dynamicId, values: [rvalue] })
                     break
                 case TYPEID_LOCAL.FLOW_ENERGY:
                     let evalue = seriesElement.values[0] as number
                     if (simulationAt % 10 === 0) {
-                        evalue = generators.clamp(generators.inc(evalue, 0.1), [-1, 1])
+                        evalue = generators.clamp(generators.inc(evalue, 0.01), [-1, 1])
+                        if (evalue >= 1) {
+                            evalue = -1
+                        }
                     }
                     result.addSeries({ dynamicId: seriesElement.dynamicId, values: [evalue] })
                     break
                 case TYPEID_LOCAL.FLOW_PEOPLE:
                     let pvalue = seriesElement.values[0] as number
                     if (simulationAt % 15 === 0) {
-                        pvalue = generators.clamp(generators.inc(pvalue, 0.1), [-1, 1])
+                        pvalue = generators.clamp(generators.inc(pvalue, 0.01), [-1, 1])
+                        if (pvalue >= 1) {
+                            pvalue = -1
+                        }
                     }
                     result.addSeries({ dynamicId: seriesElement.dynamicId, values: [pvalue] })
                     break
