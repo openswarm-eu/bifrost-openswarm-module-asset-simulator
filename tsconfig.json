@@ -1,6 +1,6 @@
 {
     "extends": "@tsconfig/node16/tsconfig.json",
-    "files" :["./src/ModuleTemplate.ts"],
+    "files" :["ModuleTemplate.ts"],
      "compilerOptions": {
         "outDir": "./build",
         "noImplicitAny": false,
@@ -13,6 +13,6 @@
     "ts-node": { 
         "esm": true
     },
-    "include": ["src/"],
+    "include": ["src/", "data/fragment/local_types.ts", "ModuleTemplate.ts"],
     "exclude": ["node_modules/", "build/"]
 }

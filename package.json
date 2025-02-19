@@ -10,8 +10,8 @@
         "module": "node ./build/ModuleTemplate.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./src/ModuleTemplate.ts",
-        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./src/ModuleTemplate.ts"
+        "debug": "tsx ./ModuleTemplate.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./ModuleTemplate.ts"
     },
     "main": "./build/ModuleTemplate.js",
     "author": "anonymous",

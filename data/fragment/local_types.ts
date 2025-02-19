@@ -1,0 +1,8 @@
+export const TYPEID_LOCAL = {
+    AMBIENT_NOISE_LEVEL : 'AMBIENT-NOISE-LEVEL',
+    POLITICAL_MODEL     : 'POLITICAL-MODEL', 
+    OCCUPANCY           : 'OCCUPANCY',
+    FLOW_REVENUE        : '~REVENUE',
+    FLOW_ENERGY         : '~ENERGY',
+    FLOW_PEOPLE         : '~PEOPLE'
+}
