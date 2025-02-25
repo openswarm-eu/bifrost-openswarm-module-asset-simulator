@@ -1,6 +1,6 @@
 FROM node:18.16.1-slim
 
-WORKDIR /opt/bifrost/moduletemplate/
+WORKDIR /opt/proseco-fragment-module/
 
 # set up node environment
 COPY package*.json ./

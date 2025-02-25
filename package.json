@@ -1,19 +1,19 @@
 {
-    "name": "moduletemplate",
+    "name": "proseco-fragment-module",
     "version": "1.0.0",
     "description": "ZERO Module Template",
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/ModuleTemplate.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/ModuleTemplate.js",
-        "module": "node ./build/ModuleTemplate.js",
+        "start": "node ./build/ProSeCOFragmentModule.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/ProSeCOFragmentModule.js",
+        "module": "node ./build/ProSeCOFragmentModule.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./ModuleTemplate.ts",
-        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./ModuleTemplate.ts"
+        "debug": "tsx ./ProSeCOFragmentModule.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./ProSeCOFragmentModule.ts"
     },
-    "main": "./build/ModuleTemplate.js",
+    "main": "./build/ProSeCOFragmentModul.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {

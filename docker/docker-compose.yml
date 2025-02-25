@@ -1,4 +1,4 @@
-name: moduletemplate_dockerfile
+name: proseco-fragment-module_dockerfile
 services:
     influxdb:
         image: influxdb:2.7.5-alpine
@@ -21,11 +21,11 @@ services:
         ports:
             - '9091:9091'
     
-    moduletemplate:
+    proseco-fragment-module:
         build:
             context: ../
             dockerfile: ./docker/Dockerfile-module
-        image: moduletemplate:latest
+        image: proseco-fragment-module:latest
         environment:
             BIFROST_URL: 'http://bifrost-core:9091'
-            MODULE_URL: 'http://moduletemplate:1809'
+            MODULE_URL: 'http://proseco-fragment-module:1809'

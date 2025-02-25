@@ -1,0 +1,255 @@
+type: DIRECTORY-FRAGMENT
+name: ProSeCOFragment
+
+structures: {}
+
+dynamics:
+  INCOME:
+    domain: landscape
+    name: Income
+    description: Net yearly income of the residents
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 60
+    pinnable: true
+    dataLabels: [ 'Yearly income' ]
+    chartType: LINE
+    unit: k€
+    schema:
+      type: number
+      minimum: 0
+      maximum: 400
+    tags:
+      - socioeconomicfactor
+
+  PV-INSTALLED-POWER:
+    domain: landscape
+    name: PV installed power
+    description: Installed power of photovoltaic panels
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 10
+    pinnable: true
+    dataLabels: [ 'Installed power' ]
+    chartType: LINE
+    unit: kW
+    schema:
+      type: number
+      minimum: 0
+      maximum: 100
+    tags:
+      - energy
+
+  BESS-POWER-RANGE:
+    domain: landscape
+    name: BESS power
+    description: Power of the Battery Energy Storage System
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 
+      - 10
+      - -10
+    pinnable: true
+    dataLabels: 
+      - 'Power Charge'
+      - 'Power Discharge'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: number
+        minimum: -100
+        maximum: 100
+    tags:
+      - energy
+
+  BESS-SOC-RANGE:
+    domain: landscape
+    name: BESS SOC
+    description: State of Charge of the Battery Energy Storage System
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 
+      - 10
+      - 90
+    pinnable: true
+    dataLabels:
+      - 'SOC Lower Limit'
+      - 'SOC Upper Limit'
+    chartType: LINE
+    unit: p.u.
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: number
+        minimum: 0
+        maximum: 100
+    tags:
+      - energy
+
+  BESS-CAPACITY:
+    domain: landscape
+    name: BESS capacity
+    description: Capacity of the Battery Energy Storage System
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 20
+    pinnable: true
+    dataLabels: [ 'Capacity' ]
+    chartType: LINE
+    unit: kWh
+    schema:
+      type: number
+      minimum: 0
+      maximum: 1000
+    tags:
+      - energy
+
+  OCCUPANCY:
+    domain: landscape
+    name: Occupancy
+    description: The number of people currently living here, per age cohort
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue:
+      - 0
+      - 2
+      - 0
+      - 0
+    pinnable: true
+    dataLabels:
+      - Age 0-10
+      - Age 11-41
+      - Age 42-71
+      - Age 72-99
+    chartType: LINE
+    schema:
+      type: array
+      minItems: 4
+      maxItems: 4
+      items:
+        type: integer
+        minimum: 0
+        maximum: 100
+    tags:
+      - socioeconomicfactor
+
+  POLITICAL-MODEL:
+    domain: landscape
+    name: Political model
+    description: Political model of this micro-nation
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: Eco-Occultism
+    pinnable: true
+    dataLabels: [ 'Political model' ]
+    chartType: LINE
+    schema:
+      type: string
+      enum:
+        - Calvinist Deconstructionsim
+        - Eco-Occultism
+        - Arachno-libertarianism
+        - Ironic Johnsonism
+    tags:
+      - socioeconomicfactor
+      - politics
+
+  ~REVENUE:
+    domain: landscape
+    name: Revenue
+    description: Revenue flow dynamic
+    visible: true
+    alwaysUpdate: false
+    unit: €
+    defaultValue: -1
+    widgetType: NONE
+    schema:
+      type: number
+      minimum: -1
+      maximum: 1
+    tags:
+      - number
+      - flow
+
+  ~ENERGY:
+    domain: landscape
+    name: Energy
+    description: Energy flow dynamic
+    visible: true
+    alwaysUpdate: false
+    unit: kJ
+    defaultValue: 0
+    widgetType: NONE
+    schema:
+      type: number
+      minimum: -1
+      maximum: 1
+    tags:
+      - number
+      - flow
+
+  ~PEOPLE:
+    domain: landscape
+    name: People
+    description: People flow dynamic
+    visible: true
+    alwaysUpdate: false
+    unit: ""
+    defaultValue: 0
+    chartType: LINE
+    widgetType: NONE
+    schema:
+      type: number
+      minimum: -1
+      maximum: 1
+    tags:
+      - number
+      - flow
+
+mappings:
+  INCOME:
+    - RESIDENTIAL-SINGLE
+    - RESIDENTIAL-MULTI-LARGE
+
+  POLITICAL-MODEL:
+    - RESIDENTIAL-SINGLE
+    - RESIDENTIAL-MULTI-LARGE
+
+  OCCUPANCY:
+    - RESIDENTIAL-SINGLE
+    - RESIDENTIAL-MULTI-LARGE
+
+  PV-INSTALLED-POWER:
+    - 'SOLAR-FARM'
+
+  BESS-POWER-RANGE:
+    - 'BATTERY-SMALL'
+
+  BESS-SOC-RANGE:
+    - 'BATTERY-SMALL'
+
+  BESS-CAPACITY:
+    - 'BATTERY-SMALL'
+
+  ~REVENUE:
+    - RESIDENTIAL-SINGLE
+    - RESIDENTIAL-MULTI-LARGE
+  ~ENERGY:
+    - RESIDENTIAL-SINGLE
+    - RESIDENTIAL-MULTI-LARGE
+  ~PEOPLE:
+    - RESIDENTIAL-SINGLE
+    - RESIDENTIAL-MULTI-LARGE
