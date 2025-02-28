@@ -35,11 +35,11 @@ const logic = {
             const parentId = state.dynamics.entities[loadingId].parentId
             if (parentId.includes(TYPEID.CABLE)) {
                 localStorage[experimentId].loading2StackedLoadingMap[loadingId] = {
-                    stackedLoadingId: state.connections.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING))
+                    stackedLoadingId: state.connections.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING)) || ''
                 }
             } else if (parentId.includes(TYPEID.TRANSFORMER)) {
                 localStorage[experimentId].loading2StackedLoadingMap[loadingId] = {
-                    stackedLoadingId: state.structures.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING))
+                    stackedLoadingId: state.structures.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING)) || ''
                 }
             }
             
