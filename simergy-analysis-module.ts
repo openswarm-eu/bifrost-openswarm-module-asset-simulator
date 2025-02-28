@@ -9,7 +9,8 @@ import  {
     TState 
         } from 'bifrost-zero-common'
 import  { 
-    localStorageType, 
+    localStorageType,
+    TYPEID, 
         } from './src/types.js';
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { TYPEID_LOCAL } from './data/fragment/local_types.js';
@@ -24,7 +25,25 @@ const logic = {
         context.log.write(`Init from [${storyId}/${experimentId}]`)
         
         // initialize the local storage for this experiment
-        localStorage[experimentId] = {}	
+        localStorage[experimentId] = {
+            loading2StackedLoadingMap: {}
+        }	
+
+        const loadingIds = state.dynamics.ids.filter(entry => entry.includes(TYPEID.LOADING))
+
+        for (const loadingId of loadingIds) {
+            const parentId = state.dynamics.entities[loadingId].parentId
+            if (parentId.includes(TYPEID.CABLE)) {
+                localStorage[experimentId].loading2StackedLoadingMap[loadingId] = {
+                    stackedLoadingId: state.connections.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING))
+                }
+            } else if (parentId.includes(TYPEID.TRANSFORMER)) {
+                localStorage[experimentId].loading2StackedLoadingMap[loadingId] = {
+                    stackedLoadingId: state.structures.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING))
+                }
+            }
+            
+        }
         
         return new DataFrame()
     },
@@ -32,9 +51,29 @@ const logic = {
     updateFn: (storyId: string, experimentId: string, startAt:number, simulationAt: number, replayAt: number, data: DataFrame, context: TModuleContext) => {
         
         context.log.write(`\nUpdate from [${storyId}/${experimentId}] @ ${simulationAt}`)
-        
+
         const result: DataFrame = new DataFrame()
         result.setTime(simulationAt)
+
+        for (const seriesElement of data.series) {
+            const loadingValue = seriesElement.values[0][0]
+            const loadingId = seriesElement.dynamicId
+            const stackedLoadingId = localStorage[experimentId].loading2StackedLoadingMap[loadingId].stackedLoadingId
+            const stackedLoadingValue = [0 , 0 , 0 ]
+            
+            if ( loadingValue <= 70) {
+                stackedLoadingValue[0] = loadingValue
+            } else if ((loadingValue >= 70) && (loadingValue < 100)) {
+                stackedLoadingValue[0] = 70
+                stackedLoadingValue[1] = loadingValue - 70
+            } else {
+                stackedLoadingValue[0] = 70
+                stackedLoadingValue[1] = 30
+                stackedLoadingValue[2] = loadingValue - 100
+            }
+
+            result.addSeries({dynamicId: stackedLoadingId, values: [stackedLoadingValue]})
+        }
         
         return result
     }
@@ -48,7 +87,7 @@ const m = new BifrostZeroModule({
     updateCallback : logic.updateFn,
     fragmentFile   : './data/fragment/ProSeCO.Fragment.yaml',
     subscriptions  : [
-        TYPEID_LOCAL.FLOW_REVENUE, TYPEID_LOCAL.FLOW_ENERGY, TYPEID_LOCAL.FLOW_PEOPLE
+        TYPEID.LOADING
     ],
     samplingRate   : 900,
     docURL         : '',
