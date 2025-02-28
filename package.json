@@ -1,19 +1,19 @@
 {
-    "name": "proseco-fragment-module",
+    "name": "simergy-analysis-module",
     "version": "1.0.0",
     "description": "ZERO Module Template",
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/ProSeCOFragmentModule.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/ProSeCOFragmentModule.js",
-        "module": "node ./build/ProSeCOFragmentModule.js",
+        "start": "node ./build/simergy-analysis-module.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/simergy-analysis-module.js",
+        "module": "node ./build/simergy-analysis-module.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./ProSeCOFragmentModule.ts",
-        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./ProSeCOFragmentModule.ts"
+        "debug": "tsx ./simergy-analysis-module.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./simergy-analysis-module.ts"
     },
-    "main": "./build/ProSeCOFragmentModul.js",
+    "main": "./build/simergy-analysis-module.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {

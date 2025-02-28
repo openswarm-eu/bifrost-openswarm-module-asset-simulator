@@ -1,4 +1,4 @@
-name: proseco-fragment-module_dockerfile
+name: simergy-analysis-module_dockerfile
 services:
     influxdb:
         image: influxdb:2.7.5-alpine
@@ -21,11 +21,11 @@ services:
         ports:
             - '9091:9091'
     
-    proseco-fragment-module:
+    simergy-analysis-module:
         build:
             context: ../
             dockerfile: ./docker/Dockerfile-module
-        image: proseco-fragment-module:latest
+        image: simergy-analysis-module:latest
         environment:
             BIFROST_URL: 'http://bifrost-core:9091'
-            MODULE_URL: 'http://proseco-fragment-module:1809'
+            MODULE_URL: 'http://simergy-analysis-module:1809'

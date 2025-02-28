@@ -42,8 +42,8 @@ const logic = {
 
 const m = new BifrostZeroModule({
     author         : 'anonymous',
-    label          : 'ProSeCO Fragment Module',
-    about          : 'Module to provide the needed fragments for the ProSeCO scenarios.',
+    label          : 'SiEmergy Analysis Module',
+    about          : 'Module to provide additional analysis for SiEmergy project.',
     initCallback   : logic.initFn,
     updateCallback : logic.updateFn,
     fragmentFile   : './data/fragment/ProSeCO.Fragment.yaml',

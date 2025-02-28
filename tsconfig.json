@@ -1,6 +1,6 @@
 {
     "extends": "@tsconfig/node16/tsconfig.json",
-    "files" :["ProSeCOFragmentModule.ts"],
+    "files" :["simergy-analysis-module.ts"],
      "compilerOptions": {
         "outDir": "./build",
         "noImplicitAny": false,
@@ -13,6 +13,6 @@
     "ts-node": { 
         "esm": true
     },
-    "include": ["src/", "data/fragment/local_types.ts", "ProSeCOFragmentModule.ts"],
+    "include": ["src/", "data/fragment/local_types.ts", "simergy-analysis-module.ts"],
     "exclude": ["node_modules/", "build/"]
 }
