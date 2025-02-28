@@ -1,19 +1,19 @@
 {
-    "name": "simergy-analysis-module",
+    "name": "siemergy-analysis-module",
     "version": "1.0.0",
     "description": "ZERO Module Template",
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/simergy-analysis-module.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/simergy-analysis-module.js",
-        "module": "node ./build/simergy-analysis-module.js",
+        "start": "node ./build/siemergy-analysis-module.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/siemergy-analysis-module.js",
+        "module": "node ./build/siemergy-analysis-module.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./simergy-analysis-module.ts",
-        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./simergy-analysis-module.ts"
+        "debug": "tsx ./siemergy-analysis-module.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./siemergy-analysis-module.ts"
     },
-    "main": "./build/simergy-analysis-module.js",
+    "main": "./build/siemergy-analysis-module.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {
