@@ -10,6 +10,7 @@ RUN npm install
 # copy module files
 COPY src/ ./src/
 COPY data/ ./data/
+COPY siemergy-analysis-module.ts ./siemergy-analysis-module.ts
 
 RUN npm run tsc
 

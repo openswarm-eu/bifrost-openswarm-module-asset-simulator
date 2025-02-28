@@ -50,7 +50,7 @@ const logic = {
 
     updateFn: (storyId: string, experimentId: string, startAt:number, simulationAt: number, replayAt: number, data: DataFrame, context: TModuleContext) => {
         
-        context.log.write(`\nUpdate from [${storyId}/${experimentId}] @ ${simulationAt}`)
+        context.log.write(`Update from [${storyId}/${experimentId}] @ ${simulationAt}`)
 
         const result: DataFrame = new DataFrame()
         result.setTime(simulationAt)
