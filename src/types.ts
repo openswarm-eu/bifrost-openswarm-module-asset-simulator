@@ -10,8 +10,19 @@ export type loadingMapType = {
     }
 }
 
+export type overlaodingDetectionMapType = {
+    [Key: string] : {
+        overlaodingTimeId: string
+        checkedLastTime: number
+        overloading070Time: number
+        overloading100Time: number
+    }
+    
+}
+
 export type localStorageType = {
     [Key: string]: {
-        loading2StackedLoadingMap: loadingMapType
+        loading2StackedLoading: loadingMapType
+        overlaodingDetection: overlaodingDetectionMapType
     }
 }

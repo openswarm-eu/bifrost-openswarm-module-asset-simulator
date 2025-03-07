@@ -26,7 +26,8 @@ const logic = {
         
         // initialize the local storage for this experiment
         localStorage[experimentId] = {
-            loading2StackedLoadingMap: {}
+            loading2StackedLoading: {},
+            overlaodingDetection: {}
         }	
 
         const loadingIds = state.dynamics.ids.filter(entry => entry.includes(TYPEID.LOADING))
@@ -34,12 +35,24 @@ const logic = {
         for (const loadingId of loadingIds) {
             const parentId = state.dynamics.entities[loadingId].parentId
             if (parentId.includes(TYPEID.CABLE)) {
-                localStorage[experimentId].loading2StackedLoadingMap[loadingId] = {
+                localStorage[experimentId].loading2StackedLoading[loadingId] = {
                     stackedLoadingId: state.connections.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING)) || ''
                 }
+                localStorage[experimentId].overlaodingDetection[loadingId] = {
+                    overlaodingTimeId: state.connections.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.OVERLAODED_TIME)) || '',
+                    checkedLastTime: 0,
+                    overloading070Time: 0,
+                    overloading100Time: 0
+                }
             } else if (parentId.includes(TYPEID.TRANSFORMER)) {
-                localStorage[experimentId].loading2StackedLoadingMap[loadingId] = {
+                localStorage[experimentId].loading2StackedLoading[loadingId] = {
                     stackedLoadingId: state.structures.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.STACKED_LOADING)) || ''
+                }
+                localStorage[experimentId].overlaodingDetection[loadingId] = {
+                    overlaodingTimeId: state.structures.entities[parentId].dynamicIds.find(entry => entry.includes(TYPEID_LOCAL.OVERLAODED_TIME)) || '',
+                    checkedLastTime: 0,
+                    overloading070Time: 0,
+                    overloading100Time: 0
                 }
             }
             
@@ -58,7 +71,11 @@ const logic = {
         for (const seriesElement of data.series) {
             const loadingValue = seriesElement.values[0][0]
             const loadingId = seriesElement.dynamicId
-            const stackedLoadingId = localStorage[experimentId].loading2StackedLoadingMap[loadingId].stackedLoadingId
+            const stackedLoadingId = localStorage[experimentId].loading2StackedLoading[loadingId].stackedLoadingId
+            const overlaodingTimeId = localStorage[experimentId].overlaodingDetection[loadingId].overlaodingTimeId
+            const overloadingCheckedLastTime = localStorage[experimentId].overlaodingDetection[loadingId].checkedLastTime
+            var   overloading070Time = localStorage[experimentId].overlaodingDetection[loadingId].overloading070Time
+            var   overloading100Time = localStorage[experimentId].overlaodingDetection[loadingId].overloading100Time
             const stackedLoadingValue = [0 , 0 , 0 ]
             
             if ( loadingValue <= 70) {
@@ -66,13 +83,22 @@ const logic = {
             } else if ((loadingValue >= 70) && (loadingValue < 100)) {
                 stackedLoadingValue[0] = 70
                 stackedLoadingValue[1] = loadingValue - 70
+                overloading070Time += (simulationAt - overloadingCheckedLastTime) / 3600
             } else {
                 stackedLoadingValue[0] = 70
                 stackedLoadingValue[1] = 30
                 stackedLoadingValue[2] = loadingValue - 100
+                overloading070Time += (simulationAt - overloadingCheckedLastTime) / 3600
+                overloading100Time += (simulationAt - overloadingCheckedLastTime) / 3600
+                
             }
 
-            result.addSeries({dynamicId: stackedLoadingId, values: [stackedLoadingValue]})
+            localStorage[experimentId].overlaodingDetection[loadingId].checkedLastTime = simulationAt
+            localStorage[experimentId].overlaodingDetection[loadingId].overloading070Time = overloading070Time
+            localStorage[experimentId].overlaodingDetection[loadingId].overloading100Time = overloading100Time
+
+            result.addSeries({dynamicId: stackedLoadingId,  values: [stackedLoadingValue]})
+            result.addSeries({dynamicId: overlaodingTimeId, values: [[overloading100Time, overloading070Time]]})
         }
         
         return result
