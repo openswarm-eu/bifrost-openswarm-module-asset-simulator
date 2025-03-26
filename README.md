@@ -1,4 +1,11 @@
-# ProSeCOFragmentModul
+# Siemergy Data Module
+Reads in data from ```./data/csv/siemergy.csv``` and adds the load/ev/chp/bat data to the buildings depending on their stackable for the ```POWERGRID-CONNECTOR```.
+    - PV data requires ```SOLAR-PANEL```
+    - EV data ```CHARGING-POLE```
+    - Household Battery data requires ```HOUSEHOLD-BATTERY```
+    - CHP data requires ```CHP-STACK```
+      If the EV should not charge, set the ```POWERED``` dynamic of the ```CHARGING-POLE``` to false
+There is the global dynamic ```PERCENTAGE-REACTIVE-POWER``` which determines how much % of the active-power is also generated as reactive power.
 
 ## Compile and run your module
 
@@ -25,7 +32,7 @@ This will also compile your typescript files into your local build directory. Yo
 If the BIFROST core is running in a docker container, change the host of the moduleURL to `host.docker.internal`. This can be done by setting the respective environment variable `MODULE_URL`:
 ```sh
 docker-compose -f ./docker/docker-compose_bifrost_base.yml up -d
-env MODULE_URL=http://host.docker.internal:3000 
+env MODULE_URL=http://host.docker.internal:1808 
 npm run start
 ```
 

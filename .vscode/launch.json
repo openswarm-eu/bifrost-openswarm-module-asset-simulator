@@ -1,0 +1,56 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug siemergy-data Module (tsx)",
+            "type": "node",
+            "request": "launch",
+            "program": "./siemergy-data-module.ts",
+            "runtimeExecutable": "tsx",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug siemergy-data Module production",
+            "type": "node",
+            "request": "launch",
+            "program": "./build/siemergy-data-module.js",
+            "preLaunchTask": "Build Backend",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "MODULE_URL": "http://localhost:1808",
+                "BIFROST_URL": "http://localhost:9091"
+            }
+        },
+        {
+            "name": "Debug siemergy-data Module docker(tsx)",
+            "type": "node",
+            "request": "launch",
+            "program": "./siemergy-data-module.ts",
+            "runtimeExecutable": "tsx",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "MODULE_URL": "http://host.docker.internal:1808",
+                "BIFROST_URL": "http://127.0.0.1:9091"
+            }
+        },
+        {
+            "name": "Debug siemergy-data Module production docker",
+            "type": "node",
+            "request": "launch",
+            "program": "./build/siemergy-data-module.js",
+            "preLaunchTask": "Build Backend",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "MODULE_URL": "http://host.docker.internal:1808",
+                "BIFROST_URL": "http://127.0.0.1:9091"
+            }
+        },
+    ]
+}

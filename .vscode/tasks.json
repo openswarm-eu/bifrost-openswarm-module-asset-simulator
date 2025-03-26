@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true
+    },
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "build",
+            // "path": "server",
+            "group": "build",
+            "problemMatcher": [],
+            "label": "Build Backend",
+            "detail": "tsc -p tsconfig.json"
+        }
+    ]
+}

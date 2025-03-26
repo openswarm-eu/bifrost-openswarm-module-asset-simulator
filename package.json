@@ -5,15 +5,15 @@
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/siemergy-analysis-module.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/siemergy-analysis-module.js",
-        "module": "node ./build/siemergy-analysis-module.js",
+        "start": "node ./build/siemergy-data-module.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/siemergy-data-module.js",
+        "module": "node ./build/siemergy-data-module.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./siemergy-analysis-module.ts",
+        "debug": "tsx ./siemergy-data-module.ts",
         "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./siemergy-analysis-module.ts"
     },
-    "main": "./build/siemergy-analysis-module.js",
+    "main": "./build/siemergy-data-module.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {
@@ -21,6 +21,7 @@
         "bifrost-zero-common": "^1.0.1",
         "bifrost-zero-sdk": "^1.0.10",
         "cross-env": "^7.0.3",
+        "csv-parser": "^3.2.0",
         "js-yaml": "^4.1.0",
         "node-fetch": "^3.3.2",
         "socket.io-client": "^4.5.3",

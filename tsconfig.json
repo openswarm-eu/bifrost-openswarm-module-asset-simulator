@@ -1,6 +1,6 @@
 {
     "extends": "@tsconfig/node16/tsconfig.json",
-    "files" :["siemergy-analysis-module.ts"],
+    "files" :["siemergy-data-module.ts"],
      "compilerOptions": {
         "outDir": "./build",
         "noImplicitAny": false,
@@ -13,6 +13,6 @@
     "ts-node": { 
         "esm": true
     },
-    "include": ["src/", "data/fragment/local_types.ts", "siemergy-analysis-module.ts"],
+    "include": ["src/", "data/fragment/local_types.ts", "siemergy-data-module.ts"],
     "exclude": ["node_modules/", "build/"]
 }

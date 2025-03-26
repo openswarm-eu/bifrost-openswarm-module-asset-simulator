@@ -1,0 +1,236 @@
+type: DIRECTORY-FRAGMENT
+name: SiemergyDataModule
+
+structures:
+
+  SOLAR-PANEL: 
+    domain: powergrid
+    memberOf: 
+      - electrical
+      - sources
+    placeOn: 
+      - POWERGRID-CONNECTOR
+    name: PV System
+    description: Photovoltaic installation
+    size: 1
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics:
+      - ACTIVE-POWER-3P
+    flavors: 
+      - 76_SBC_plugin
+    renderData: 
+        file: buildings/
+        image: 
+            base: objects/inactive/buildings/
+            hover: objects/active/buildings/
+            active: objects/active/buildings/
+        rotationY: 0.75
+        hideObjectOnCanvas: true
+        scale: default
+        hideInPanel: false
+        nightmode: false
+        emissiveOnConnection: true
+        category: ELECTRICAL
+        sorting: 502
+  
+  CHARGING-POLE:
+    domain: powergrid
+    memberOf:
+      - electrical
+    placeOn:
+      - POWERGRID-CONNECTOR
+    name: E-Car Charging Pole
+    description: E-car charging pole
+    size: 1
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics:
+      - ACTIVE-POWER-3P
+      - POWERED
+    flavors:
+      - 76_SBC_plugin
+    renderData:
+      file: buildings/
+      image:
+        base: objects/inactive/buildings/
+        hover: objects/active/buildings/
+        active: objects/active/buildings/
+      rotationY: 0.75
+      hideObjectOnCanvas: true
+      scale: default
+      hideInPanel: false
+      nightmode: false
+      emissiveOnConnection: true
+      category: ELECTRICAL
+      sorting: 503
+    tags:
+      - base
+      - lvgrid
+
+  HOUSEHOLD-BATTERY:
+    domain: powergrid
+    memberOf:
+      - electrical
+    placeOn:
+      - POWERGRID-CONNECTOR
+    name: Household Battery
+    description: Household battery
+    size: 1
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics:
+      - ACTIVE-POWER-3P
+      - ENERGY-STORAGE-CAPACITY
+      - ENERGY-STORAGE-MAXPOWER
+      - STATE-OF-CHARGE
+    flavors:
+      - 72_SBC_battery-storage
+    renderData:
+      file: buildings/
+      image:
+        base: objects/inactive/buildings/
+        hover: objects/active/buildings/
+        active: objects/active/buildings/
+      rotationY: 0.75
+      hideObjectOnCanvas: true
+      scale: default
+      hideInPanel: false
+      nightmode: false
+      emissiveOnConnection: true
+      category: ELECTRICAL
+      sorting: 504
+    tags:
+      - base
+      - lvgrid
+
+  CHP-STACK:
+    domain: powergrid
+    memberOf:
+      - electrical
+    placeOn:
+      - POWERGRID-CONNECTOR
+    name: Combined Heat and Power
+    description: Combined Heat and Power Stack
+    size: 1
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics:
+      - ACTIVE-POWER-3P
+    flavors:
+      - 108_SBC_heat-exchanger
+    renderData:
+      file: buildings/
+      image:
+        base: objects/inactive/buildings/
+        hover: objects/active/buildings/
+        active: objects/active/buildings/
+      rotationY: 0.75
+      hideObjectOnCanvas: true
+      scale: default
+      hideInPanel: false
+      nightmode: false
+      emissiveOnConnection: true
+      category: ELECTRICAL
+      sorting: 504
+    tags:
+      - base
+      - lvgrid
+
+dynamics:
+
+  PERCENTAGE-REACTIVE-POWER:
+    name: Percentage Reactive Power
+    description: Percentage of Active-Power which is Reactive
+    visible: true
+    defaultValue: 0
+    pinnable: true
+    dataLabels: []
+    chartType: NUMBER
+    schema:
+      type: number
+      minimum: 0
+      maximum: 50
+    tags:
+      - global
+
+
+  ENERGY-STORAGE-CAPACITY:
+    domain: powergrid
+    name: Energy Storage Capacity
+    description: Total capacity of an energy storage element
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 10
+    unit: "kWh"
+    pinnable: true
+    dataLabels: []
+    chartType: NUMBER
+    schema:
+      type: number
+    tags:
+      - lvgrid
+
+  ENERGY-STORAGE-MAXPOWER:
+    domain: powergrid
+    name: Energy Storage Maximum Power
+    description: Maximum charge and discharge power for the energy storage
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 2
+    unit: "kW"
+    pinnable: true
+    dataLabels: []
+    chartType: NUMBER
+    schema:
+      type: number
+    tags:
+      - lvgrid
+
+  STATE-OF-CHARGE:
+    domain: powergrid
+    name: State of Charge
+    description: Energy charge of a storage element
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    unit: "%"
+    defaultValue: 100
+    pinnable: true
+    dataLabels: []
+    chartType: LINE
+    widgetType: FLOAT_ROUND
+    schema:
+      type: number
+      minimum: 0
+      maximum: 100
+      bins: 4
+    tags:
+      - lvgrid
+
+mappings:
+
+  PERCENTAGE-REACTIVE-POWER:
+   - GLOBAL
+
+  ENERGY-STORAGE-CAPACITY:
+   - BATTERY-STORAGE-SMALL
+   - BATTERY-STORAGE-LARGE
+
+  ENERGY-STORAGE-MAXPOWER:
+   - BATTERY-STORAGE-SMALL
+   - BATTERY-STORAGE-LARGE
+   
+  STATE-OF-CHARGE:
+   - BATTERY-STORAGE-SMALL
+   - BATTERY-STORAGE-LARGE
