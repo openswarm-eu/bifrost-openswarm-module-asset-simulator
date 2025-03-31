@@ -1,19 +1,19 @@
 {
-    "name": "siemergy-analysis-module",
+    "name": "energy-community-pv-simulator",
     "version": "1.0.0",
-    "description": "ZERO Module Template",
+    "description": "PV simulator for PoC1",
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/siemergy-data-module.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/siemergy-data-module.js",
-        "module": "node ./build/siemergy-data-module.js",
+        "start": "node ./build/energy-community-pv-simulator.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/energy-community-pv-simulator.js",
+        "module": "node ./build/energy-community-pv-simulator.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./siemergy-data-module.ts",
-        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./siemergy-analysis-module.ts"
+        "debug": "tsx ./energy-community-pv-simulator.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./energy-community-pv-simulator.ts"
     },
-    "main": "./build/siemergy-data-module.js",
+    "main": "./build/energy-community-pv-simulator.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {

@@ -1,5 +1,5 @@
-# Siemergy Data Module
-Reads in data from ```./data/csv/siemergy.csv``` and adds the load/ev/chp/bat data to the buildings depending on their stackable for the ```POWERGRID-CONNECTOR```.
+# PoC1 PV Simulation Module
+Reads in data from ```./data/csv/profile-data.csv``` and adds the load/ev/chp/bat data to the buildings depending on their stackable for the ```POWERGRID-CONNECTOR```.
     - PV data requires ```SOLAR-PANEL```
     - EV data ```CHARGING-POLE```
     - Household Battery data requires ```HOUSEHOLD-BATTERY```
@@ -51,7 +51,7 @@ npm run debug:docker
 
 To build a docker image of the module, use
 ```sh
-docker build -f ./docker/Dockerfile-module -t siemergy-analysis-module:latest .
+docker build -f ./docker/Dockerfile-module -t energy-community-pv-simulator:latest .
 ```
 
 Or run the module in a docker container with (along with BIFROST ZERO):

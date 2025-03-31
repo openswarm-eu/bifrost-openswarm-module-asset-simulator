@@ -1,4 +1,4 @@
-name: siemergy-analysis-module_dockerfile
+name: energy-community-pv-simulator_dockerfile
 services:
     influxdb:
         image: influxdb:2.7.5-alpine
@@ -21,11 +21,11 @@ services:
         ports:
             - '9091:9091'
     
-    siemergy-analysis-module:
+    energy-community-pv-simulator:
         build:
             context: ../
             dockerfile: ./docker/Dockerfile-module
-        image: siemergy-analysis-module:latest
+        image: energy-community-pv-simulator:latest
         environment:
             BIFROST_URL: 'http://bifrost-core:9091'
-            MODULE_URL: 'http://siemergy-analysis-module:1809'
+            MODULE_URL: 'http://energy-community-pv-simulator:1809'

@@ -5,19 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug siemergy-data Module (tsx)",
+            "name": "Debug energy-community-pv-simulator (tsx)",
             "type": "node",
             "request": "launch",
-            "program": "./siemergy-data-module.ts",
+            "program": "./energy-community-pv-simulator.ts",
             "runtimeExecutable": "tsx",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Debug siemergy-data Module production",
+            "name": "Debug energy-community-pv-simulator production",
             "type": "node",
             "request": "launch",
-            "program": "./build/siemergy-data-module.js",
+            "program": "./build/energy-community-pv-simulator.js",
             "preLaunchTask": "Build Backend",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -27,10 +27,10 @@
             }
         },
         {
-            "name": "Debug siemergy-data Module docker(tsx)",
+            "name": "Debug energy-community-pv-simulator docker(tsx)",
             "type": "node",
             "request": "launch",
-            "program": "./siemergy-data-module.ts",
+            "program": "./energy-community-pv-simulator.ts",
             "runtimeExecutable": "tsx",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -40,10 +40,10 @@
             }
         },
         {
-            "name": "Debug siemergy-data Module production docker",
+            "name": "Debug energy-community-pv-simulator production docker",
             "type": "node",
             "request": "launch",
-            "program": "./build/siemergy-data-module.js",
+            "program": "./build/energy-community-pv-simulator.js",
             "preLaunchTask": "Build Backend",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

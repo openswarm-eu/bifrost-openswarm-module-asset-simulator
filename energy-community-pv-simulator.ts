@@ -214,11 +214,11 @@ const logic = {
 
 const m = new BifrostZeroModule({
     author         : 'anonymous',
-    label          : 'SiEmergy Data Module',
-    about          : 'Module to provide data for Buildings in the SiEmergy project.',
+    label          : 'OpenSwarm PV Simulator',
+    about          : 'Module to simulate PV systems in OpenSwarm.',
     initCallback   : logic.initFn,
     updateCallback : logic.updateFn,
-    fragmentFile   : './data/fragment/SiemergyDataModule.Fragment.yaml',
+    fragmentFile   : './data/fragment/Module.Fragment.yaml',
     subscriptions  : [
         TYPEID.VOLTAGE_3P,
         TYPEID.POWERED,
@@ -231,7 +231,7 @@ const m = new BifrostZeroModule({
     hook           : [90]
 })
 
-const csvFilePath = 'data/csv/siemergy.csv';
+const csvFilePath = 'data/csv/profile-data.csv';
 readCSVtoDict(csvFilePath)
   .then(() => {
     m.context.log.write("Data loaded");
