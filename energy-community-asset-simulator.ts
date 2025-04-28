@@ -200,8 +200,8 @@ const logic = {
 
 const m = new BifrostZeroModule({
     author         : 'anonymous',
-    label          : 'OpenSwarm PV Simulator',
-    about          : 'Module to simulate PV systems in OpenSwarm.',
+    label          : 'OpenSwarm Asset Simulator',
+    about          : 'Module to simulate assest in OpenSwarm PoC1.',
     initCallback   : logic.initFn,
     updateCallback : logic.updateFn,
     fragmentFile   : './data/fragment/Module.Fragment.yaml',
