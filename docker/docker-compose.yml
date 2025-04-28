@@ -1,4 +1,4 @@
-name: energy-community-pv-simulator_dockerfile
+name: energy-community-asset-simulator_dockerfile
 services:
     influxdb:
         image: influxdb:2.7.5-alpine
@@ -21,11 +21,11 @@ services:
         ports:
             - '9091:9091'
     
-    energy-community-pv-simulator:
+    energy-community-asset-simulator:
         build:
             context: ../
             dockerfile: ./docker/Dockerfile-module
-        image: energy-community-pv-simulator:latest
+        image: energy-community-asset-simulator:latest
         environment:
             BIFROST_URL: 'http://bifrost-core:9091'
-            MODULE_URL: 'http://energy-community-pv-simulator:1809'
+            MODULE_URL: 'http://energy-community-asset-simulator:1809'

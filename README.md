@@ -1,11 +1,13 @@
-# PoC1 PV Simulation Module
-Reads in data from ```./data/csv/profile-data.csv``` and adds the load/ev/chp/bat data to the buildings depending on their stackable for the ```POWERGRID-CONNECTOR```.
+# PoC1 EC Asset Simulation Module
+
+This module simulates all assets of the Energy Community (EC) tackled in the PoC1 use cases of the OpenSwarm project.
+
+This module Reads in data from ```./data/csv/profile-data.csv``` and adds the load/ev/chp/bat data to the buildings depending on their stackable for the ```POWERGRID-CONNECTOR```.
     - PV data requires ```SOLAR-PANEL```
     - EV data ```CHARGING-POLE```
     - Household Battery data requires ```HOUSEHOLD-BATTERY```
     - CHP data requires ```CHP-STACK```
       If the EV should not charge, set the ```POWERED``` dynamic of the ```CHARGING-POLE``` to false
-There is the global dynamic ```PERCENTAGE-REACTIVE-POWER``` which determines how much % of the active-power is also generated as reactive power.
 
 ## Compile and run your module
 
@@ -51,7 +53,7 @@ npm run debug:docker
 
 To build a docker image of the module, use
 ```sh
-docker build -f ./docker/Dockerfile-module -t energy-community-pv-simulator:latest .
+docker build -f ./docker/Dockerfile-module -t energy-community-asset-simulator:latest .
 ```
 
 Or run the module in a docker container with (along with BIFROST ZERO):

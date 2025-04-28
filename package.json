@@ -1,19 +1,19 @@
 {
-    "name": "energy-community-pv-simulator",
+    "name": "energy-community-asset-simulator",
     "version": "1.0.0",
     "description": "PV simulator for PoC1",
     "type": "module",
     "scripts": {
         "prestart": "npm run tsc",
-        "start": "node ./build/energy-community-pv-simulator.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/energy-community-pv-simulator.js",
-        "module": "node ./build/energy-community-pv-simulator.js",
+        "start": "node ./build/energy-community-asset-simulator.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1809 node ./build/energy-community-asset-simulator.js",
+        "module": "node ./build/energy-community-asset-simulator.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "tsx ./energy-community-pv-simulator.ts",
-        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./energy-community-pv-simulator.ts"
+        "debug": "tsx ./energy-community-asset-simulator.ts",
+        "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1809 tsx ./energy-community-asset-simulator.ts"
     },
-    "main": "./build/energy-community-pv-simulator.js",
+    "main": "./build/energy-community-asset-simulator.js",
     "author": "anonymous",
     "license": "ISC",
     "dependencies": {

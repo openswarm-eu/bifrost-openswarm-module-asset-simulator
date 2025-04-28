@@ -5,19 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug energy-community-pv-simulator (tsx)",
+            "name": "Debug energy-community-asset-simulator (tsx)",
             "type": "node",
             "request": "launch",
-            "program": "./energy-community-pv-simulator.ts",
+            "program": "./energy-community-asset-simulator.ts",
             "runtimeExecutable": "tsx",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Debug energy-community-pv-simulator production",
+            "name": "Debug energy-community-asset-simulator production",
             "type": "node",
             "request": "launch",
-            "program": "./build/energy-community-pv-simulator.js",
+            "program": "./build/energy-community-asset-simulator.js",
             "preLaunchTask": "Build Backend",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -27,10 +27,10 @@
             }
         },
         {
-            "name": "Debug energy-community-pv-simulator docker(tsx)",
+            "name": "Debug energy-community-asset-simulator docker(tsx)",
             "type": "node",
             "request": "launch",
-            "program": "./energy-community-pv-simulator.ts",
+            "program": "./energy-community-asset-simulator.ts",
             "runtimeExecutable": "tsx",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -40,10 +40,10 @@
             }
         },
         {
-            "name": "Debug energy-community-pv-simulator production docker",
+            "name": "Debug energy-community-asset-simulator production docker",
             "type": "node",
             "request": "launch",
-            "program": "./build/energy-community-pv-simulator.js",
+            "program": "./build/energy-community-asset-simulator.js",
             "preLaunchTask": "Build Backend",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

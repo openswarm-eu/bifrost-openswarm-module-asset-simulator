@@ -1,6 +1,6 @@
 {
     "extends": "@tsconfig/node16/tsconfig.json",
-    "files" :["energy-community-pv-simulator.ts"],
+    "files" :["energy-community-asset-simulator.ts"],
      "compilerOptions": {
         "outDir": "./build",
         "noImplicitAny": false,
@@ -13,6 +13,6 @@
     "ts-node": { 
         "esm": true
     },
-    "include": ["src/", "data/fragment/local_types.ts", "energy-community-pv-simulator.ts"],
+    "include": ["src/", "data/fragment/local_types.ts", "energy-community-asset-simulator.ts"],
     "exclude": ["node_modules/", "build/"]
 }

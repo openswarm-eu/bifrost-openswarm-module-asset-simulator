@@ -1,6 +1,6 @@
 FROM node:18.16.1-slim
 
-WORKDIR /opt/energy-community-pv-simulator/
+WORKDIR /opt/energy-community-asset-simulator/
 
 # set up node environment
 COPY package*.json ./
@@ -10,7 +10,7 @@ RUN npm install
 # copy module files
 COPY src/ ./src/
 COPY data/ ./data/
-COPY energy-community-pv-simulator.ts ./energy-community-pv-simulator.ts
+COPY energy-community-asset-simulator.ts ./energy-community-asset-simulator.ts
 
 RUN npm run tsc
 
