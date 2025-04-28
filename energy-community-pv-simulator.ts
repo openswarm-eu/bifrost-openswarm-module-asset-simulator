@@ -21,40 +21,36 @@ import csv from 'csv-parser';
 import { unescape } from 'querystring';
 
 async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> {
-  
     return new Promise((resolve, reject) => {
-      fs.createReadStream(filePath)
-        .pipe(csv({separator: ";", }))
-        .on('data', (row) => {
-            const timestamp = row.Time;
-            const [hours, minutes, seconds] = timestamp.split(':').map(Number);
-            delete row.Time; // Remove the timestamp column from the row object
-            const convertedTs = hours*3600 + minutes*60 + seconds
-            const numericRow: Record<string, number> = {};
-            Object.keys(row).forEach(key => {
-            numericRow[key] = parseFloat(row[key]);
-            if (isNaN(numericRow[key])) {
-                numericRow[key] = 0; // or any default value, or keep as null/undefined
-            }
+        fs.createReadStream(filePath)
+            .pipe(csv({separator: ";", }))
+            .on('data', (row) => {
+                const timestamp = row.Time;
+                const [hours, minutes, seconds] = timestamp.split(':').map(Number);
+                delete row.Time; // Remove the timestamp column from the row object
+                const convertedTs = hours*3600 + minutes*60 + seconds
+                const numericRow: Record<string, number> = {};
+                Object.keys(row).forEach(key => {
+                numericRow[key] = parseFloat(row[key]);
+                if (isNaN(numericRow[key])) {
+                    numericRow[key] = 0; // or any default value, or keep as null/undefined
+                }
+                });
+                csvData[convertedTs] = numericRow;
+            })
+            .on('end', () => {
+                resolve(csvData);
+            })
+            .on('error', (err) => {
+                reject(err);
             });
-            csvData[convertedTs] = numericRow;
-        })
-        .on('end', () => {
-          resolve(csvData);
-        })
-        .on('error', (err) => {
-          reject(err);
-        });
     });
 }
-
-
 
 const localStorage : typeLocalStorage = {}
 const csvData: { [key: string]: any } = {};
 
 const logic = { 
-
 
     initFn: (storyId: string, experimentId: string, state: TState, context: TModuleContext) => { 
         
@@ -63,17 +59,9 @@ const logic = {
         // initialize the local storage for this experiment
         localStorage[experimentId] = {
             allPGCs: [],
-            byPGC: {},
-            pRPId: ""
+            byPGC: {}
         }	
         try {
-            for (const dynId of state.dynamics.ids){
-                if (state.dynamics.entities[dynId].typeId == TYPEID.PRP_ID){
-                    if(state.dynamics.entities[dynId].experimentId == experimentId){
-                        localStorage[experimentId].pRPId = dynId
-                    }
-                }
-            }
 
             for (const pgcId of state.structures.ids){
                 const entity = state.structures.entities[pgcId]
@@ -162,7 +150,7 @@ const logic = {
 
         try {
             //  time modulo so day repeats
-            const dataTime = simulationAt % 86400
+            const dataTime = (startAt + simulationAt) % 86400
             const wData = csvData[dataTime]
             // summer/winter
             let SW = ""
@@ -181,7 +169,7 @@ const logic = {
                 }
                 if(pStruct.pvApId){
                     sumLoad += wData["PV-"+SW]/1000
-                    const PV_3 = [wData["PV-"+SW]/3000,wData["PV-"+SW]/3000,wData["PV-"+SW]/3000]
+                    const PV_3 = [-wData["PV-"+SW]/3000,-wData["PV-"+SW]/3000,-wData["PV-"+SW]/3000]
                     result.addSeries({dynamicId:pStruct.pvApId,values:[PV_3]})
                 }
                 if(pStruct.hbatApId){
@@ -201,8 +189,6 @@ const logic = {
                 // There is always at least  "normal" pgc load
                 const resultLoad = (sumLoad/3)+(wData["LD-"+SW]/3)
                 result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
-                const pRP = dynamicsById[localStorage[experimentId].pRPId]/100
-                result.addSeries({dynamicId:pStruct.pgcRpId,values:[[resultLoad*pRP,resultLoad*pRP,resultLoad*pRP]]})
             }
         } catch (error) {
             context.log.write(`Error: ${error}`, Log.level.ERROR)
@@ -221,8 +207,7 @@ const m = new BifrostZeroModule({
     fragmentFile   : './data/fragment/Module.Fragment.yaml',
     subscriptions  : [
         TYPEID.VOLTAGE_3P,
-        TYPEID.POWERED,
-        TYPEID.PRP_ID
+        TYPEID.POWERED
     ],
     samplingRate   : 900,
     docURL         : '',
@@ -233,11 +218,11 @@ const m = new BifrostZeroModule({
 
 const csvFilePath = 'data/csv/profile-data.csv';
 readCSVtoDict(csvFilePath)
-  .then(() => {
-    m.context.log.write("Data loaded");
-  })
-  .catch((error) => {
-    m.context.log.write('Error reading CSV:', error);
-  });
+    .then(() => {
+        m.context.log.write("Data loaded");
+    })
+    .catch((error) => {
+        m.context.log.write('Error reading CSV:', error);
+    });
 
 m.start()

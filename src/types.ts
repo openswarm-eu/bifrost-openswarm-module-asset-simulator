@@ -13,7 +13,6 @@ export const TYPEID = {
     HOUSEHOLD_BAT: "HOUSEHOLD-BATTERY",
     CHP_STACK    : "CHP-STACK",
     POWERED      : "POWERED",
-    PRP_ID       : "PERCENTAGE-REACTIVE-POWER"
 }
 
 export type loadingMapType = {
@@ -55,6 +54,5 @@ export type typeLocalStorage = {
     [Key: string]: {
         allPGCs: string[],
         byPGC : powerGridConnectorDictType
-        pRPId: string
     }
 }
