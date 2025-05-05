@@ -43,10 +43,11 @@ export type powerGridConnectorDictType = {
         pgcApId: string
         pgcRpId: string
         pvApId: string
+        pvMaxApId: string
         evApId: string
+        evMaxApId: string
         chpApId: string
         hbatApId: string
-        evPoweredId: string
     }
 }
 

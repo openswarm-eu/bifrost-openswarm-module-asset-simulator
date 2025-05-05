@@ -74,8 +74,9 @@ const logic = {
                             chpApId: "",
                             hbatApId: "",
                             pvApId: "",
+                            pvMaxApId: "",
                             evApId: "",
-                            evPoweredId: ""
+                            evMaxApId: ""
                         }
                         // get apId of pgc
                         const pgcDynIds:string[] = entity.dynamicIds
@@ -96,18 +97,20 @@ const logic = {
                             }
                             if (state.structures.entities[childId].typeId == TYPEID.SOLAR_PANEL){
                                 for (const dynId of dynIds){
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
                                         localStorage[experimentId].byPGC[pgcId].pvApId = dynId
-                                        break
+                                    }
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_MAX_POWER){
+                                        localStorage[experimentId].byPGC[pgcId].pvMaxApId = dynId
                                     }
                                 }
                             }else if (state.structures.entities[childId].typeId == TYPEID.CHARGING_POLE){
                                 for (const dynId of dynIds){
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_POWER){
                                         localStorage[experimentId].byPGC[pgcId].evApId = dynId
                                     }
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID.POWERED){
-                                        localStorage[experimentId].byPGC[pgcId].evPoweredId = dynId
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
+                                        localStorage[experimentId].byPGC[pgcId].evMaxApId = dynId
                                     }
                                 }
                             }else if (state.structures.entities[childId].typeId == TYPEID.CHP_STACK){
@@ -168,9 +171,14 @@ const logic = {
                     result.addSeries({dynamicId:pStruct.chpApId,values:[CHP_3]})
                 }
                 if(pStruct.pvApId){
-                    sumLoad += wData["PV-"+SW]/1000
-                    const PV_3 = [-wData["PV-"+SW]/3000,-wData["PV-"+SW]/3000,-wData["PV-"+SW]/3000]
-                    result.addSeries({dynamicId:pStruct.pvApId,values:[PV_3]})
+                    let pvInfeed = wData["PV-"+SW]/1000
+                    if (-pvInfeed <= dynamicsById[pStruct.pvMaxApId]){
+                        result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, -pvInfeed]]})
+                    } else {
+                        result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, dynamicsById[pStruct.pvMaxApId]]]})
+                        pvInfeed = -dynamicsById[pStruct.pvMaxApId]
+                    }
+                    sumLoad += pvInfeed
                 }
                 if(pStruct.hbatApId){
                     sumLoad += wData["BAT-"+SW]
@@ -178,13 +186,14 @@ const logic = {
                     result.addSeries({dynamicId:pStruct.hbatApId,values:[HBAT_3]})
                 }
                 if(pStruct.evApId){
-                    if (dynamicsById[pStruct.evPoweredId]){
-                        sumLoad += wData["EV"]
-                        const EV_3 = [wData["EV"]/3,wData["EV"]/3,wData["EV"]/3]
-                        result.addSeries({dynamicId:pStruct.evApId,values:[EV_3]})
-                    }else{
-                        result.addSeries({dynamicId:pStruct.evApId,values:[[0,0,0]]})
+                    let chgPowerDemand = wData["EV"]
+                    if (chgPowerDemand <= dynamicsById[pStruct.evMaxApId]){
+                        result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], wData["EV"]]]})
+                    } else {
+                        result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], dynamicsById[pStruct.evMaxApId]]]})
+                        chgPowerDemand = dynamicsById[pStruct.evMaxApId]
                     }
+                    sumLoad += chgPowerDemand
                 }
                 // There is always at least  "normal" pgc load
                 const resultLoad = (sumLoad/3)+(wData["LD-"+SW]/3)
@@ -206,8 +215,8 @@ const m = new BifrostZeroModule({
     updateCallback : logic.updateFn,
     fragmentFile   : './data/fragment/Module.Fragment.yaml',
     subscriptions  : [
-        TYPEID.VOLTAGE_3P,
-        TYPEID.POWERED
+        TYPEID_LOCAL.CHGSTATION_MAX_POWER,
+        TYPEID_LOCAL.PV_SYSTEM_MAX_POWER
     ],
     samplingRate   : 900,
     docURL         : '',

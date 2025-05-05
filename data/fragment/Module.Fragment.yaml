@@ -5,7 +5,7 @@ structures:
 
   EV-STATION: 
     domain: 'landscape'
-    memberOf: ['buildings', 'electrical', 'sources']
+    memberOf: ['buildings', 'electrical']
     placeOn: ['canvas']
     name: 'E-Car Charging Station'
     description: 'E-charging station'
@@ -40,6 +40,40 @@ structures:
                       position: [-0.8, 0.027, 0.9]
                       repeatX: 4
   
+  SOLAR-FARM: 
+    domain: 'landscape'
+    memberOf: ['buildings', 'generators']
+    placeOn: ['canvas']
+    name: 'Solar Farm'
+    description: ''
+    size: 4
+    replace: false
+    defaultPairing: []
+    requiredPairing: ['POWERGRID-CONNECTOR', 'SOLAR-PANEL']
+    forbiddenPairing: []
+    dynamics: []
+    flavors: ['68_SBC_powergrid']
+    renderData: 
+        file: 'buildings/'
+        image: 
+            base: 'objects/inactive/buildings/'
+            hover: 'objects/active/buildings/'
+            active: 'objects/active/buildings/'
+        rotationY: 0.75
+        scale: 'default'
+        hideInPanel: false
+        category: 'ELECTRICAL'
+        sorting: 204
+        nightmode: true
+        geoObject: true
+        widgetPosition: 
+            '68_SBC_powergrid': [0, 0.5, 0.3]
+        showPlaceholder: true
+    tags: 
+      - 'base' 
+      - 'lvgrid'
+      - 'mvgrid'
+        
   SOLAR-PANEL: 
     domain: powergrid
     memberOf: 
@@ -55,7 +89,8 @@ structures:
     requiredPairing: []
     forbiddenPairing: []
     dynamics:
-      - ACTIVE-POWER-3P
+      - PV-SYSTEM-POWER
+      - PV-SYSTEM-MAX-POWER
     flavors: 
       - 76_SBC_plugin
     renderData: 
@@ -87,8 +122,8 @@ structures:
     requiredPairing: []
     forbiddenPairing: []
     dynamics:
-      - ACTIVE-POWER-3P
-      - POWERED
+      - CHGSTATION-POWER
+      - CHGSTATION-MAX-POWER
     flavors:
       - 76_SBC_plugin
     renderData:
@@ -109,6 +144,90 @@ structures:
       - base
       - lvgrid
 
-dynamics: {}
+dynamics: 
+
+  CHGSTATION-POWER:
+    domain: powergrid
+    name: Chargestation Power
+    description: Power situation of the charging station
+    visible: true
+    actionable: false
+    alwaysUpdate: false
+    defaultValue: 
+      - 0
+      - 0
+    pinnable: false
+    dataLabels: 
+      - 'Power Demand'
+      - 'Actual Power'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: number
+    tags:
+      - energyCommunityController
+
+  PV-SYSTEM-POWER:
+    domain: powergrid
+    name: PV System Power
+    description: Power situation of the PV system
+    visible: true
+    actionable: false
+    alwaysUpdate: false
+    defaultValue: 
+      - 0
+      - 0
+    pinnable: false
+    dataLabels:
+      - 'Infeed Potential'
+      - 'Actual Infeed'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: number
+    tags:
+      - energyCommunityController
+
+  CHGSTATION-MAX-POWER:
+    domain: powergrid
+    name: Chargingstation Power Limit
+    description: The currently limit of the power of this chargingstation
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 100
+    pinnable: true
+    dataLabels: [ 'kW' ]
+    chartType: LINE
+    unit: kW
+    schema:
+      type: number
+    tags:
+      - energyCommunityController
+
+  PV-SYSTEM-MAX-POWER:
+    domain: powergrid
+    name: PV System Infeed Limit
+    description: The currently limit of the infeed of this PV system
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 100
+    pinnable: true
+    dataLabels: [ 'kW' ]
+    chartType: LINE
+    unit: kW
+    schema:
+      type: number
+    tags:
+      - energyCommunityController
 
 mappings: {}
