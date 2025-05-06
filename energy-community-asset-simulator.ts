@@ -63,6 +63,8 @@ const logic = {
         
         // initialize the local storage for this experiment
         localStorage[experimentId] = {
+            lastUpdate     : -1,
+            numberUpdate   : 0,
             allPGCs        : [],
             byPGC          : {},
             allGridSensors : [],
@@ -156,13 +158,11 @@ const logic = {
                     if(entity.typeId === TYPEID.PGC){
                         localStorage[experimentId].allPGCs.push(structureId)
                         localStorage[experimentId].byPGC[structureId] = {
-                            pgcApId: "",
-                            chpApId: "",
-                            hbatApId: "",
-                            pvApId: "",
-                            pvMaxApId: "",
-                            evApId: "",
-                            evMaxApId: ""
+                            pgcApId   : "",
+                            pvApId    : "",
+                            pvMaxApId : "",
+                            evApId    : "",
+                            evMaxApId : ""
                         }
                         // get apId of pgc
                         const pgcDynIds:string[] = entity.dynamicIds
@@ -178,7 +178,7 @@ const logic = {
                             if (dynIds === undefined){
                                 continue
                             }
-                            if (state.structures.entities[childId].typeId == TYPEID.SOLAR_PANEL){
+                            if (state.structures.entities[childId].typeId == TYPEID_LOCAL.SOLAR_PANEL){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
                                         localStorage[experimentId].byPGC[structureId].pvApId = dynId
@@ -187,27 +187,13 @@ const logic = {
                                         localStorage[experimentId].byPGC[structureId].pvMaxApId = dynId
                                     }
                                 }
-                            }else if (state.structures.entities[childId].typeId == TYPEID.CHARGING_POLE){
+                            }else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.CHARGING_POLE){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_POWER){
                                         localStorage[experimentId].byPGC[structureId].evApId = dynId
                                     }
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
                                         localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
-                                    }
-                                }
-                            }else if (state.structures.entities[childId].typeId == TYPEID.CHP_STACK){
-                                for (const dynId of dynIds){
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
-                                        localStorage[experimentId].byPGC[structureId].chpApId = dynId
-                                        break
-                                    }
-                                }
-                            }else if (state.structures.entities[childId].typeId == TYPEID.HOUSEHOLD_BAT){
-                                for (const dynId of dynIds){
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
-                                        localStorage[experimentId].byPGC[structureId].hbatApId = dynId
-                                        break
                                     }
                                 }
                             }
@@ -233,6 +219,12 @@ const logic = {
         }
         const result: DataFrame = new DataFrame()
         result.setTime(simulationAt)
+        if (localStorage[experimentId].lastUpdate !== simulationAt){
+            localStorage[experimentId].lastUpdate = simulationAt
+            localStorage[experimentId].numberUpdate = 1
+        } else {
+            localStorage[experimentId].numberUpdate += 1
+        }
         
         try {
             //  time modulo so day repeats
@@ -248,61 +240,57 @@ const logic = {
             }
             
             // update asset values
-            for (const pgcId of localStorage[experimentId].allPGCs){
-                const pStruct = localStorage[experimentId].byPGC[pgcId]
-                let sumLoad = 0
-                if(pStruct.chpApId){
-                    const CHP_3 = [wData["CHP-"+SW]/3,wData["CHP-"+SW]/3,wData["CHP-"+SW]/3]
-                    sumLoad += wData["CHP-"+SW]
-                    result.addSeries({dynamicId:pStruct.chpApId,values:[CHP_3]})
-                }
-                if(pStruct.pvApId){
-                    let pvInfeed = wData["PV-"+SW]/1000
-                    if (-pvInfeed <= dynamicsById[pStruct.pvMaxApId]){
-                        result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, -pvInfeed]]})
-                    } else {
-                        result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, dynamicsById[pStruct.pvMaxApId]]]})
-                        pvInfeed = -dynamicsById[pStruct.pvMaxApId]
+            if (localStorage[experimentId].numberUpdate == 1){
+                for (const pgcId of localStorage[experimentId].allPGCs){
+                    const pStruct = localStorage[experimentId].byPGC[pgcId]
+                    let sumLoad = 0
+
+                    if(pStruct.pvApId){
+                        let pvInfeed = wData["PV-"+SW]/1000
+                        if (-pvInfeed <= dynamicsById[pStruct.pvMaxApId]){
+                            result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, -pvInfeed]]})
+                        } else {
+                            result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, dynamicsById[pStruct.pvMaxApId]]]})
+                            pvInfeed = -dynamicsById[pStruct.pvMaxApId]
+                        }
+                        sumLoad += pvInfeed
                     }
-                    sumLoad += pvInfeed
-                }
-                if(pStruct.hbatApId){
-                    sumLoad += wData["BAT-"+SW]
-                    const HBAT_3 = [wData["BAT-"+SW]/3,wData["BAT-"+SW]/3,wData["BAT-"+SW]/3]
-                    result.addSeries({dynamicId:pStruct.hbatApId,values:[HBAT_3]})
-                }
-                if(pStruct.evApId){
-                    let chgPowerDemand = wData["EV"]
-                    if (chgPowerDemand <= dynamicsById[pStruct.evMaxApId]){
-                        result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], wData["EV"]]]})
-                    } else {
-                        result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], dynamicsById[pStruct.evMaxApId]]]})
-                        chgPowerDemand = dynamicsById[pStruct.evMaxApId]
+
+                    if(pStruct.evApId){
+                        let chgPowerDemand = wData["EV"]
+                        if (chgPowerDemand <= dynamicsById[pStruct.evMaxApId]){
+                            result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], wData["EV"]]]})
+                        } else {
+                            result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], dynamicsById[pStruct.evMaxApId]]]})
+                            chgPowerDemand = dynamicsById[pStruct.evMaxApId]
+                        }
+                        sumLoad += chgPowerDemand
                     }
-                    sumLoad += chgPowerDemand
+                    
+                    // calculate the resulting load value
+                    const resultLoad = (sumLoad/3)
+                    result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
                 }
-                
-                // calculate the resulting load value
-                const resultLoad = (sumLoad/3)
-                result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
             }
             
             // update the grid sensor values
-            for (const sensorId of localStorage[experimentId].allGridSensors){
-                const sStruct = localStorage[experimentId].byGridSensor[sensorId]
-                if (sStruct.isActive){
-                    const nodeVoltage = dynamicsById[sStruct.nodeVoltageId]
-                    const cableCurrent = dynamicsById[sStruct.cableCurrentId]
-                    const powerLimit = dynamicsById[sStruct.powerLimitId]
-                    
-                    // calculate the power value 
-                    const measuredPower = (
-                                        nodeVoltage[0] * cableCurrent[0] + 
-                                        nodeVoltage[1] * cableCurrent[1] + 
-                                        nodeVoltage[2] * cableCurrent[2]   ) / 1000
-                    // write the sensor value
-                    result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[measuredPower]})
-                } 
+            if (localStorage[experimentId].numberUpdate == 2){
+                for (const sensorId of localStorage[experimentId].allGridSensors){
+                    const sStruct = localStorage[experimentId].byGridSensor[sensorId]
+                    if (sStruct.isActive){
+                        const nodeVoltage = dynamicsById[sStruct.nodeVoltageId]
+                        const cableCurrent = dynamicsById[sStruct.cableCurrentId]
+                        const powerLimit = dynamicsById[sStruct.powerLimitId]
+                        
+                        // calculate the power value 
+                        const measuredPower = (
+                                            nodeVoltage[0] * cableCurrent[0] + 
+                                            nodeVoltage[1] * cableCurrent[1] + 
+                                            nodeVoltage[2] * cableCurrent[2]   ) / 1000
+                        // write the sensor value
+                        result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[measuredPower]})
+                    } 
+                }
             }
             
         } catch (error) {
@@ -330,7 +318,7 @@ const m = new BifrostZeroModule({
     docURL         : '',
     moduleURL      : process.env.MODULE_URL  || 'http://localhost:1808',
     bifrostURL     : process.env.BIFROST_URL || 'http://localhost:9091',
-    hook           : [90]
+    hook           : [100, 910]
 })
 
 const csvFilePath = 'data/csv/profile-data.csv';

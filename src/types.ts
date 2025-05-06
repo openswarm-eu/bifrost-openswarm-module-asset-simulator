@@ -7,11 +7,6 @@ export const TYPEID = {
     CABLE          : "CABLE-UNDERGROUND-SD",
     NODE           : "POWERGRID-NODE",
 
-    CHARGING_POLE  : "CHARGING-POLE",
-    SOLAR_PANEL    : "SOLAR-PANEL",
-    HOUSEHOLD_BAT  : "HOUSEHOLD-BATTERY",
-    CHP_STACK      : "CHP-STACK",
-
     // Dynamics
     LOADING        : "LOADING",
     VOLTAGE        : "VOLTAGE-3P",
@@ -27,8 +22,6 @@ export type powerGridConnectorType = {
         pvMaxApId : string
         evApId    : string
         evMaxApId : string
-        chpApId   : string
-        hbatApId  : string
     }
 }
 
@@ -45,6 +38,8 @@ export type gridSensorType = {
 
 export type localStorageType = {
     [Key: string]: {
+        lastUpdate     : number,
+        numberUpdate   : number,
         allPGCs        : string[],
         byPGC          : powerGridConnectorType,
         allGridSensors : string[],
