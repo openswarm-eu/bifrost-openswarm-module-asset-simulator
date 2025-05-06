@@ -11,14 +11,15 @@ import  {
         } from 'bifrost-zero-common'
 import  { 
     localStorageType,
-    TYPEID,
-    typeLocalStorage, 
-        } from './src/types.js';
+    TYPEID, 
+        } from './src/types.js'
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
-import  { TYPEID_LOCAL } from './data/fragment/local_types.js';
-import * as fs from 'fs';
-import csv from 'csv-parser';
-import { unescape } from 'querystring';
+import  { 
+    sensorNames, 
+    TYPEID_LOCAL 
+        } from './data/fragment/local_types.js'
+import * as fs from 'fs'
+import csv from 'csv-parser'
 
 async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> {
     return new Promise((resolve, reject) => {
@@ -47,7 +48,7 @@ async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> 
     });
 }
 
-const localStorage : typeLocalStorage = {}
+const localStorage : localStorageType = {}
 const csvData: { [key: string]: any } = {};
 
 const logic = { 
@@ -56,21 +57,106 @@ const logic = {
         
         context.log.write(`Init from [${storyId}/${experimentId}]`)
         
+        // initialize the result DataFrame of the init function
+        const initResult: DataFrame = new DataFrame()
+        initResult.setTime(0)
+        
         // initialize the local storage for this experiment
         localStorage[experimentId] = {
-            allPGCs: [],
-            byPGC: {}
+            allPGCs        : [],
+            byPGC          : {},
+            allGridSensors : [],
+            byGridSensor   : {}
         }	
         try {
-
-            for (const pgcId of state.structures.ids){
-                const entity = state.structures.entities[pgcId]
-                if(entity.typeId === TYPEID.PGC){
-                    if(entity.experimentId === experimentId){
-                        localStorage[experimentId].allPGCs.push(pgcId)
-                        localStorage[experimentId].byPGC[pgcId] = {
+            for (const structureId of state.structures.ids){
+                const entity = state.structures.entities[structureId]
+                if(entity.experimentId === experimentId){
+                    
+                    // get all needed information for the grid sensors
+                    if(entity.typeId === TYPEID_LOCAL.GRID_SENSOR){
+                        localStorage[experimentId].allGridSensors.push(structureId)
+                        localStorage[experimentId].byGridSensor[structureId] = {
+                            nameId             : "",
+                            isActive           : false,
+                            nodeVoltageId      : "",
+                            cableCurrentId     : "",
+                            powerMeasurementId : "",
+                            powerLimitId       : ""
+                        }
+                        // get the sensor dynamicIds
+                        const gridDynIds:string[] = entity.dynamicIds
+                        for (const dynId of gridDynIds){
+                            if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_NAME){
+                                localStorage[experimentId].byGridSensor[structureId].nameId = dynId
+                                // get the value of the sensor name
+                                const sensorName = state.values.entities[dynId].value
+                                // when sensor name is "Inactive" then set isActive to false
+                                if (sensorName == sensorNames.INACTIVE){
+                                    localStorage[experimentId].byGridSensor[structureId].isActive = false
+                                } else { 
+                                    localStorage[experimentId].byGridSensor[structureId].isActive = true
+                                }
+                            }else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERMEASUREMENT){
+                                localStorage[experimentId].byGridSensor[structureId].powerMeasurementId = dynId
+                            }else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERLIMIT){
+                                localStorage[experimentId].byGridSensor[structureId].powerLimitId = dynId
+                            }
+                        }
+                        // get now the dynamics of the needed values for calculation of the sensor measurements
+                        const parentIds:string[] = entity.parentIds
+                        for (const parentId of parentIds){
+                            if (state.structures.entities[parentId].typeId == TYPEID.NODE){
+                                const nodeEntity = state.structures.entities[parentId]
+                                const nodeDynIds:string[] = nodeEntity.dynamicIds
+                                for (const dynId of nodeDynIds){
+                                    // get the voltage id of the node
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID.VOLTAGE){
+                                        localStorage[experimentId].byGridSensor[structureId].nodeVoltageId = dynId
+                                    }
+                                }
+                                // get the childs of the node
+                                const nodeChildIds:string[] = nodeEntity.childIds
+                                let cableCounter = 0
+                                for (const childId of nodeChildIds){
+                                    // skip non connnection entities
+                                    if (state.connections.entities[childId] === undefined){
+                                        continue
+                                    }
+                                    if (state.connections.entities[childId].typeId == TYPEID.CABLE){
+                                        cableCounter++
+                                        if (cableCounter > 2){
+                                            // more than 2 cables connected to the node
+                                            context.log.write(`Error: More than 2 cables connected to the node ${parentId}`, Log.level.ERROR)
+                                            context.log.write(`Sensor ${localStorage[experimentId].byGridSensor[structureId].nameId} set to inactive`, Log.level.INFO)
+                                            // set this sensor to inactive
+                                            localStorage[experimentId].byGridSensor[structureId].isActive = false
+                                            // set the sensor name to "Inactive"
+                                            initResult.addSeries({dynamicId:localStorage[experimentId].byGridSensor[structureId].nameId,values:[sensorNames.INACTIVE]})
+                                            continue
+                                        }
+                                        if (cableCounter > 1){
+                                            continue
+                                        }
+                                        // get the cable current id of the cable
+                                        const cableEntity = state.connections.entities[childId]
+                                        const cableDynIds:string[] = cableEntity.dynamicIds
+                                        for (const cableDynId of cableDynIds){
+                                            if (state.dynamics.entities[cableDynId].typeId == TYPEID.CURRENT){
+                                                localStorage[experimentId].byGridSensor[structureId].cableCurrentId = cableDynId
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // get all needed information for the power grid connectors
+                    if(entity.typeId === TYPEID.PGC){
+                        localStorage[experimentId].allPGCs.push(structureId)
+                        localStorage[experimentId].byPGC[structureId] = {
                             pgcApId: "",
-                            pgcRpId: "",
                             chpApId: "",
                             hbatApId: "",
                             pvApId: "",
@@ -82,10 +168,7 @@ const logic = {
                         const pgcDynIds:string[] = entity.dynamicIds
                         for (const dynId of pgcDynIds){
                             if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
-                                localStorage[experimentId].byPGC[pgcId].pgcApId = dynId
-                            }
-                            if (state.dynamics.entities[dynId].typeId == TYPEID.REACTIVE_POWER){
-                                localStorage[experimentId].byPGC[pgcId].pgcRpId = dynId
+                                localStorage[experimentId].byPGC[structureId].pgcApId = dynId
                             }
                         }
                         // get childIds
@@ -98,32 +181,32 @@ const logic = {
                             if (state.structures.entities[childId].typeId == TYPEID.SOLAR_PANEL){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
-                                        localStorage[experimentId].byPGC[pgcId].pvApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].pvApId = dynId
                                     }
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_MAX_POWER){
-                                        localStorage[experimentId].byPGC[pgcId].pvMaxApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].pvMaxApId = dynId
                                     }
                                 }
                             }else if (state.structures.entities[childId].typeId == TYPEID.CHARGING_POLE){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_POWER){
-                                        localStorage[experimentId].byPGC[pgcId].evApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].evApId = dynId
                                     }
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
-                                        localStorage[experimentId].byPGC[pgcId].evMaxApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
                                     }
                                 }
                             }else if (state.structures.entities[childId].typeId == TYPEID.CHP_STACK){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
-                                        localStorage[experimentId].byPGC[pgcId].chpApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].chpApId = dynId
                                         break
                                     }
                                 }
                             }else if (state.structures.entities[childId].typeId == TYPEID.HOUSEHOLD_BAT){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
-                                        localStorage[experimentId].byPGC[pgcId].hbatApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].hbatApId = dynId
                                         break
                                     }
                                 }
@@ -136,7 +219,7 @@ const logic = {
             context.log.write(`Error in init ${error}`, Log.level.ERROR)
         }
         
-        return new DataFrame()
+        return initResult
     },
 
     updateFn: (storyId: string, experimentId: string, startAt:number, simulationAt: number, replayAt: number, data: DataFrame, context: TModuleContext) => {
@@ -150,18 +233,21 @@ const logic = {
         }
         const result: DataFrame = new DataFrame()
         result.setTime(simulationAt)
-
+        
         try {
             //  time modulo so day repeats
             const dataTime = (startAt + simulationAt) % 86400
             const wData = csvData[dataTime]
-            // summer/winter
+            
+            // check, if summer or winter
             let SW = ""
             if (startAt > 6739200 && startAt < 22809600){
                 SW = "S"
             }else{
                 SW = "W"
             }
+            
+            // update asset values
             for (const pgcId of localStorage[experimentId].allPGCs){
                 const pStruct = localStorage[experimentId].byPGC[pgcId]
                 let sumLoad = 0
@@ -195,10 +281,30 @@ const logic = {
                     }
                     sumLoad += chgPowerDemand
                 }
-                // There is always at least  "normal" pgc load
-                const resultLoad = (sumLoad/3)+(wData["LD-"+SW]/3)
+                
+                // calculate the resulting load value
+                const resultLoad = (sumLoad/3)
                 result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
             }
+            
+            // update the grid sensor values
+            for (const sensorId of localStorage[experimentId].allGridSensors){
+                const sStruct = localStorage[experimentId].byGridSensor[sensorId]
+                if (sStruct.isActive){
+                    const nodeVoltage = dynamicsById[sStruct.nodeVoltageId]
+                    const cableCurrent = dynamicsById[sStruct.cableCurrentId]
+                    const powerLimit = dynamicsById[sStruct.powerLimitId]
+                    
+                    // calculate the power value 
+                    const measuredPower = (
+                                        nodeVoltage[0] * cableCurrent[0] + 
+                                        nodeVoltage[1] * cableCurrent[1] + 
+                                        nodeVoltage[2] * cableCurrent[2]   ) / 1000
+                    // write the sensor value
+                    result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[measuredPower]})
+                } 
+            }
+            
         } catch (error) {
             context.log.write(`Error: ${error}`, Log.level.ERROR)
         }
@@ -215,6 +321,8 @@ const m = new BifrostZeroModule({
     updateCallback : logic.updateFn,
     fragmentFile   : './data/fragment/Module.Fragment.yaml',
     subscriptions  : [
+        TYPEID.VOLTAGE,
+        TYPEID.CURRENT,
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
         TYPEID_LOCAL.PV_SYSTEM_MAX_POWER
     ],

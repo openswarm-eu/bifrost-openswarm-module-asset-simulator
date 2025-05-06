@@ -144,6 +144,42 @@ structures:
       - base
       - lvgrid
 
+  GRID-SENSOR:
+    domain: powergrid
+    memberOf:
+      - electrical
+    placeOn: ['POWERGRID-NODE']
+    name: Grid Sensor
+    description: Measurement for ALGO controller
+    size: 1
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics: 
+      - GRID-SENSOR-NAME
+      - GRID-SENSOR-POWERMEASUREMENT
+      - GRID-SENSOR-POWERLIMIT
+    flavors:
+      - 74_SBC_transceiver
+    renderData:
+      file: buildings/
+      image:
+        base: objects/inactive/buildings/
+        hover: objects/active/buildings/
+        active: objects/active/buildings/
+      rotationY: 0.75
+      hideObjectOnCanvas: true
+      scale: default
+      hideInPanel: false
+      nightmode: false
+      emissiveOnConnection: true
+      category: ELECTRICAL
+      sorting: 502
+    tags:
+      - algo
+      
+
 dynamics: 
 
   CHGSTATION-POWER:
@@ -205,7 +241,8 @@ dynamics:
     alwaysUpdate: false
     defaultValue: 100
     pinnable: true
-    dataLabels: [ 'kW' ]
+    dataLabels:
+      - 'Charge Power Limit'
     chartType: LINE
     unit: kW
     schema:
@@ -222,7 +259,72 @@ dynamics:
     alwaysUpdate: false
     defaultValue: 100
     pinnable: true
-    dataLabels: [ 'kW' ]
+    dataLabels: 
+      - 'Infeed Limit'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: number
+    tags:
+      - energyCommunityController
+  
+  GRID-SENSOR-NAME:
+    domain: powergrid
+    name: Grid Sensor Name
+    description: Name of the grid sensor
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 'Inactive'
+    pinnable: true
+    dataLabels:
+      - 'Grid Sensor Name'
+    chartType: TEXT
+    schema:
+      type: string
+      enum:
+        - S1
+        - S2
+        - S3
+        - S4
+        - S5
+        - S6
+        - S7
+        - S8
+        - S9
+        - Inactive
+    tags:
+      - energyCommunityController
+
+  GRID-SENSOR-POWERMEASUREMENT:
+    domain: powergrid
+    name: Grid Sensor Power Measurement
+    description: Power measurement of the grid sensor
+    visible: true
+    actionable: false
+    alwaysUpdate: false
+    defaultValue: 0
+    pinnable: false
+    dataLabels:
+      - 'Power Measurement'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: number
+    tags:
+      - energyCommunityController
+
+  GRID-SENSOR-POWERLIMIT:
+    domain: powergrid
+    name: Grid Sensor Power Limit
+    description: The currently limit of the power of this grid sensor
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 100
+    pinnable: true
+    dataLabels:
+      - 'Line Power Limit'
     chartType: LINE
     unit: kW
     schema:
