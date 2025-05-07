@@ -24,7 +24,7 @@ services:
     energy-community-asset-simulator:
         build:
             context: ../
-            dockerfile: ./docker/Dockerfile-module
+            dockerfile: ./docker/Dockerfile.module
         image: energy-community-asset-simulator:latest
         environment:
             BIFROST_URL: 'http://bifrost-core:9091'
