@@ -2,12 +2,10 @@
 
 This module simulates all assets of the Energy Community (EC) tackled in the PoC1 use cases of the OpenSwarm project.
 
-This module Reads in data from ```./data/csv/profile-data.csv``` and adds the load/ev/chp/bat data to the buildings depending on their stackable for the ```POWERGRID-CONNECTOR```.
-    - PV data requires ```SOLAR-PANEL```
-    - EV data ```CHARGING-POLE```
-    - Household Battery data requires ```HOUSEHOLD-BATTERY```
-    - CHP data requires ```CHP-STACK```
-      If the EV should not charge, set the ```POWERED``` dynamic of the ```CHARGING-POLE``` to false
+This module Reads in data from `./data/csv/profile-data.csv` and adds the PV or electro vehicle (EV) data to the buildings depending on their stackable for the `POWERGRID-CONNECTOR`. It also provides measurement data and limits for feeder line grid sensors.
+  - PV data requires `SOLAR-PANEL`
+  - EV data `CHARGING-POLE`
+  - Grid Sensor Measurements requires `GRID-SENSOR`
 
 ## Compile and run your module
 
