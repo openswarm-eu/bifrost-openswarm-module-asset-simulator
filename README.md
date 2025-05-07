@@ -103,4 +103,4 @@ There is a PowerShell script `releaseNewVersion.ps1` which does the above in one
 
 ## Current Version
 
-vX.Y.Z (see `release` branch. `vX.Y.Z-A` indicates a re-release of a version (mostly fixes), the flag `-A` can be ignored when docker images are used)
+v0.0.0
