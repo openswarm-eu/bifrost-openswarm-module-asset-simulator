@@ -296,6 +296,34 @@ dynamics:
     tags:
       - energyCommunityController
 
+  GRID-SENSOR-ASSIGNMENT:
+    domain: powergrid
+    name: Grid Sensor Assignment
+    description: The assignment of the grid sensor to a specific grid segment
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 'Unassigned'
+    pinnable: true
+    dataLabels:
+      - 'Grid Sensor Assignment'
+    chartType: TEXT
+    schema:
+      type: string
+      enum:
+        - S1
+        - S2
+        - S3
+        - S4
+        - S5
+        - S6
+        - S7
+        - S8
+        - S9
+        - Unassigned
+    tags:
+      - energyCommunityController
+  
   GRID-SENSOR-POWERMEASUREMENT:
     domain: powergrid
     name: Grid Sensor Power Measurement
@@ -332,4 +360,7 @@ dynamics:
     tags:
       - energyCommunityController
 
-mappings: {}
+mappings:
+
+  GRID-SENSOR-ASSIGNMENT:
+    - POWERGRID-CONNECTOR
