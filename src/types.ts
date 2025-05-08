@@ -32,7 +32,9 @@ export type solarSimulatorType = {
 }
 
 export type evChargerSimulatorType = {
-    chargingSlots : number
+    chargingSlots   : number
+    maxPowerPerSlot : number
+    shiftedEnergy   : number
 }
 
 export type gridSensorType = {

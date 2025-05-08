@@ -192,16 +192,18 @@ dynamics:
     defaultValue: 
       - 0
       - 0
+      - 0
     pinnable: false
     dataLabels: 
       - 'Power Demand'
       - 'Actual Power'
+      - 'Shifted Demand'
     chartType: LINE
     unit: kW
     schema:
       type: array
-      minItems: 2
-      maxItems: 2
+      minItems: 3
+      maxItems: 3
       items:
         type: number
     tags:

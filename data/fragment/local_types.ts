@@ -35,6 +35,7 @@ export const PV_SYSTEM_POWER_MAPPING = {
 }
 
 export const CHARGING_STATION_POWER_MAPPING = {
-    Power_Demand : 0,
-    Actual_Power : 1,
+    Power_Demand   : 0,
+    Actual_Power   : 1,
+    Shifted_Demand : 2,
 }

@@ -90,7 +90,9 @@ const logic = {
                             evApId    : "",
                             evMaxApId : "",
                             evCharger : {
-                                chargingSlots : 1
+                                chargingSlots   : 1,
+                                maxPowerPerSlot : 4,
+                                shiftedEnergy   : 0
                             }
                         }
                         
@@ -135,7 +137,7 @@ const logic = {
                         for (const parentId of pgcParentIds){
                             // identfiy Solar-Farms and set the scaleFactor for the solar system simulator to 5
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.SOLAR_FARM){
-                                localStorage[experimentId].byPGC[structureId].solarSystem.scaleFactor = 5
+                                localStorage[experimentId].byPGC[structureId].solarSystem.scaleFactor = 8
                             }
                             // identify EV-Station and set the scaleFactor for the EV-Charger simulator to 3
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.EV_STATION){
@@ -284,23 +286,48 @@ const logic = {
                     }
 
                     if(pStruct.evApId){
-                        let chgPowerResult = [0, 0]
-                        let chgPowerDemand = wData["EV"]
-                        let chgPowerActual  = chgPowerDemand
+                        let chgPowerResult  = [0, 0]
+                        let chgPowerDemand  = 0
+                        let chgPowerActual  = 0
+                        let chgPowerShifted = 0
+                        let chgPowerLimit   = 0
 
                         // calculate the charging power of each of the charging slots
                         for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
-                            chgPowerDemand += wData["EV"]
-                        }
-                        // check if the resulting charging power is higher than the max power of the charging station
-                        if (chgPowerDemand > dynamicsById[pStruct.evMaxApId]){
-                            chgPowerActual = dynamicsById[pStruct.evMaxApId]
-                        } else {
-                            chgPowerActual = chgPowerDemand
+                            chgPowerDemand  += wData["EV"]
+                            chgPowerShifted += wData["EV"]
+                            chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
                         }
 
-                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand] = chgPowerDemand
-                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power] = chgPowerActual
+                        if (pStruct.evCharger.shiftedEnergy > 0){
+                            let newChgPower = chgPowerShifted + pStruct.evCharger.shiftedEnergy
+                            if (newChgPower > chgPowerLimit){
+                                newChgPower = chgPowerLimit
+                            } 
+
+                            pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
+                            chgPowerShifted = newChgPower
+
+                        }
+                        // check if the resulting charging power is higher than the max power of the charging station
+                        let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
+                        if (chgPowerShifted > chgPowerSetPoint){
+                            chgPowerActual = chgPowerSetPoint
+                            pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
+                        } else {
+                            chgPowerActual = chgPowerShifted
+                        }
+
+                        // if (pStruct.evCharger.shiftedEnergy > 0){
+                        //     if ((chgPowerActual === 0) && (chgPowerDemand === 0)){
+                        //         pStruct.evCharger.shiftedEnergy = 0
+                        //     }
+                        // }
+
+
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand]   = chgPowerDemand
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]   = chgPowerActual
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
                         result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                         sumLoad += chgPowerActual
                     }
