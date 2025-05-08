@@ -246,7 +246,7 @@ const logic = {
                     let sumLoad = 0
 
                     if(pStruct.pvApId){
-                        let pvInfeed = wData["PV-"+SW]/1000
+                        let pvInfeed = wData["PV-"+SW]
                         if (-pvInfeed <= dynamicsById[pStruct.pvMaxApId]){
                             result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, -pvInfeed]]})
                         } else {
