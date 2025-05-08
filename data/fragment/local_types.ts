@@ -1,5 +1,7 @@
 export const TYPEID_LOCAL = {
     // Structures
+    SOLAR_FARM                   : "SOLAR-FARM",
+    EV_STATION                   : "EV-STATION",
     CHARGING_POLE                : "CHARGING-POLE",
     SOLAR_PANEL                  : "SOLAR-PANEL",
     GRID_SENSOR                  : "GRID-SENSOR",
@@ -25,4 +27,14 @@ export const enum sensorNames {
     S8       = "S8",
     S9       = "S9",
     INACTIVE = "Inactive",
+}
+
+export const PV_SYSTEM_POWER_MAPPING = {
+    Infeed_Potential : 0,
+    Actual_Infeed    : 1,   
+}
+
+export const CHARGING_STATION_POWER_MAPPING = {
+    Power_Demand : 0,
+    Actual_Power : 1,
 }

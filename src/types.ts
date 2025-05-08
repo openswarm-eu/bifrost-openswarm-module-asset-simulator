@@ -17,12 +17,22 @@ export const TYPEID = {
 
 export type powerGridConnectorType = {
     [Key: string]:{
-        pgcApId   : string
-        pvApId    : string
-        pvMaxApId : string
-        evApId    : string
-        evMaxApId : string
+        pgcApId     : string
+        pvApId      : string
+        pvMaxApId   : string
+        solarSystem : solarSimulatorType
+        evApId      : string
+        evMaxApId   : string
+        evCharger   : evChargerSimulatorType
     }
+}
+
+export type solarSimulatorType = {
+    scaleFactor : number
+}
+
+export type evChargerSimulatorType = {
+    chargingSlots : number
 }
 
 export type gridSensorType = {
