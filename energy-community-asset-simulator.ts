@@ -15,6 +15,8 @@ import  {
         } from './src/types.js'
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
+    CHARGING_STATION_POWER_MAPPING,
+    PV_SYSTEM_POWER_MAPPING,
     sensorNames, 
     TYPEID_LOCAL 
         } from './data/fragment/local_types.js'
@@ -74,7 +76,76 @@ const logic = {
             for (const structureId of state.structures.ids){
                 const entity = state.structures.entities[structureId]
                 if(entity.experimentId === experimentId){
-                    
+                                    
+                    // get all needed information for the power grid connectors
+                    if(entity.typeId === TYPEID.PGC){
+                        localStorage[experimentId].allPGCs.push(structureId)
+                        localStorage[experimentId].byPGC[structureId] = {
+                            pgcApId   : "",
+                            pvApId    : "",
+                            pvMaxApId : "",
+                            solarSystem : {
+                                scaleFactor : 1
+                            },
+                            evApId    : "",
+                            evMaxApId : "",
+                            evCharger : {
+                                chargingSlots   : 1,
+                                maxPowerPerSlot : 4,
+                                shiftedEnergy   : 0
+                            }
+                        }
+                        
+                        // get apId of pgc
+                        const pgcDynIds:string[] = entity.dynamicIds
+                        for (const dynId of pgcDynIds){
+                            if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
+                                localStorage[experimentId].byPGC[structureId].pgcApId = dynId
+                            }
+                        }
+                        
+                        // got through the childs
+                        const pgcChildIds:string[] = entity.childIds
+                        for (const childId of pgcChildIds){
+                            const dynIds = state.structures.entities[childId]?.dynamicIds
+                            if (dynIds === undefined){
+                                continue
+                            }
+                            if (state.structures.entities[childId].typeId == TYPEID_LOCAL.SOLAR_PANEL){
+                                for (const dynId of dynIds){
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
+                                        localStorage[experimentId].byPGC[structureId].pvApId = dynId
+                                    }
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_MAX_POWER){
+                                        localStorage[experimentId].byPGC[structureId].pvMaxApId = dynId
+                                    }
+                                }
+                            } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.CHARGING_POLE){
+                                for (const dynId of dynIds){
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_POWER){
+                                        localStorage[experimentId].byPGC[structureId].evApId = dynId
+                                    }
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
+                                        localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
+                                    }
+                                }
+                            }
+                        }
+
+                        // go throught the parents
+                        const pgcParentIds:string[] = entity.parentIds
+                        for (const parentId of pgcParentIds){
+                            // identfiy Solar-Farms and set the scaleFactor for the solar system simulator to 5
+                            if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.SOLAR_FARM){
+                                localStorage[experimentId].byPGC[structureId].solarSystem.scaleFactor = 8
+                            }
+                            // identify EV-Station and set the scaleFactor for the EV-Charger simulator to 3
+                            if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.EV_STATION){
+                                localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = 3
+                            }
+                        }
+                    }
+
                     // get all needed information for the grid sensors
                     if(entity.typeId === TYPEID_LOCAL.GRID_SENSOR){
                         localStorage[experimentId].allGridSensors.push(structureId)
@@ -153,52 +224,6 @@ const logic = {
                             }
                         }
                     }
-                    
-                    // get all needed information for the power grid connectors
-                    if(entity.typeId === TYPEID.PGC){
-                        localStorage[experimentId].allPGCs.push(structureId)
-                        localStorage[experimentId].byPGC[structureId] = {
-                            pgcApId   : "",
-                            pvApId    : "",
-                            pvMaxApId : "",
-                            evApId    : "",
-                            evMaxApId : ""
-                        }
-                        // get apId of pgc
-                        const pgcDynIds:string[] = entity.dynamicIds
-                        for (const dynId of pgcDynIds){
-                            if (state.dynamics.entities[dynId].typeId == TYPEID.ACTIVE_POWER){
-                                localStorage[experimentId].byPGC[structureId].pgcApId = dynId
-                            }
-                        }
-                        // get childIds
-                        const pgcChildIds:string[] = entity.childIds
-                        for (const childId of pgcChildIds){
-                            const dynIds = state.structures.entities[childId]?.dynamicIds
-                            if (dynIds === undefined){
-                                continue
-                            }
-                            if (state.structures.entities[childId].typeId == TYPEID_LOCAL.SOLAR_PANEL){
-                                for (const dynId of dynIds){
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
-                                        localStorage[experimentId].byPGC[structureId].pvApId = dynId
-                                    }
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_MAX_POWER){
-                                        localStorage[experimentId].byPGC[structureId].pvMaxApId = dynId
-                                    }
-                                }
-                            }else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.CHARGING_POLE){
-                                for (const dynId of dynIds){
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_POWER){
-                                        localStorage[experimentId].byPGC[structureId].evApId = dynId
-                                    }
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
-                                        localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
         } catch (error) {
@@ -246,25 +271,65 @@ const logic = {
                     let sumLoad = 0
 
                     if(pStruct.pvApId){
-                        let pvInfeed = wData["PV-"+SW]/1000
-                        if (-pvInfeed <= dynamicsById[pStruct.pvMaxApId]){
-                            result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, -pvInfeed]]})
-                        } else {
-                            result.addSeries({dynamicId:pStruct.pvApId,values:[[-pvInfeed, dynamicsById[pStruct.pvMaxApId]]]})
-                            pvInfeed = -dynamicsById[pStruct.pvMaxApId]
+                        let pvInfeedResult    = [0, 0]
+                        let pvInfeedPotential = wData["PV-"+SW] * pStruct.solarSystem.scaleFactor
+                        let pvInfeedActual    = pvInfeedPotential
+    
+                        if (-pvInfeedPotential > dynamicsById[pStruct.pvMaxApId]){
+                            pvInfeedActual = -dynamicsById[pStruct.pvMaxApId]
                         }
-                        sumLoad += pvInfeed
+                        // write the values to the result DataFrame
+                        pvInfeedResult[PV_SYSTEM_POWER_MAPPING.Infeed_Potential] = -pvInfeedPotential
+                        pvInfeedResult[PV_SYSTEM_POWER_MAPPING.Actual_Infeed]    = -pvInfeedActual
+                        result.addSeries({dynamicId:pStruct.pvApId,values:[pvInfeedResult]})
+                        sumLoad += pvInfeedActual
                     }
 
                     if(pStruct.evApId){
-                        let chgPowerDemand = wData["EV"]
-                        if (chgPowerDemand <= dynamicsById[pStruct.evMaxApId]){
-                            result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], wData["EV"]]]})
-                        } else {
-                            result.addSeries({dynamicId:pStruct.evApId,values:[[wData["EV"], dynamicsById[pStruct.evMaxApId]]]})
-                            chgPowerDemand = dynamicsById[pStruct.evMaxApId]
+                        let chgPowerResult  = [0, 0]
+                        let chgPowerDemand  = 0
+                        let chgPowerActual  = 0
+                        let chgPowerShifted = 0
+                        let chgPowerLimit   = 0
+
+                        // calculate the charging power of each of the charging slots
+                        for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
+                            chgPowerDemand  += wData["EV"]
+                            chgPowerShifted += wData["EV"]
+                            chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
                         }
-                        sumLoad += chgPowerDemand
+
+                        if (pStruct.evCharger.shiftedEnergy > 0){
+                            let newChgPower = chgPowerShifted + pStruct.evCharger.shiftedEnergy
+                            if (newChgPower > chgPowerLimit){
+                                newChgPower = chgPowerLimit
+                            } 
+
+                            pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
+                            chgPowerShifted = newChgPower
+
+                        }
+                        // check if the resulting charging power is higher than the max power of the charging station
+                        let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
+                        if (chgPowerShifted > chgPowerSetPoint){
+                            chgPowerActual = chgPowerSetPoint
+                            pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
+                        } else {
+                            chgPowerActual = chgPowerShifted
+                        }
+
+                        // if (pStruct.evCharger.shiftedEnergy > 0){
+                        //     if ((chgPowerActual === 0) && (chgPowerDemand === 0)){
+                        //         pStruct.evCharger.shiftedEnergy = 0
+                        //     }
+                        // }
+
+
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand]   = chgPowerDemand
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]   = chgPowerActual
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
+                        result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
+                        sumLoad += chgPowerActual
                     }
                     
                     // calculate the resulting load value
