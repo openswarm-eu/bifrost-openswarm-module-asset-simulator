@@ -101,4 +101,4 @@ There is a PowerShell script `releaseNewVersion.ps1` which does the above in one
 
 ## Current Version
 
-v1.0.0-1
+v1.1.0
