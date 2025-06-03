@@ -39,7 +39,7 @@ structures:
                   '38_SBC_ev-station': 
                       position: [-0.8, 0.027, 0.9]
                       repeatX: 4
-  
+
   SOLAR-FARM: 
     domain: 'landscape'
     memberOf: ['buildings', 'generators']
@@ -73,7 +73,7 @@ structures:
       - 'base' 
       - 'lvgrid'
       - 'mvgrid'
-        
+
   SOLAR-PANEL: 
     domain: powergrid
     memberOf: 
@@ -107,7 +107,7 @@ structures:
         emissiveOnConnection: true
         category: ELECTRICAL
         sorting: 502
-  
+
   CHARGING-POLE:
     domain: powergrid
     memberOf:
@@ -160,6 +160,7 @@ structures:
       - GRID-SENSOR-NAME
       - GRID-SENSOR-POWERMEASUREMENT
       - GRID-SENSOR-POWERLIMIT
+      - GRID-SENSOR-ASSIGNMENT
     flavors:
       - 74_SBC_transceiver
     renderData:
@@ -178,7 +179,6 @@ structures:
       sorting: 502
     tags:
       - algo
-      
 
 dynamics: 
 
@@ -269,7 +269,7 @@ dynamics:
       type: number
     tags:
       - energyCommunityController
-  
+
   GRID-SENSOR-NAME:
     domain: powergrid
     name: Grid Sensor Name
@@ -325,7 +325,7 @@ dynamics:
         - Unassigned
     tags:
       - energyCommunityController
-  
+
   GRID-SENSOR-POWERMEASUREMENT:
     domain: powergrid
     name: Grid Sensor Power Measurement
