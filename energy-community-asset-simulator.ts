@@ -379,7 +379,7 @@ const m = new BifrostZeroModule({
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
         TYPEID_LOCAL.PV_SYSTEM_MAX_POWER
     ],
-    samplingRate   : 900,
+    samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 900,
     docURL         : '',
     moduleURL      : process.env.MODULE_URL  || 'http://localhost:1808',
     bifrostURL     : process.env.BIFROST_URL || 'http://localhost:9091',
