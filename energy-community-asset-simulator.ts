@@ -270,6 +270,11 @@ const logic = {
                     const pStruct = localStorage[experimentId].byPGC[pgcId]
                     let sumLoad = 0
 
+                    // add load power
+                    let loadPowerResult = wData["LD-"+SW]
+                    sumLoad += loadPowerResult
+                    
+                    // add PV power
                     if(pStruct.pvApId){
                         let pvInfeedResult    = [0, 0]
                         let pvInfeedPotential = wData["PV-"+SW] * pStruct.solarSystem.scaleFactor
@@ -285,6 +290,7 @@ const logic = {
                         sumLoad += pvInfeedActual
                     }
 
+                    // add EV charging power
                     if(pStruct.evApId){
                         let chgPowerResult  = [0, 0]
                         let chgPowerDemand  = 0
@@ -379,7 +385,7 @@ const m = new BifrostZeroModule({
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
         TYPEID_LOCAL.PV_SYSTEM_MAX_POWER
     ],
-    samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 900,
+    samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 60,
     docURL         : '',
     moduleURL      : process.env.MODULE_URL  || 'http://localhost:1808',
     bifrostURL     : process.env.BIFROST_URL || 'http://localhost:9091',
