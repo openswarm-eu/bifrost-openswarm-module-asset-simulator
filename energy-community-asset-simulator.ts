@@ -252,24 +252,55 @@ const logic = {
         }
         
         try {
-            //  time modulo so day repeats
-            const dataTime = (startAt + simulationAt) % 86400
-            const wData = csvData[dataTime]
-            
-            // check, if summer or winter
-            let SW = ""
-            if (startAt > 6739200 && startAt < 22809600){
-                SW = "S"
-            }else{
-                SW = "W"
-            }
-            
             // update asset values
             if (localStorage[experimentId].numberUpdate == 1){
+                let   wData = {};
+                //  time modulo so day repeats
+                const dataTime = (startAt + simulationAt) % 86400
+                // check if the dataTime is in the csvData
+                if (!csvData.hasOwnProperty(dataTime)) {
+                    // if not, make a linear interpolation
+                    const keys = Object.keys(csvData).map(Number).sort((a, b) => a - b);
+                    let lowerKey = keys[0];
+                    let upperKey = keys[keys.length - 1];
+                    for (let i = 0; i < keys.length; i++) {
+                        if (keys[i] <= dataTime) {
+                            lowerKey = keys[i];
+                        }
+                        if (keys[i] > dataTime) {
+                            upperKey = keys[i];
+                            break;
+                        }
+                    }
+                    if (lowerKey === undefined || upperKey === undefined) {
+                        context.log.write(`No data available for time ${dataTime}`, Log.level.WARNING);
+                        return result; // No data available for this time
+                    }
+                    // perform linear interpolation
+                    const lowerData = csvData[lowerKey];
+                    const upperData = csvData[upperKey];
+                    const interpolationFactor = (dataTime - lowerKey) / (upperKey - lowerKey);
+                    for (const key in lowerData) {
+                        if (lowerData.hasOwnProperty(key) && upperData.hasOwnProperty(key)) {
+                            wData[key] = lowerData[key] + interpolationFactor * (upperData[key] - lowerData[key]);
+                        }
+                    }
+                } else {
+                    wData = csvData[dataTime]
+                }
+                
+                // check, if summer or winter
+                let SW = ""
+                if (startAt > 6739200 && startAt < 22809600){
+                    SW = "S"
+                }else{
+                    SW = "W"
+                }
+                
                 for (const pgcId of localStorage[experimentId].allPGCs){
                     const pStruct = localStorage[experimentId].byPGC[pgcId]
                     let sumLoad = 0
-
+                    
                     // add load power
                     let loadPowerResult = wData["LD-"+SW]
                     sumLoad += loadPowerResult
