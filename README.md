@@ -99,6 +99,16 @@ Please stick to following procedure:
 
 There is a PowerShell script `releaseNewVersion.ps1` which does the above in one step. Use it with care!
 
+## OpenSwarm github Repository
+Here some commands which where used to mirror the code.siemens.com repository to the openswarm github repository:
+```sh
+git remote add openswarmgithub https://github.com/openswarm-eu/bifrost-openswarm-module-asset-simulator.git
+git push openswarmgithub main
+git push openswarmgithub release
+git push openswarmgithub v1.1.0
+git push openswarmgithub latest
+```
+
 ## Current Version
 
 v1.1.0-2
