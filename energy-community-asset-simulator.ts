@@ -151,7 +151,7 @@ const logic = {
                         localStorage[experimentId].allGridSensors.push(structureId)
                         localStorage[experimentId].byGridSensor[structureId] = {
                             nameId             : "",
-                            isActive           : false,
+                            isActive           : true,
                             nodeVoltageId      : "",
                             cableCurrentId     : "",
                             powerMeasurementId : "",
@@ -162,17 +162,9 @@ const logic = {
                         for (const dynId of gridDynIds){
                             if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_NAME){
                                 localStorage[experimentId].byGridSensor[structureId].nameId = dynId
-                                // get the value of the sensor name
-                                const sensorName = state.values.entities[dynId].value
-                                // when sensor name is "Inactive" then set isActive to false
-                                if (sensorName == sensorNames.INACTIVE){
-                                    localStorage[experimentId].byGridSensor[structureId].isActive = false
-                                } else { 
-                                    localStorage[experimentId].byGridSensor[structureId].isActive = true
-                                }
-                            }else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERMEASUREMENT){
+                            } else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERMEASUREMENT){
                                 localStorage[experimentId].byGridSensor[structureId].powerMeasurementId = dynId
-                            }else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERLIMIT){
+                            } else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERLIMIT){
                                 localStorage[experimentId].byGridSensor[structureId].powerLimitId = dynId
                             }
                         }
@@ -310,7 +302,7 @@ const logic = {
                         let pvInfeedResult    = [0, 0]
                         let pvInfeedPotential = wData["PV-"+SW] * pStruct.solarSystem.scaleFactor
                         let pvInfeedActual    = pvInfeedPotential
-    
+                        
                         if (-pvInfeedPotential > dynamicsById[pStruct.pvMaxApId]){
                             pvInfeedActual = -dynamicsById[pStruct.pvMaxApId]
                         }
@@ -344,7 +336,7 @@ const logic = {
 
                             pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
                             chgPowerShifted = newChgPower
-
+                        
                         }
                         // check if the resulting charging power is higher than the max power of the charging station
                         let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
@@ -379,7 +371,21 @@ const logic = {
             if (localStorage[experimentId].numberUpdate == 2){
                 for (const sensorId of localStorage[experimentId].allGridSensors){
                     const sStruct = localStorage[experimentId].byGridSensor[sensorId]
-                    if (sStruct.isActive){
+                    
+                    // if sensor is conected to more than 2 cables, then skip this sensor
+                    if (!sStruct.isActive){
+                        // set the sensor name to "Inactive"
+                        result.addSeries({dynamicId:sStruct.nameId,values:[sensorNames.INACTIVE]})
+                        result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[0]})
+                        continue
+                    }
+                    
+                    // get the value of the sensor name
+                    const sensorName = dynamicsById[sStruct.nameId]
+                    if (sensorName == sensorNames.INACTIVE){
+                        result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[0]})
+                        continue
+                    } else { 
                         const nodeVoltage = dynamicsById[sStruct.nodeVoltageId]
                         const cableCurrent = dynamicsById[sStruct.cableCurrentId]
                         const powerLimit = dynamicsById[sStruct.powerLimitId]
@@ -414,7 +420,8 @@ const m = new BifrostZeroModule({
         TYPEID.VOLTAGE,
         TYPEID.CURRENT,
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
-        TYPEID_LOCAL.PV_SYSTEM_MAX_POWER
+        TYPEID_LOCAL.PV_SYSTEM_MAX_POWER,
+        TYPEID_LOCAL.GRID_SENSOR_NAME
     ],
     samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 60,
     docURL         : '',
