@@ -427,7 +427,7 @@ const m = new BifrostZeroModule({
     docURL         : '',
     moduleURL      : process.env.MODULE_URL  || 'http://localhost:1808',
     bifrostURL     : process.env.BIFROST_URL || 'http://localhost:9091',
-    hook           : [100, 910]
+    hook           : process.env.HOOK ? JSON.parse(process.env.HOOK) : [100, 910]
 })
 
 const csvFilePath = 'data/csv/profile-data.csv';
