@@ -17,6 +17,7 @@ import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
     CHARGING_STATION_POWER_MAPPING,
     PV_SYSTEM_POWER_MAPPING,
+    sensorDirections,
     sensorNames, 
     TYPEID_LOCAL 
         } from './data/fragment/local_types.js'
@@ -159,18 +160,22 @@ const logic = {
                     if(entity.typeId === TYPEID_LOCAL.GRID_SENSOR){
                         localStorage[experimentId].allGridSensors.push(structureId)
                         localStorage[experimentId].byGridSensor[structureId] = {
-                            nameId             : "",
-                            isActive           : true,
-                            nodeVoltageId      : "",
-                            cableCurrentId     : "",
-                            powerMeasurementId : "",
-                            powerLimitId       : ""
+                            nameId               : "",
+                            isActive             : true,
+                            nodeVoltageId        : "",
+                            cableCurrentId       : "",
+                            cablePowerId         : "",
+                            powerFlowDirectionId : "",
+                            powerMeasurementId   : "",
+                            powerLimitId         : ""
                         }
                         // get the sensor dynamicIds
                         const gridDynIds:string[] = entity.dynamicIds
                         for (const dynId of gridDynIds){
                             if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_NAME){
                                 localStorage[experimentId].byGridSensor[structureId].nameId = dynId
+                            } else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_DIRECTION){
+                                localStorage[experimentId].byGridSensor[structureId].powerFlowDirectionId = dynId
                             } else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERMEASUREMENT){
                                 localStorage[experimentId].byGridSensor[structureId].powerMeasurementId = dynId
                             } else if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.GRID_SENSOR_POWERLIMIT){
@@ -218,6 +223,8 @@ const logic = {
                                         for (const cableDynId of cableDynIds){
                                             if (state.dynamics.entities[cableDynId].typeId == TYPEID.CURRENT){
                                                 localStorage[experimentId].byGridSensor[structureId].cableCurrentId = cableDynId
+                                            } else if (state.dynamics.entities[cableDynId].typeId == TYPEID.CABLE_POWER){
+                                                localStorage[experimentId].byGridSensor[structureId].cablePowerId = cableDynId
                                             }
                                         }
                                     }
@@ -356,13 +363,6 @@ const logic = {
                             chgPowerActual = chgPowerShifted
                         }
 
-                        // if (pStruct.evCharger.shiftedEnergy > 0){
-                        //     if ((chgPowerActual === 0) && (chgPowerDemand === 0)){
-                        //         pStruct.evCharger.shiftedEnergy = 0
-                        //     }
-                        // }
-
-
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand]   = chgPowerDemand
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]   = chgPowerActual
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
@@ -398,12 +398,20 @@ const logic = {
                         const nodeVoltage = dynamicsById[sStruct.nodeVoltageId]
                         const cableCurrent = dynamicsById[sStruct.cableCurrentId]
                         const powerLimit = dynamicsById[sStruct.powerLimitId]
+                        const cablePower = dynamicsById[sStruct.cablePowerId]
+                        
+                        // get the power flow scaling factor, which is -1 if powerFlowDirection is "DOWN" and 1 if it is "UP"
+                        const powerFlowDirection = dynamicsById[sStruct.powerFlowDirectionId]
+                        let powerFlowScalingFactor = 1
+                        if (powerFlowDirection === sensorDirections.DOWN){ 
+                            powerFlowScalingFactor = -1
+                        }
                         
                         // calculate the power value 
-                        const measuredPower = (
-                                            nodeVoltage[0] * cableCurrent[0] + 
-                                            nodeVoltage[1] * cableCurrent[1] + 
-                                            nodeVoltage[2] * cableCurrent[2]   ) / 1000
+                        const measuredPower = powerFlowScalingFactor * (
+                                            cablePower[0] + 
+                                            cablePower[1] + 
+                                            cablePower[2] ) / 3
                         // write the sensor value
                         result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[measuredPower]})
                     } 
@@ -428,8 +436,10 @@ const m = new BifrostZeroModule({
     subscriptions  : [
         TYPEID.VOLTAGE,
         TYPEID.CURRENT,
+        TYPEID.CABLE_POWER,
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
         TYPEID_LOCAL.PV_SYSTEM_MAX_POWER,
+        TYPEID_LOCAL.GRID_SENSOR_DIRECTION,
         TYPEID_LOCAL.GRID_SENSOR_NAME
     ],
     samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 60,

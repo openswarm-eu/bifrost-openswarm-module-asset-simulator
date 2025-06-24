@@ -13,6 +13,7 @@ export const TYPEID = {
     CURRENT        : "CURRENT-3P",
     ACTIVE_POWER   : "ACTIVE-POWER-3P",
     POWERED        : "POWERED",
+    CABLE_POWER    : "CABLE-POWER-3PF"
 }
 
 export type powerGridConnectorType = {
@@ -44,12 +45,14 @@ export type evChargerSimulatorType = {
 
 export type gridSensorType = {
     [Key: string]:{
-        nameId             : string
-        isActive           : boolean
-        nodeVoltageId      : string
-        cableCurrentId     : string
-        powerMeasurementId : string
-        powerLimitId       : string
+        nameId               : string
+        isActive             : boolean
+        nodeVoltageId        : string
+        cableCurrentId       : string
+        cablePowerId         : string
+        powerFlowDirectionId : string
+        powerMeasurementId   : string
+        powerLimitId         : string
     }
 }
 

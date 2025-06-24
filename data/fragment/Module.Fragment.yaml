@@ -161,6 +161,7 @@ structures:
       - GRID-SENSOR-POWERMEASUREMENT
       - GRID-SENSOR-POWERLIMIT
       - GRID-SENSOR-ASSIGNMENT
+      - GRID-SENSOR-FLOW-DIRECTION
     flavors:
       - 74_SBC_transceiver
     renderData:
@@ -359,6 +360,26 @@ dynamics:
     unit: kW
     schema:
       type: number
+    tags:
+      - energyCommunityController
+
+  GRID-SENSOR-FLOW-DIRECTION:
+    domain: powergrid
+    name: Grid Sensor Flow Direction
+    description: The direction of the measured power flow by the grid sensor
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 'UP'
+    pinnable: true
+    dataLabels:
+      - 'Flow Direction'
+    chartType: TEXT
+    schema:
+      type: string
+      enum:
+        - UP
+        - DOWN
     tags:
       - energyCommunityController
 
