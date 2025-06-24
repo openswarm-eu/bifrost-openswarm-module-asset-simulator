@@ -162,8 +162,6 @@ const logic = {
                         localStorage[experimentId].byGridSensor[structureId] = {
                             nameId               : "",
                             isActive             : true,
-                            nodeVoltageId        : "",
-                            cableCurrentId       : "",
                             cablePowerId         : "",
                             powerFlowDirectionId : "",
                             powerMeasurementId   : "",
@@ -187,13 +185,6 @@ const logic = {
                         for (const parentId of parentIds){
                             if (state.structures.entities[parentId].typeId == TYPEID.NODE){
                                 const nodeEntity = state.structures.entities[parentId]
-                                const nodeDynIds:string[] = nodeEntity.dynamicIds
-                                for (const dynId of nodeDynIds){
-                                    // get the voltage id of the node
-                                    if (state.dynamics.entities[dynId].typeId == TYPEID.VOLTAGE){
-                                        localStorage[experimentId].byGridSensor[structureId].nodeVoltageId = dynId
-                                    }
-                                }
                                 // get the childs of the node
                                 const nodeChildIds:string[] = nodeEntity.childIds
                                 let cableCounter = 0
@@ -221,9 +212,7 @@ const logic = {
                                         const cableEntity = state.connections.entities[childId]
                                         const cableDynIds:string[] = cableEntity.dynamicIds
                                         for (const cableDynId of cableDynIds){
-                                            if (state.dynamics.entities[cableDynId].typeId == TYPEID.CURRENT){
-                                                localStorage[experimentId].byGridSensor[structureId].cableCurrentId = cableDynId
-                                            } else if (state.dynamics.entities[cableDynId].typeId == TYPEID.CABLE_POWER){
+                                            if (state.dynamics.entities[cableDynId].typeId == TYPEID.CABLE_POWER){
                                                 localStorage[experimentId].byGridSensor[structureId].cablePowerId = cableDynId
                                             }
                                         }
@@ -395,9 +384,6 @@ const logic = {
                         result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[0]})
                         continue
                     } else { 
-                        const nodeVoltage = dynamicsById[sStruct.nodeVoltageId]
-                        const cableCurrent = dynamicsById[sStruct.cableCurrentId]
-                        const powerLimit = dynamicsById[sStruct.powerLimitId]
                         const cablePower = dynamicsById[sStruct.cablePowerId]
                         
                         // get the power flow scaling factor, which is -1 if powerFlowDirection is "DOWN" and 1 if it is "UP"
@@ -434,8 +420,6 @@ const m = new BifrostZeroModule({
     updateCallback : logic.updateFn,
     fragmentFile   : './data/fragment/Module.Fragment.yaml',
     subscriptions  : [
-        TYPEID.VOLTAGE,
-        TYPEID.CURRENT,
         TYPEID.CABLE_POWER,
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
         TYPEID_LOCAL.PV_SYSTEM_MAX_POWER,

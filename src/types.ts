@@ -47,8 +47,6 @@ export type gridSensorType = {
     [Key: string]:{
         nameId               : string
         isActive             : boolean
-        nodeVoltageId        : string
-        cableCurrentId       : string
         cablePowerId         : string
         powerFlowDirectionId : string
         powerMeasurementId   : string
