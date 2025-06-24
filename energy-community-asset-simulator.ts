@@ -84,6 +84,9 @@ const logic = {
                             pgcApId   : "",
                             pvApId    : "",
                             pvMaxApId : "",
+                            load      : {
+                                scaleFactor : 1
+                            },
                             solarSystem : {
                                 scaleFactor : 1
                             },
@@ -135,13 +138,19 @@ const logic = {
                         // go throught the parents
                         const pgcParentIds:string[] = entity.parentIds
                         for (const parentId of pgcParentIds){
-                            // identfiy Solar-Farms and set the scaleFactor for the solar system simulator to 5
+                            // identfiy Solar-Farms
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.SOLAR_FARM){
+                                // set the scaleFactor for the solar system simulator to a higher value
                                 localStorage[experimentId].byPGC[structureId].solarSystem.scaleFactor = 8
+                                // switch off the load simulator for the solar farm
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
                             }
-                            // identify EV-Station and set the scaleFactor for the EV-Charger simulator to 3
+                            // identify EV-Station
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.EV_STATION){
+                                // set the scaleFactor for the EV-Charger simulator to a higher value
                                 localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = 3
+                                //switch off the load simulator for the EV-Station
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
                             }
                         }
                     }
@@ -294,7 +303,7 @@ const logic = {
                     let sumLoad = 0
                     
                     // add load power
-                    let loadPowerResult = wData["LD-"+SW]
+                    let loadPowerResult = wData["LD-"+SW] * pStruct.load.scaleFactor
                     sumLoad += loadPowerResult
                     
                     // add PV power

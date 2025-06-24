@@ -20,11 +20,16 @@ export type powerGridConnectorType = {
         pgcApId     : string
         pvApId      : string
         pvMaxApId   : string
+        load        : loadSimulatorType
         solarSystem : solarSimulatorType
         evApId      : string
         evMaxApId   : string
         evCharger   : evChargerSimulatorType
     }
+}
+
+export type loadSimulatorType = {
+    scaleFactor : number
 }
 
 export type solarSimulatorType = {
