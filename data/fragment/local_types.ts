@@ -14,6 +14,7 @@ export const TYPEID_LOCAL = {
     GRID_SENSOR_POWERMEASUREMENT : "GRID-SENSOR-POWERMEASUREMENT",
     GRID_SENSOR_POWERLIMIT       : "GRID-SENSOR-POWERLIMIT",
     GRID_SENSOR_NAME             : "GRID-SENSOR-NAME",
+    GRID_SENSOR_DIRECTION        : "GRID-SENSOR-FLOW-DIRECTION"
 }
 
 export const enum sensorNames {
@@ -27,6 +28,11 @@ export const enum sensorNames {
     S8       = "S8",
     S9       = "S9",
     INACTIVE = "Inactive",
+}
+
+export const enum sensorDirections {
+    UP   = "UP",
+    DOWN = "DOWN",
 }
 
 export const PV_SYSTEM_POWER_MAPPING = {
