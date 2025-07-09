@@ -105,7 +105,9 @@ Here some commands which where used to mirror the code.siemens.com repository to
 git remote add openswarmgithub https://github.com/openswarm-eu/bifrost-openswarm-module-asset-simulator.git
 git push openswarmgithub main
 git push openswarmgithub release
-git push openswarmgithub v1.1.0
+git push openswarmgithub :refs/tags/vX.Y.Z 
+git push openswarmgithub vX.Y.Z
+git push openswarmgithub :refs/tags/latest
 git push openswarmgithub latest
 ```
 
