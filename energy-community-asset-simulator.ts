@@ -153,6 +153,16 @@ const logic = {
                                 //switch off the load simulator for the EV-Station
                                 localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
                             }
+                            // is it a small house?
+                            if (state.structures.entities[parentId].typeId == TYPEID.SMALL_HOUSE){
+                                // set the scaleFactor for the load simulator
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 2
+                            }
+                            // is it a huge house?
+                            if (state.structures.entities[parentId].typeId == TYPEID.HUGE_HOUSE){
+                                // set the scaleFactor for the load simulator
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 10
+                            }
                         }
                     }
 
@@ -251,6 +261,8 @@ const logic = {
         try {
             // update asset values
             if (localStorage[experimentId].numberUpdate == 1){
+                // give as debug information the hook which is processed here
+                context.log.write(`Processing hook ${m.hook[localStorage[experimentId].numberUpdate-1]}`, Log.level.DEBUG)
                 let   wData = {};
                 //  time modulo so day repeats
                 const dataTime = (startAt + simulationAt) % 86400
@@ -367,6 +379,7 @@ const logic = {
             
             // update the grid sensor values
             if (localStorage[experimentId].numberUpdate == 2){
+                context.log.write(`Processing hook ${m.hook[localStorage[experimentId].numberUpdate-1]}`, Log.level.DEBUG)
                 for (const sensorId of localStorage[experimentId].allGridSensors){
                     const sStruct = localStorage[experimentId].byGridSensor[sensorId]
                     

@@ -6,6 +6,8 @@ export const TYPEID = {
     PGC 	       : "POWERGRID-CONNECTOR",
     CABLE          : "CABLE-UNDERGROUND-SD",
     NODE           : "POWERGRID-NODE",
+    HUGE_HOUSE     : "RESIDENTIAL-MULTI-LARGE",
+    SMALL_HOUSE    : "RESIDENTIAL-SINGLE",
 
     // Dynamics
     LOADING        : "LOADING",
