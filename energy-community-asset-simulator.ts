@@ -153,6 +153,16 @@ const logic = {
                                 //switch off the load simulator for the EV-Station
                                 localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
                             }
+                            // is it a small house?
+                            if (state.structures.entities[parentId].typeId == TYPEID.SMALL_HOUSE){
+                                // set the scaleFactor for the load simulator
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 2
+                            }
+                            // is it a huge house?
+                            if (state.structures.entities[parentId].typeId == TYPEID.HUGE_HOUSE){
+                                // set the scaleFactor for the load simulator
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 10
+                            }
                         }
                     }
 
