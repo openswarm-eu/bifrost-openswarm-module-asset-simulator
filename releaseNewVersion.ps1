@@ -13,6 +13,7 @@ if ($currentBranch -ne "main") {
 # Get the last commit message of 'main':
 $lastCommitMessage = git log -1 --pretty=format:%s
 
+# Step 2: Check if the 'release' branch is checked out and merge 'main' into it
 git checkout release
 $currentBranch = git rev-parse --abbrev-ref HEAD
 if ($currentBranch -ne "release") {
@@ -23,7 +24,7 @@ if ($currentBranch -ne "release") {
 git pull
 git merge main
 
-# Step 2: Increase version number and commit
+# Step 3: Increase version number and commit
 $readmePath = "README.md"
 $currentVersionPattern = "(?<=## Current Version\r?\n\r?\nv)(.+)"
 $readmeContent = Get-Content $readmePath -Raw
@@ -38,6 +39,10 @@ if ($versionParts.Length -gt 1) {
     $versionWithoutFlag = $version
     $flag = 0
 }
+
+# Get the tag message from the tag with the versionWithoutFlag
+$lastTagMessage = git tag -l --format='%(contents)' "v$versionWithoutFlag" | Out-String
+$lastTagMessage = $lastTagMessage.Trim()
 
 # Prompt the user to enter the new version number or hit Enter to keep the same version
 $newVersionWithoutFlag = Read-Host "Enter the new version number (current version: $versionWithoutFlag) [hit Enter to keep the same version]"
@@ -80,10 +85,21 @@ if (-not $isVersionDifferent) {
     }
 }
 
+if (-not $isVersionDifferent) {
+    # If the version is not different, use the last tag message as the default commit message
+    $defaulCommitMessage = $lastTagMessage
+    $messageSource = 'tag'
+}
+else {
+    # If the version is different, use the last commit message as the default commit message
+    $defaulCommitMessage = $lastCommitMessage
+    $messageSource = 'commit'
+}
+
 # Prompt the user to enter a custom tag message
-$customTagMessage = Read-Host "Enter a custom tag message [hit Enter to use the last commit message '$lastCommitMessage']"
+$customTagMessage = Read-Host "Enter a custom tag message [hit Enter to use the last $messageSource message '$defaulCommitMessage']"
 if ([string]::IsNullOrWhiteSpace($customTagMessage)) {
-    $tagMessage = $lastCommitMessage
+    $tagMessage = $defaulCommitMessage
     Write-Host "The tag message is '$tagMessage'."
 } else {
     $tagMessage = $customTagMessage
@@ -97,12 +113,11 @@ if (-not $isVersionDifferent) {
     $newVersion = $newVersionWithoutFlag
 }
 
-# Update the version number in the README file
+# Step 4: Update the version number in the README file
 $updatedReadmeContent = $readmeContent -replace $currentVersionPattern, $newVersion
 $streamWriter = [System.IO.StreamWriter]::new($readmePath, $false)
 $streamWriter.Write($updatedReadmeContent.Trim())
 $streamWriter.Close()
-
 git add $readmePath
 if (-not $isVersionDifferent) {
     git commit -m "FIX: re-release version (v$newVersion)"
@@ -110,7 +125,7 @@ if (-not $isVersionDifferent) {
     git commit -m "CHORE: release new version (v$newVersion)"
 }
 
-# Step 3: Tag commit and move 'latest' tag
+# Step 5: Tag commit and move 'latest' tag
 git tag -d latest
 git push origin :refs/tags/latest
 if (-not $isVersionDifferent) {
@@ -121,12 +136,12 @@ if (-not $isVersionDifferent) {
 git tag -a v$newVersionWithoutFlag -m "$tagMessage"
 git tag -a latest -m "Latest tagged version"
 
-# Step 4: Push commit and tag
+# Step 6: Push commit and tag
 git push
 git push origin v$newVersionWithoutFlag
 git push origin latest
 
-# Step 5: Switch back to the 'main' branch
+# Step 7: Switch back to the 'main' branch
 git checkout main
 
 Write-Host ""
