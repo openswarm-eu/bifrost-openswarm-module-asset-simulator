@@ -13,6 +13,7 @@ import  {
     localStorageType,
     TYPEID, 
         } from './src/types.js'
+import { config } from './src/config.js'
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
     CHARGING_STATION_POWER_MAPPING,
@@ -86,16 +87,16 @@ const logic = {
                             pvApId    : "",
                             pvMaxApId : "",
                             load      : {
-                                scaleFactor : 1
+                                scaleFactor : 1  // Default load scale factor
                             },
                             solarSystem : {
-                                scaleFactor : 1
+                                scaleFactor : 1  // Default solar scale factor
                             },
                             evApId    : "",
                             evMaxApId : "",
                             evCharger : {
-                                chargingSlots   : 1,
-                                maxPowerPerSlot : 4,
+                                chargingSlots   : 1,  // Default charging slots
+                                maxPowerPerSlot : 4,  // Default max power per slot in kW
                                 shiftedEnergy   : 0
                             }
                         }
@@ -142,26 +143,26 @@ const logic = {
                             // identfiy Solar-Farms
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.SOLAR_FARM){
                                 // set the scaleFactor for the solar system simulator to a higher value
-                                localStorage[experimentId].byPGC[structureId].solarSystem.scaleFactor = 8
+                                localStorage[experimentId].byPGC[structureId].solarSystem.scaleFactor = config.structureTypes.solarFarm.solarSystem.scaleFactor
                                 // switch off the load simulator for the solar farm
-                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.solarFarm.load.scaleFactor
                             }
                             // identify EV-Station
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.EV_STATION){
                                 // set the scaleFactor for the EV-Charger simulator to a higher value
-                                localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = 3
+                                localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = config.structureTypes.evStation.evCharger.chargingSlots
                                 //switch off the load simulator for the EV-Station
-                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.evStation.load.scaleFactor
                             }
                             // is it a small house?
                             if (state.structures.entities[parentId].typeId == TYPEID.SMALL_HOUSE){
                                 // set the scaleFactor for the load simulator
-                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 2
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.smallHouse.load.scaleFactor
                             }
                             // is it a huge house?
                             if (state.structures.entities[parentId].typeId == TYPEID.HUGE_HOUSE){
                                 // set the scaleFactor for the load simulator
-                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 10
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.hugeHouse.load.scaleFactor
                             }
                         }
                     }
@@ -300,7 +301,9 @@ const logic = {
                 
                 // check, if summer or winter
                 let SW = ""
-                if (startAt > 6739200 && startAt < 22809600){
+                const SUMMER_START = 6739200;   // ~March 21st in seconds
+                const SUMMER_END = 22809600;    // ~September 21st in seconds
+                if (startAt > SUMMER_START && startAt < SUMMER_END){
                     SW = "S"
                 }else{
                     SW = "W"
@@ -449,10 +452,10 @@ const m = new BifrostZeroModule({
 const csvFilePath = 'data/csv/profile-data.csv';
 readCSVtoDict(csvFilePath)
     .then(() => {
-        m.context.log.write("Data loaded");
+        m.context.log.write("CSV Data loaded!");
     })
     .catch((error) => {
-        m.context.log.write('Error reading CSV:', error);
+        m.context.log.write('Error reading CSV Data:', error);
     });
 
 m.start()

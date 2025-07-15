@@ -8,8 +8,9 @@ COPY tsconfig.json ./
 RUN npm install
 
 # copy module files
-COPY src/ ./src/
 COPY data/ ./data/
+COPY config/ ./config/
+COPY src/ ./src/
 COPY energy-community-asset-simulator.ts ./energy-community-asset-simulator.ts
 
 RUN npm run tsc

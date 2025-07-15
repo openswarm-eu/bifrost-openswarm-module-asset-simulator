@@ -1,0 +1,34 @@
+# Energy Community Asset Simulator Configuration
+# This file contains configurable parameters for different structure types
+
+# Structure-specific configurations override built-in defaults
+structureTypes:
+  solarFarm:
+    solarSystem:
+      # Higher scale factor for solar farms to simulate large installations
+      # 8x means 8 times the base solar generation from profile data
+      scaleFactor: 8
+    load:
+      # Solar farms have no load consumption (pure generation)
+      scaleFactor: 0
+  
+  evStation:
+    evCharger:
+      # EV stations typically have multiple charging slots
+      # 3 slots allows for multiple vehicles charging simultaneously
+      chargingSlots: 3
+    load:
+      # EV stations have no additional load beyond the charging itself
+      scaleFactor: 0
+  
+  smallHouse:
+    load:
+      # Small houses consume 2x the base load profile
+      # Represents typical single-family home consumption
+      scaleFactor: 2
+  
+  hugeHouse:
+    load:
+      # Large houses consume 10x the base load profile
+      # Represents large residential buildings or small commercial properties
+      scaleFactor: 10
