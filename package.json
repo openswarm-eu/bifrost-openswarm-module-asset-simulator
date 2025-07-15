@@ -4,12 +4,12 @@
     "description": "PV simulator for PoC1",
     "type": "module",
     "scripts": {
-        "start": "npm run tsc && cross-env NODE_ENV='production' HOOK='[100,200] node ./build/energy-community-asset-simulator.js",
-        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1810 HOOK='[100,200] NODE_ENV='production' node ./build/energy-community-asset-simulator.js",
+        "start": "npm run tsc && cross-env NODE_ENV='production' HOOK='[100,200]' node ./build/energy-community-asset-simulator.js",
+        "start:docker": "npm run tsc && cross-env MODULE_URL=http://host.docker.internal:1810 HOOK='[100,200]' NODE_ENV='production' node ./build/energy-community-asset-simulator.js",
         "module": "node ./build/energy-community-asset-simulator.js",
         "tsc": "tsc -p tsconfig.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "debug": "cross-env HOOK='[100,200] tsx ./energy-community-asset-simulator.ts",
+        "debug": "cross-env HOOK='[100,200]' tsx ./energy-community-asset-simulator.ts",
         "debug:docker": "cross-env MODULE_URL=http://host.docker.internal:1810 HOOK='[100,200]' tsx ./energy-community-asset-simulator.ts"
     },
     "main": "./build/energy-community-asset-simulator.js",
