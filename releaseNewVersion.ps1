@@ -12,7 +12,7 @@ if ($currentBranch -ne "main") {
 }
 # Get the last commit message of 'main':
 $lastCommitMessage = git log -1 --pretty=format:%s
-Check if the 'release' branch is checked out and merge 'main' into it
+# Check if the 'release' branch is checked out and merge 'main' into it
 git checkout release
 $currentBranch = git rev-parse --abbrev-ref HEAD
 if ($currentBranch -ne "release") {
