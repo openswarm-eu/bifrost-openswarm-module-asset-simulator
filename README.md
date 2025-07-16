@@ -7,6 +7,20 @@ This module Reads in data from `./data/csv/profile-data.csv` and adds the PV or 
   - EV data `CHARGING-POLE`
   - Grid Sensor Measurements requires `GRID-SENSOR`
 
+# EV-STATION
+To write data to this charging poles, the endpoint ```/rest/updateCars``` needs to be satisfied.
+```
+curl --request POST \
+  --url http://127.0.0.1:7032/rest/updateCars \
+  --header 'content-type: application/json' \
+  --data '{
+  "EV-STATION::[4|-2,4|-1,5|-2,5|-1]@EXPERIMENT::FwpXHh6o": [-1,-1,-1],
+  "expId": ["EXPERIMENT::qOPprfAn"]
+}'
+```
+Where the EV-STATION needs to be the full BIFROST id of your wanted EV-STATION and the list describes the car which
+is currently connected to the according slot. For example ```[1,-1,2]``` connects car 1 to slot 1 and car 2 to slot 3.
+
 ## Compile and run your module
 
 1. Install [Node.JS](https://nodejs.org/en) (tested with version 20.13.1, npm 10.5.2).
