@@ -18,19 +18,6 @@ export const TYPEID = {
     CABLE_POWER    : "CABLE-POWER-3PF"
 }
 
-export type powerGridConnectorType = {
-    [Key: string]:{
-        pgcApId     : string
-        pvApId      : string
-        pvMaxApId   : string
-        load        : loadSimulatorType
-        solarSystem : solarSimulatorType
-        evApId      : string
-        evMaxApId   : string
-        evCharger   : evChargerSimulatorType
-    }
-}
-
 export type loadSimulatorType = {
     scaleFactor : number
 }
@@ -43,6 +30,30 @@ export type evChargerSimulatorType = {
     chargingSlots   : number
     maxPowerPerSlot : number
     shiftedEnergy   : number
+}
+
+export type batterySimulatorType = {
+    chargePower    : number
+    dischargePower : number
+    capacity       : number
+}
+
+export type powerGridConnectorType = {
+    [Key: string]:{
+        pgcApId           : string
+        pvApId            : string
+        pvMaxApId         : string
+        load              : loadSimulatorType
+        solarSystem       : solarSimulatorType
+        evApId            : string
+        evMaxApId         : string
+        evCharger         : evChargerSimulatorType
+        batteryApId       : string
+        batteryMaxApId    : string
+        batterySoCId      : string
+        batteryCapacityId : string
+        batterySystem     : batterySimulatorType
+    }
 }
 
 export type gridSensorType = {
