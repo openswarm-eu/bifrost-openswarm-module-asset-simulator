@@ -15,6 +15,8 @@ import  {
         } from './src/types.js'
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
+    BATTERY_SYSTEM_POWER_MAPPING,
+    BATTERY_SYSTEM_MAX_POWER_MAPPING,
     CHARGING_STATION_POWER_MAPPING,
     PV_SYSTEM_POWER_MAPPING,
     sensorDirections,
@@ -97,7 +99,16 @@ const logic = {
                                 chargingSlots   : 1,
                                 maxPowerPerSlot : 4,
                                 shiftedEnergy   : 0
-                            }
+                            },
+                            batteryApId       : "",
+                            batteryMaxApId    : "",
+                            batterySoCId      : "",
+                            batteryCapacityId : "",
+                            batterySystem     : {
+                                chargePower    : 5,
+                                dischargePower : 5,
+                                capacity       : 10
+                            },
                         }
                         
                         // get apId of pgc
@@ -133,6 +144,21 @@ const logic = {
                                         localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
                                     }
                                 }
+                            } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){
+                                for (const dynId of dynIds){
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_POWER){
+                                        localStorage[experimentId].byPGC[structureId].batteryApId = dynId
+                                    }
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_MAX_POWER){
+                                        localStorage[experimentId].byPGC[structureId].batteryMaxApId = dynId
+                                    }
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_SOC){
+                                        localStorage[experimentId].byPGC[structureId].batterySoCId = dynId
+                                    }
+                                    if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_CAPACITY){
+                                        localStorage[experimentId].byPGC[structureId].batteryCapacityId = dynId
+                                    }
+                                }
                             }
                         }
 
@@ -151,6 +177,16 @@ const logic = {
                                 // set the scaleFactor for the EV-Charger simulator to a higher value
                                 localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = 3
                                 //switch off the load simulator for the EV-Station
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
+                            }
+                            // identify Battery-Station
+                            if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.BATTERY_STATION){
+                                // set the charge and discharge power and capacity to a higher value
+                                localStorage[experimentId].byPGC[structureId].batterySystem.chargePower = 10
+                                localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = 10
+                                localStorage[experimentId].byPGC[structureId].batterySystem.capacity = 40
+                                initResult.addSeries({dynamicId:localStorage[experimentId].byPGC[structureId].batteryCapacityId,values:[40]})
+                                // switch off the load simulator for the Battery-Station
                                 localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
                             }
                             // is it a small house?
@@ -370,6 +406,62 @@ const logic = {
                         result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                         sumLoad += chgPowerActual
                     }
+
+                    // add battery power
+                    if(pStruct.batteryApId){
+                        let batSocCurrent  = dynamicsById[pStruct.batterySoCId]
+                        let batCapacity    = dynamicsById[pStruct.batteryCapacityId]
+                        let batPowerLimit  = dynamicsById[pStruct.batteryMaxApId]
+                        let batPowerResult = [0, 0, 0]
+                        let batPowerActual = 0
+
+                        // calculate the possible charge and discharge power in the current simulation step based on the current SoC and capacity
+                        let batPossibleChargePowerSimulationStep = ( batCapacity * ( (100 - batSocCurrent) / 100 )) / ( m.samplingRate / 3600 )
+                        if (batPossibleChargePowerSimulationStep > pStruct.batterySystem.chargePower){
+                            batPossibleChargePowerSimulationStep = pStruct.batterySystem.chargePower
+                        }
+                        let batPossibleDischargePowerSimulationStep = ( batCapacity * ( batSocCurrent / 100 )) / (m.samplingRate / 3600)
+                        if (batPossibleDischargePowerSimulationStep > pStruct.batterySystem.dischargePower){
+                            batPossibleDischargePowerSimulationStep = pStruct.batterySystem.dischargePower
+                        }
+
+                        // perform the battery operation based on the given power limits (charge and discharge limits are added up, but it is assumed that one of them is zero.)
+                        // Examples: Battery should be charged with 2.5kW:    batPowerLimit = [2.5, 0]  --> results in batPowerActual = 2.5kW
+                        //           Battery should be discharged with 3.5kW: batPowerLimit = [0, -3.5] --> results in batPowerActual = -3.5kW
+                        // But if both limits are set, then the battery is charged or discharged with the resulting power, which is the sum of both limits.
+                        // Example: Battery gets the limits with 2.5kW to charge and 1.5kW to discharge: batPowerLimit = [2.5, -1.5] --> results in batPowerActual = 1kW
+                        batPowerActual = batPowerLimit[BATTERY_SYSTEM_MAX_POWER_MAPPING.Charge_Limit] + batPowerLimit[BATTERY_SYSTEM_MAX_POWER_MAPPING.Discharge_Limit]
+                        if ((batPowerActual > 0) && (batPowerActual > batPossibleChargePowerSimulationStep)){
+                                batPowerActual = batPossibleChargePowerSimulationStep
+                        } else if ((batPowerActual < 0) && (Math.abs(batPowerActual) > batPossibleDischargePowerSimulationStep)){
+                                batPowerActual = -batPossibleDischargePowerSimulationStep
+                        }
+                        batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Actual_Power] = batPowerActual
+                        // update the SoC based on the actual power and the capacity
+                        batSocCurrent += (batPowerActual / batCapacity) * (m.samplingRate / 3600) * 100
+                        // limit the SoC to 0-100%, should only be needed due to numerical errors in the calculations before
+                        if (batSocCurrent > 100){
+                            batSocCurrent = 100
+                        } else if (batSocCurrent < 0){
+                            batSocCurrent = 0
+                        }
+
+                        // again calculate the possible charge and discharge power, now for the next simulation step based on the altered SoC and capacity
+                        batPossibleChargePowerSimulationStep = ( batCapacity * ( (100 - batSocCurrent) / 100 )) / ( m.samplingRate / 3600 )
+                        if (batPossibleChargePowerSimulationStep > pStruct.batterySystem.chargePower){
+                            batPossibleChargePowerSimulationStep = pStruct.batterySystem.chargePower
+                        }
+                        batPossibleDischargePowerSimulationStep = ( batCapacity * ( batSocCurrent / 100 )) / (m.samplingRate / 3600)
+                        if (batPossibleDischargePowerSimulationStep > pStruct.batterySystem.dischargePower){
+                            batPossibleDischargePowerSimulationStep = pStruct.batterySystem.dischargePower
+                        }
+                        batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Charge_Potential] = batPossibleChargePowerSimulationStep
+                        batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Discharge_Potential] = -batPossibleDischargePowerSimulationStep
+
+                        result.addSeries({dynamicId:pStruct.batterySoCId,values:[batSocCurrent]})
+                        result.addSeries({dynamicId:pStruct.batteryApId,values:[batPowerResult]})
+                        sumLoad += batPowerActual
+                    }
                     
                     // calculate the resulting load value
                     const resultLoad = (sumLoad/3)
@@ -436,6 +528,9 @@ const m = new BifrostZeroModule({
         TYPEID.CABLE_POWER,
         TYPEID_LOCAL.CHGSTATION_MAX_POWER,
         TYPEID_LOCAL.PV_SYSTEM_MAX_POWER,
+        TYPEID_LOCAL.BATTERY_SOC,
+        TYPEID_LOCAL.BATTERY_CAPACITY,
+        TYPEID_LOCAL.BATTERY_MAX_POWER,
         TYPEID_LOCAL.GRID_SENSOR_DIRECTION,
         TYPEID_LOCAL.GRID_SENSOR_NAME
     ],

@@ -2,15 +2,21 @@ export const TYPEID_LOCAL = {
     // Structures
     SOLAR_FARM                   : "SOLAR-FARM",
     EV_STATION                   : "EV-STATION",
+    BATTERY_STATION              : "BATTERY-STATION",
     CHARGING_POLE                : "CHARGING-POLE",
     SOLAR_PANEL                  : "SOLAR-PANEL",
     GRID_SENSOR                  : "GRID-SENSOR",
+    BATTERY_SYSTEM               : "BATTERY-SYSTEM",
 
     // Dynamics
     CHGSTATION_POWER             : "CHGSTATION-POWER",
     CHGSTATION_MAX_POWER         : "CHGSTATION-MAX-POWER",
     PV_SYSTEM_POWER              : "PV-SYSTEM-POWER",
     PV_SYSTEM_MAX_POWER          : "PV-SYSTEM-MAX-POWER",
+    BATTERY_POWER                : "BATTERY-SYSTEM-POWER",
+    BATTERY_MAX_POWER            : "BATTERY-SYSTEM-MAX-POWER",
+    BATTERY_SOC                  : "BATTERY-SYSTEM-SOC",
+    BATTERY_CAPACITY             : "BATTERY-STORAGE-CAPACITY",
     GRID_SENSOR_POWERMEASUREMENT : "GRID-SENSOR-POWERMEASUREMENT",
     GRID_SENSOR_POWERLIMIT       : "GRID-SENSOR-POWERLIMIT",
     GRID_SENSOR_NAME             : "GRID-SENSOR-NAME",
@@ -44,4 +50,16 @@ export const CHARGING_STATION_POWER_MAPPING = {
     Power_Demand   : 0,
     Actual_Power   : 1,
     Shifted_Demand : 2,
+}
+
+export const BATTERY_SYSTEM_POWER_MAPPING = {
+    Charge_Potential    : 0,
+    Actual_Power        : 1,
+    Discharge_Potential : 2,
+    
+}
+
+export const BATTERY_SYSTEM_MAX_POWER_MAPPING = {
+    Charge_Limit    : 0,
+    Discharge_Limit : 1,
 }
