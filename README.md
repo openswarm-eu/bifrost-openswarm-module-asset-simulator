@@ -1,12 +1,15 @@
-# PoC1 EC Asset Simulation Module
+# Reality Twin EC Asset Simulation Module
 
-This module simulates all assets of the Energy Community (EC) tackled in the PoC1 use cases of the OpenSwarm project.
+Fork for BIFROST reality twin adoption of the OpenSwarm energy-community-asset-simulator (https://code.siemens.com/openswarm/energy-community-asset-simulator)
 
-This module Reads in data from `./data/csv/profile-data.csv` and adds the PV, battery system or electro vehicle (EV) data to the buildings depending on their stackable for the `POWERGRID-CONNECTOR`. It also provides measurement data and limits for feeder line grid sensors.
-  - PV data requires `SOLAR-PANEL`
-  - EV data `CHARGING-POLE`
-  - BATTERY system data `BATTERY-SYSTEM`
-  - Grid Sensor Measurements requires `GRID-SENSOR`
+To get the the latest changes you have to set an additional remote connection with
+```bash
+git remote add energy-community-asset-simulator git@code.siemens.com:openswarm/energy-community-asset-simulator.git
+```
+Pull the changes with
+```bash
+git pull energy-community-asset-simulator main
+```
 
 ## Compile and run your module
 
@@ -99,18 +102,6 @@ Please stick to following procedure:
     ```
 
 There is a PowerShell script `releaseNewVersion.ps1` which does the above in one step. Use it with care!
-
-## OpenSwarm github Repository
-Here some commands which where used to mirror the code.siemens.com repository to the openswarm github repository:
-```sh
-git remote add openswarmgithub https://github.com/openswarm-eu/bifrost-openswarm-module-asset-simulator.git
-git push openswarmgithub main
-git push openswarmgithub release
-git push openswarmgithub :refs/tags/vX.Y.Z 
-git push openswarmgithub vX.Y.Z
-git push openswarmgithub :refs/tags/latest
-git push openswarmgithub latest
-```
 
 ## Current Version
 
