@@ -10,6 +10,9 @@ import  {
     Log
         } from 'bifrost-zero-common'
 import  { 
+    CarAssignment,
+    CarAssignmentObject,
+    CarObj,
     localStorageType,
     TYPEID, 
         } from './src/types.js'
@@ -24,6 +27,7 @@ import  {
     sensorNames, 
     TYPEID_LOCAL 
         } from './data/fragment/local_types.js'
+import { updateDynamic } from './src/tools.js'
 import * as fs from 'fs'
 import csv from 'csv-parser'
 
@@ -56,6 +60,7 @@ async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> 
 
 const localStorage : localStorageType = {}
 const csvData: { [key: string]: any } = {};
+var carAssignmentObject:CarAssignmentObject = {}
 
 const logic = { 
 
@@ -75,7 +80,11 @@ const logic = {
             byPGC          : {},
             allGridSensors : [],
             byGridSensor   : {}
-        }	
+        }
+        // initialize struct for EV-STATIONS
+        if (carAssignmentObject[experimentId] == undefined){
+                carAssignmentObject[experimentId] = [] as CarAssignment
+            }
         try {
             for (const structureId of state.structures.ids){
                 const entity = state.structures.entities[structureId]
@@ -110,8 +119,31 @@ const logic = {
                                 dischargePower : 5,
                                 capacity       : 10
                             },
+                            parentBuildingId: ""
                         }
-                        
+                        // to get the ev-station key for the struct
+                        const parentBuildingId = state.structures.entities[structureId].parentIds[0]
+                        localStorage[experimentId].byPGC[structureId].parentBuildingId = parentBuildingId
+                        // init no cars if it is a EV-STATION
+                        if (state.structures.entities[parentBuildingId].typeId == TYPEID_LOCAL.EV_STATION){
+                            if (carAssignmentObject[experimentId][parentBuildingId] == undefined){
+                                let carObj:CarObj = {
+                                ecar_assignment_slots_number: 3,
+                                ecar_assignment_slots : [],
+                                pgc_id: structureId
+                                }
+                                // init occupation for all slots
+                                for(var i = 0; i < 3; i++){
+                                    carObj.ecar_assignment_slots.push({ecar_id: -1,
+                                                                    charge: 0,
+                                                                    charge_max:0,
+                                                                    shifted_energy: 0
+                                    })
+                                }
+                                carAssignmentObject[experimentId][parentBuildingId] = carObj
+                            }
+                        }
+
                         // get apId of pgc
                         const pgcDynIds:string[] = entity.dynamicIds
                         for (const dynId of pgcDynIds){
@@ -376,14 +408,33 @@ const logic = {
                         let chgPowerActual  = 0
                         let chgPowerShifted = 0
                         let chgPowerLimit   = 0
-
-                        // calculate the charging power of each of the charging slots
-                        for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
-                            chgPowerDemand  += wData["EV"]
-                            chgPowerShifted += wData["EV"]
-                            chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
+                        let carStats = config.structureTypes.evStation.carStats
+                        const chgPowerList: number[] = []
+                        // check if ev-station is in the struct from the mc
+                        if (Object.keys(carAssignmentObject[experimentId]).includes(pStruct.parentBuildingId)){
+                            const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
+                            pStruct.evCharger.chargingSlots = carObj.ecar_assignment_slots_number
+                            for (const carinSlot of carObj.ecar_assignment_slots){
+                                const carId = carinSlot.ecar_id
+                                let curCarPower = Number(carStats[carId].carPower)
+                                const curCarCharge = carinSlot.charge
+                                if (curCarCharge >= carinSlot.charge_max){
+                                    curCarPower = 0
+                                }
+                                chgPowerList.push(curCarPower)
+                                chgPowerDemand  += curCarPower
+                                chgPowerShifted += curCarPower
+                                chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
+                            }
+                        }else{
+                            // calculate the charging power of each of the charging slots for non-ev-stations
+                            for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
+                                chgPowerDemand  += wData["EV"]
+                                chgPowerShifted += wData["EV"]
+                                chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
+                            }
                         }
-
+                        
                         if (pStruct.evCharger.shiftedEnergy > 0){
                             let newChgPower = chgPowerShifted + pStruct.evCharger.shiftedEnergy
                             if (newChgPower > chgPowerLimit){
@@ -406,6 +457,21 @@ const logic = {
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand]   = chgPowerDemand
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]   = chgPowerActual
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
+                        // again, check if it was 
+                        if (Object.keys(carAssignmentObject[experimentId]).includes(pStruct.parentBuildingId)){
+                            const sumPower = chgPowerList.reduce((acc, current) => acc + current, 0)
+                            const partPower = chgPowerActual/sumPower || 1 
+                            const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
+                            // need to reduce the power which can be actually charged for the evcars
+                            // if partPower != 1 then it should be reduced
+                            for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
+                                const carId = carObj.ecar_assignment_slots[i].ecar_id
+                                let curCarPower = Number(carStats[carId].carPower)
+                                const chargedPower = curCarPower * partPower
+                                carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
+                                carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
+                            }
+                        }
                         result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                         sumLoad += chgPowerActual
                     }
@@ -539,10 +605,123 @@ const m = new BifrostZeroModule({
     ],
     samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 60,
     docURL         : '',
-    moduleURL      : process.env.MODULE_URL  || 'http://localhost:1808',
+    moduleURL      : process.env.MODULE_URL  || 'http://localhost:7032',
     bifrostURL     : process.env.BIFROST_URL || 'http://localhost:9091',
     hook           : process.env.HOOK ? JSON.parse(process.env.HOOK) : [100, 910]
 })
+
+
+// endpoints accessed by the mc modules
+m.app.post("/rest/updateCapacity", async (request, reply) => {
+    const body = request.body as object
+    try {
+            const storyId = body["storyId"]
+            const expId = body["experimentId"]
+            const dynId = body["dynamicId"]
+            const dynVal = parseFloat(body["dynamicValue"])
+            const bifrostURL = process.env.BIFROST_URL || 'http://localhost:9091'
+            const status = await updateDynamic(bifrostURL, storyId, expId, dynId, dynVal, m.context.log, Log)
+            reply.status(status).send(JSON.stringify({
+                message: "success"
+            }))
+    } catch (e) {
+        var msg = "Error parsing capacity update"
+        m.context.log.write(msg + e, Log.level.ERROR)
+        reply.status(400).send(JSON.stringify({
+                message: "fail"
+            }))
+    }
+   
+})
+
+// should not need file-writing, since everything is in one file/module anyway
+m.app.post("/rest/updateCars", (request, reply) => {
+            const body = request.body as object
+            // get key from object
+            const evStationId = Object.keys(body)[0]
+            const experimentId = body["expId"][0] as string
+            if (carAssignmentObject[experimentId] == undefined){
+                carAssignmentObject[experimentId] = [] as CarAssignment
+            }
+            m.context.log.write(`experimentId: ${body[evStationId]}`)
+            m.context.log.write(`/rest/updateCars for: ${evStationId}`)
+            m.context.log.write(`car occupation: ${body[evStationId]}`)
+            if(!body[evStationId]){
+                reply.status(200).send(JSON.stringify({
+                    message: "failure, malformed request"
+                }))
+                return
+            }
+            if(!Array.isArray(body[evStationId])){
+                reply.status(200).send(JSON.stringify({
+                    message: "failure, request is not an array"
+                }))
+                return
+            }
+            if(body[evStationId].length < 3){
+                reply.status(200).send(JSON.stringify({
+                    message: "failure, cannot access array content"
+                }))    
+                return
+            }
+            // remove carAssignment for same element, TODO: MAYBE CHANGE IT SO THAT WE CAN SAVE THE CURRENT SOC AND CHARGING STUFF 
+            // if (carAssignmentObject[experimentId].length){
+            //     for (var evStationKey in Object.keys(carAssignmentObject[experimentId])){
+            //         if (evStationKey === evStationId){
+            //             // remove this element from array carAssignment
+            //             delete carAssignmentObject[experimentId][evStationKey]
+            //         }
+            //     }
+            // }
+            const carObj = carAssignmentObject[experimentId][evStationId] as CarObj
+            let i = 0
+            for (const slot of carObj.ecar_assignment_slots){
+                // if the car in the slot changed, then reset charge
+                if( slot.ecar_id != body[evStationId][i]){
+                    slot.ecar_id = body[evStationId][i]
+                    slot.charge_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carMaxCap
+                    slot.charge = slot.charge_max*0.15
+                    // reset the shifted energy when it disconnects and also subtract it from the internal struct
+                    if(slot.ecar_id == -1){
+                        const pStruct = localStorage[experimentId].byPGC[carObj.pgc_id]
+                        pStruct.evCharger.shiftedEnergy -= slot.shifted_energy
+                        slot.shifted_energy = 0
+                    }
+                }
+                i += 1
+            }
+        //     let length = 3;
+        //     let carObj:CarObj = {
+        //         ecar_assignment_slots_number: 3,
+        //         ecar_assignment_slots : []
+        //     }
+        //    // register occupation for all slots
+        //     for(var i = 0; i < 3; i++){
+        //         carObj.ecar_assignment_slots.push({"ecar_id": parseInt(body[evStationId][i])})
+        //     }
+        //     if (carAssignmentObject[experimentId].length == 0){
+        //         carAssignmentObject[experimentId] = [carObj]
+        //     }else{
+        //         carAssignmentObject[experimentId][evStationId] = carObj
+        //     }
+        //     carObj["ecar_assignment_slots_number"] = length
+            // try{
+            //     m.context.log.write('writing')
+            //     fs.writeFileSync(`./data/ev_files/ecar_assignment_${experimentId}.json`, JSON.stringify(carAssignmentObject[experimentId]));
+            //     m.context.log.write(`car assignment for experiment ${experimentId} successfully written`)
+            // }catch(e){
+            //     m.context.log.write(e)
+            //     reply.status(200).send(JSON.stringify({
+            //         message: "failure, try and catch failure"
+            //     }))
+            //     return
+            // }
+            // Reply to the frontend
+            reply.status(200).send(JSON.stringify({
+                message: "success"
+            }))
+        });
+
 
 const csvFilePath = 'data/csv/profile-data.csv';
 readCSVtoDict(csvFilePath)
