@@ -16,8 +16,8 @@ build-module-release:
       --build-arg http_proxy=$CODE_PROXY 
       --build-arg https_proxy=$CODE_PROXY 
       --build-arg no_proxy=code.siemens.com,$CI_REGISTRY 
-      --destination $CI_REGISTRY/openswarm/energy-community-asset-simulator:$CI_COMMIT_TAG 
-      --destination $CI_REGISTRY/openswarm/energy-community-asset-simulator:latest
+      --destination $CI_REGISTRY/bifrost/bifrost-demos/reality-twin/realitytwinzero/reality-twin-zero-ec-asset-simulator:$CI_COMMIT_TAG 
+      --destination $CI_REGISTRY/bifrost/bifrost-demos/reality-twin/realitytwinzero/reality-twin-zero-ec-asset-simulator:latest
   tags:
     - DOCKER
   rules:
