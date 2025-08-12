@@ -17,6 +17,22 @@ export const TYPEID = {
     POWERED        : "POWERED",
     CABLE_POWER    : "CABLE-POWER-3PF"
 }
+export type CarAssignmentObject = { [Key: string]: CarAssignment }
+
+export type CarAssignment = [CarObj] | []
+
+export type CarObj = {
+    ecar_assignment_slots_number: number,
+    ecar_assignment_slots : assignmentSlots[],
+    pgc_id: string
+}
+
+export type assignmentSlots = {
+    ecar_id: number
+    charge: number
+    charge_max: number
+    shifted_energy: number
+}
 
 export type loadSimulatorType = {
     scaleFactor : number
@@ -48,6 +64,7 @@ export type powerGridConnectorType = {
         evApId            : string
         evMaxApId         : string
         evCharger         : evChargerSimulatorType
+        parentBuildingId  : string
         batteryApId       : string
         batteryMaxApId    : string
         batterySoCId      : string

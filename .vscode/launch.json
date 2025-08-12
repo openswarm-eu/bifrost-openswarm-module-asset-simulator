@@ -22,7 +22,7 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "MODULE_URL": "http://localhost:1808",
+                "MODULE_URL": "http://localhost:7032",
                 "BIFROST_URL": "http://localhost:9091"
             }
         },
@@ -35,7 +35,7 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "MODULE_URL": "http://host.docker.internal:1808",
+                "MODULE_URL": "http://host.docker.internal:7032",
                 "BIFROST_URL": "http://127.0.0.1:9091"
             }
         },
@@ -48,7 +48,7 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "MODULE_URL": "http://host.docker.internal:1808",
+                "MODULE_URL": "http://host.docker.internal:7032",
                 "BIFROST_URL": "http://127.0.0.1:9091"
             }
         },

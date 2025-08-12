@@ -21,6 +21,12 @@ export interface AssetConfig {
             load: {
                 scaleFactor: number;
             };
+            carStats: {
+                [key: string]: {
+                    carPower: number,
+                    carMaxCap: number
+                }
+            }
         };
         smallHouse: {
             load: {
@@ -55,6 +61,48 @@ export const defaultConfig: AssetConfig = {
             },
             load: {
                 scaleFactor: 0
+            },
+            carStats: {
+                "-1": {
+                    carPower:0,
+                    carMaxCap:0
+                },
+                "0": {
+                    carPower:1,
+                    carMaxCap:10
+                },
+                "1": {
+                    carPower:2,
+                    carMaxCap:20
+                },
+                "2": {
+                    carPower:3,
+                    carMaxCap:30
+                },
+                "3": {
+                    carPower:4,
+                    carMaxCap:40
+                },
+                "4": {
+                    carPower:5,
+                    carMaxCap:50
+                },
+                "5": {
+                    carPower:6,
+                    carMaxCap:60
+                },
+                "6": {
+                    carPower:7,
+                    carMaxCap:70
+                },
+                "7": {
+                    carPower:8,
+                    carMaxCap:80
+                },
+                "8": {
+                    carPower:9,
+                    carMaxCap:90
+                },
             }
         },
         smallHouse: {
