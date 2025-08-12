@@ -13,15 +13,15 @@ structures:
     replace: false
     defaultPairing: []
     requiredPairing: ['POWERGRID-CONNECTOR', 'CHARGING-POLE']
-    forbiddenPairing: []
+    forbiddenPairing: ['SOLAR-PANEL', 'BATTERY-SYSTEM']
     dynamics: []
     flavors: ['38_SBC_ev-station']
     renderData: 
       file: 'buildings/'
       image: 
-          base: 'objects/inactive/buildings/'
-          hover: 'objects/active/buildings/'
-          active: 'objects/active/buildings/'
+        base: 'objects/inactive/buildings/'
+        hover: 'objects/active/buildings/'
+        active: 'objects/active/buildings/'
       rotationY: 0.75
       scale: 'default'
       hideInPanel: false
@@ -31,14 +31,14 @@ structures:
       showPlaceholder: true
       geoObject: true
       widgetPosition: 
-          '38_SBC_ev-station': [-0.7, 0.5, 0]
+        '38_SBC_ev-station': [-0.7, 0.5, 0]
       decorators: 
-          'SOLAR-PANEL': 
-              link: 'buildings/47_SBC_solar-panel'
-              flavors: 
-                  '38_SBC_ev-station': 
-                      position: [-0.8, 0.027, 0.9]
-                      repeatX: 4
+        'SOLAR-PANEL': 
+          link: 'buildings/47_SBC_solar-panel'
+          flavors: 
+            '38_SBC_ev-station': 
+              position: [-0.8, 0.027, 0.9]
+              repeatX: 4
 
   SOLAR-FARM: 
     domain: 'landscape'
@@ -50,9 +50,42 @@ structures:
     replace: false
     defaultPairing: []
     requiredPairing: ['POWERGRID-CONNECTOR', 'SOLAR-PANEL']
-    forbiddenPairing: []
+    forbiddenPairing: ['CHARGING-POLE', 'BATTERY-SYSTEM']
     dynamics: []
     flavors: ['68_SBC_powergrid']
+    renderData: 
+      file: 'buildings/'
+      image: 
+        base: 'objects/inactive/buildings/'
+        hover: 'objects/active/buildings/'
+        active: 'objects/active/buildings/'
+      rotationY: 0.75
+      scale: 'default'
+      hideInPanel: false
+      category: 'ELECTRICAL'
+      sorting: 204
+      nightmode: true
+      geoObject: true
+      widgetPosition: 
+        '68_SBC_powergrid': [0, 0.5, 0.3]
+      showPlaceholder: true
+    tags: 
+      - 'base' 
+      - 'lvgrid'
+
+  BATTERY-STATION: 
+    domain: 'landscape'
+    memberOf: ['buildings', 'storage']
+    placeOn: ['canvas']
+    name: 'Battery Station'
+    description: ''
+    size: 4
+    replace: false
+    defaultPairing: []
+    requiredPairing: ['POWERGRID-CONNECTOR', 'BATTERY-SYSTEM']
+    forbiddenPairing: ['CHARGING-POLE', 'SOLAR-PANEL']
+    dynamics: []
+    flavors: ['41_SBC_commercial-storage-small']
     renderData: 
         file: 'buildings/'
         image: 
@@ -63,16 +96,15 @@ structures:
         scale: 'default'
         hideInPanel: false
         category: 'ELECTRICAL'
-        sorting: 204
+        sorting: 302
         nightmode: true
         geoObject: true
         widgetPosition: 
-            '68_SBC_powergrid': [0, 0.5, 0.3]
+            '41_SBC_commercial-storage-small': [0.5, 0.5, -0.5]
         showPlaceholder: true
     tags: 
       - 'base' 
       - 'lvgrid'
-      - 'mvgrid'
 
   SOLAR-PANEL: 
     domain: powergrid
@@ -125,7 +157,7 @@ structures:
       - CHGSTATION-POWER
       - CHGSTATION-MAX-POWER
     flavors:
-      - 76_SBC_plugin
+      - 77_SBC_software
     renderData:
       file: buildings/
       image:
@@ -140,6 +172,44 @@ structures:
       emissiveOnConnection: true
       category: ELECTRICAL
       sorting: 503
+    tags:
+      - base
+      - lvgrid
+
+  BATTERY-SYSTEM: 
+    domain: powergrid
+    memberOf: 
+      - 'electrical'
+    placeOn:
+      - POWERGRID-CONNECTOR
+    name: 'Battery System'
+    description: 'Battery storage system'
+    size: 4
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics:
+      - BATTERY-SYSTEM-POWER
+      - BATTERY-SYSTEM-MAX-POWER
+      - BATTERY-SYSTEM-SOC
+      - BATTERY-STORAGE-CAPACITY
+    flavors:
+      - 72_SBC_battery-storage
+    renderData: 
+      file: 'buildings/'
+      image: 
+        base: 'objects/inactive/buildings/'
+        hover: 'objects/active/buildings/'
+        active: 'objects/active/buildings/'
+      rotationY: 0.75
+      hideObjectOnCanvas: true
+      scale: default
+      hideInPanel: false
+      nightmode: false
+      emissiveOnConnection: true
+      category: ELECTRICAL
+      sorting: 302
     tags:
       - base
       - lvgrid
@@ -234,6 +304,95 @@ dynamics:
         type: number
     tags:
       - energyCommunityController
+
+  BATTERY-SYSTEM-POWER:
+    domain: powergrid
+    name: Battery System Power
+    description: Power situation of the battery system
+    visible: true
+    actionable: false
+    alwaysUpdate: false
+    defaultValue: 
+      - 10
+      - 0
+      - -10
+    pinnable: false
+    dataLabels:
+      - 'Charge Potential'
+      - 'Actual Power'
+      - 'Discharge Potential'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: array
+      minItems: 3
+      maxItems: 3
+      items:
+        type: number
+    tags:
+      - energyCommunityController
+  
+  BATTERY-SYSTEM-MAX-POWER:
+    domain: powergrid
+    name: Battery System Power Limit
+    description: The currently limit of the power of this battery system
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 
+      - 10
+      - -10
+    pinnable: true
+    dataLabels:
+      - 'Charge Limit'
+      - 'Discharge Limit'
+    chartType: LINE
+    unit: kW
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: number
+    tags:
+      - energyCommunityController
+  
+  BATTERY-SYSTEM-SOC:
+    domain: powergrid
+    name: Battery System State of Charge
+    description: The current state of charge of the battery system
+    visible: true
+    actionable: false
+    alwaysUpdate: false
+    defaultValue: 50
+    pinnable: true
+    dataLabels:
+      - 'State of Charge'
+    chartType: LINE
+    unit: '%'
+    schema:
+      type: number
+      minimum: 0
+      maximum: 100
+    tags:
+      - energyCommunityController
+
+  BATTERY-STORAGE-CAPACITY:
+    domain: powergrid
+    name: Battery Syste, Capacity
+    description: Total availabe capacity of the battery system
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    pinnable: true
+    dataLabels: []
+    chartType: NUMBER
+    defaultValue: 10
+    unit: "kWh"
+    schema:
+      type: number
+    tags:
+      - lvgrid
 
   CHGSTATION-MAX-POWER:
     domain: powergrid
