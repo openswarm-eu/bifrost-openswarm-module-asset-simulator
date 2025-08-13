@@ -510,7 +510,12 @@ const logic = {
                         }
                         batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Actual_Power] = batPowerActual
                         // update the SoC based on the actual power and the capacity
-                        batSocCurrent += (batPowerActual / batCapacity) * (m.samplingRate / 3600) * 100
+                        if (batCapacity <= 0) {
+                            batSocCurrent = 0
+                        } else {
+                            batSocCurrent += (batPowerActual / batCapacity) * (m.samplingRate / 3600) * 100
+                        }
+                        
                         // limit the SoC to 0-100%, should only be needed due to numerical errors in the calculations before
                         if (batSocCurrent > 100){
                             batSocCurrent = 100
