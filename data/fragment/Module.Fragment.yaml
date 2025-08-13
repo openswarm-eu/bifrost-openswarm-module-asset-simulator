@@ -379,7 +379,7 @@ dynamics:
 
   BATTERY-STORAGE-CAPACITY:
     domain: powergrid
-    name: Battery Syste, Capacity
+    name: Battery System Capacity
     description: Total availabe capacity of the battery system
     visible: true
     actionable: true

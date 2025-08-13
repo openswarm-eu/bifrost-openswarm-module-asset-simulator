@@ -141,6 +141,8 @@ const logic = {
                                     })
                                 }
                                 carAssignmentObject[experimentId][parentBuildingId] = carObj
+                            }else{
+                                carAssignmentObject[experimentId][parentBuildingId].pgc_id = structureId
                             }
                         }
 
@@ -217,8 +219,8 @@ const logic = {
                                 // set the charge and discharge power and capacity to a higher value
                                 localStorage[experimentId].byPGC[structureId].batterySystem.chargePower = 10
                                 localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = 10
-                                localStorage[experimentId].byPGC[structureId].batterySystem.capacity = 40
-                                initResult.addSeries({dynamicId:localStorage[experimentId].byPGC[structureId].batteryCapacityId,values:[40]})
+                                // localStorage[experimentId].byPGC[structureId].batterySystem.capacity = 40
+                                // initResult.addSeries({dynamicId:localStorage[experimentId].byPGC[structureId].batteryCapacityId,values:[40]})
                                 // switch off the load simulator for the Battery-Station
                                 localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
                             }
@@ -435,21 +437,22 @@ const logic = {
                             }
                         }
                         
+                        let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
+                        pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                         if (pStruct.evCharger.shiftedEnergy > 0){
                             let newChgPower = chgPowerShifted + pStruct.evCharger.shiftedEnergy
                             if (newChgPower > chgPowerLimit){
                                 newChgPower = chgPowerLimit
                             } 
-
-                            pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
+                            // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy + chgPowerShifted
+                            //pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
                             chgPowerShifted = newChgPower
                         
                         }
                         // check if the resulting charging power is higher than the max power of the charging station
-                        let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
                         if (chgPowerShifted > chgPowerSetPoint){
                             chgPowerActual = chgPowerSetPoint
-                            pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
+                            // pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                         } else {
                             chgPowerActual = chgPowerShifted
                         }
@@ -467,7 +470,7 @@ const logic = {
                             for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
                                 const carId = carObj.ecar_assignment_slots[i].ecar_id
                                 let curCarPower = Number(carStats[carId].carPower)
-                                const chargedPower = curCarPower * partPower
+                                const chargedPower = chgPowerSetPoint * partPower
                                 carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
                                 carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
                             }
@@ -581,7 +584,6 @@ const logic = {
         } catch (error) {
             context.log.write(`Error: ${error}`, Log.level.ERROR)
         }
-        
         return result
     }
 }
@@ -642,6 +644,20 @@ m.app.post("/rest/updateCars", (request, reply) => {
             const experimentId = body["expId"][0] as string
             if (carAssignmentObject[experimentId] == undefined){
                 carAssignmentObject[experimentId] = [] as CarAssignment
+                let carObj:CarObj = {
+                                ecar_assignment_slots_number: 3,
+                                ecar_assignment_slots : [],
+                                pgc_id: ""
+                                }
+                                // init occupation for all slots
+                for(var j = 0; j < 3; j++){
+                    carObj.ecar_assignment_slots.push({ecar_id: body[evStationId][j],
+                                                    charge: config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
+                                                    charge_max:config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
+                                                    shifted_energy: 0
+                    })
+                }
+                carAssignmentObject[experimentId][evStationId] = carObj
             }
             m.context.log.write(`experimentId: ${body[evStationId]}`)
             m.context.log.write(`/rest/updateCars for: ${evStationId}`)
@@ -675,20 +691,31 @@ m.app.post("/rest/updateCars", (request, reply) => {
             // }
             const carObj = carAssignmentObject[experimentId][evStationId] as CarObj
             let i = 0
+            let slotShiftedSum = 0
             for (const slot of carObj.ecar_assignment_slots){
                 // if the car in the slot changed, then reset charge
                 if( slot.ecar_id != body[evStationId][i]){
                     slot.ecar_id = body[evStationId][i]
                     slot.charge_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carMaxCap
                     slot.charge = slot.charge_max*0.15
-                    // reset the shifted energy when it disconnects and also subtract it from the internal struct
-                    if(slot.ecar_id == -1){
-                        const pStruct = localStorage[experimentId].byPGC[carObj.pgc_id]
-                        pStruct.evCharger.shiftedEnergy -= slot.shifted_energy
-                        slot.shifted_energy = 0
+                    if(localStorage[experimentId].byPGC[carObj.pgc_id] != undefined){
+                        // reset the shifted energy when it disconnects and also subtract it from the internal struct
+                        if(slot.ecar_id == -1){
+                            const pStruct = localStorage[experimentId].byPGC[carObj.pgc_id]
+                            pStruct.evCharger.shiftedEnergy -= slot.shifted_energy
+                            // if there was nothing loaded at all because of no PV
+                            slot.shifted_energy = 0
+                        }
                     }
                 }
+                slotShiftedSum += slot.shifted_energy
                 i += 1
+            }
+            if (localStorage[experimentId] != undefined){
+                // if there was nothing loaded at all because of no PV, proper reset
+                if (slotShiftedSum == 0){
+                    localStorage[experimentId].byPGC[carObj.pgc_id].evCharger.shiftedEnergy = 0
+                }
             }
         //     let length = 3;
         //     let carObj:CarObj = {
