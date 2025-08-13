@@ -6,9 +6,10 @@ To get the the latest changes you have to set an additional remote connection wi
 ```bash
 git remote add energy-community-asset-simulator git@code.siemens.com:openswarm/energy-community-asset-simulator.git
 ```
-Pull the changes with
+Pull the changes from the `realitytwin` branch with
 ```bash
-git pull energy-community-asset-simulator main
+git checkout realitytwin
+git pull energy-community-asset-simulator realitytwin
 ```
 
 # EV-STATION

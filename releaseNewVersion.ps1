@@ -4,15 +4,15 @@ Write-Host ""
 
 # Step 1: Merge commits to 'release' branch
 $currentBranch = git rev-parse --abbrev-ref HEAD
-if ($currentBranch -ne "main") {
-    Write-Host "Error: The 'main' branch is not currently checked out."
-    Write-Host "Script has to be started out of the 'main' branch! Only the changes there can be released!"
+if ($currentBranch -ne "realitytwin") {
+    Write-Host "Error: The 'realitytwin' branch is not currently checked out."
+    Write-Host "Script has to be started out of the 'realitytwin' branch! Only the changes there can be released!"
     Write-Host "Aborting the script."
     Exit
 }
-# Get the last commit message of 'main':
+# Get the last commit message of 'realitytwin':
 $lastCommitMessage = git log -1 --pretty=format:%s
-# Check if the 'release' branch is checked out and merge 'main' into it
+# Check if the 'release' branch is checked out and merge 'realitytwin' into it
 git checkout release
 $currentBranch = git rev-parse --abbrev-ref HEAD
 if ($currentBranch -ne "release") {
@@ -138,8 +138,8 @@ git push
 git push origin v$newVersionWithoutFlag
 git push origin latest
 
-# Step 6: Switch back to the 'main' branch
-git checkout main
+# Step 6: Switch back to the 'realitytwin' branch
+git checkout realitytwin
 
 Write-Host ""
 Write-Host "VERSION 'v$newVersionWithoutFlag' WAS RELEASED"
