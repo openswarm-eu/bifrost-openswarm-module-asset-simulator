@@ -14,6 +14,10 @@ import  {
     TYPEID, 
         } from './src/types.js'
 import { config } from './src/config.js'
+import { 
+    readCSVtoDict, 
+    csvData 
+        } from './src/tools.js'
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
     CHARGING_STATION_POWER_MAPPING,
@@ -22,42 +26,11 @@ import  {
     sensorNames, 
     TYPEID_LOCAL 
         } from './data/fragment/local_types.js'
-import * as fs from 'fs'
-import csv from 'csv-parser'
 import { updateBatterySystem } from './src/components/battery-system.js'
 
-async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> {
-    return new Promise((resolve, reject) => {
-        fs.createReadStream(filePath)
-            .pipe(csv({separator: ";", }))
-            .on('data', (row) => {
-                const timestamp = row.Time;
-                const [hours, minutes, seconds] = timestamp.split(':').map(Number);
-                delete row.Time; // Remove the timestamp column from the row object
-                const convertedTs = hours*3600 + minutes*60 + seconds
-                const numericRow: Record<string, number> = {};
-                Object.keys(row).forEach(key => {
-                numericRow[key] = parseFloat(row[key]);
-                if (isNaN(numericRow[key])) {
-                    numericRow[key] = 0; // or any default value, or keep as null/undefined
-                }
-                });
-                csvData[convertedTs] = numericRow;
-            })
-            .on('end', () => {
-                resolve(csvData);
-            })
-            .on('error', (err) => {
-                reject(err);
-            });
-    });
-}
-
 const localStorage : localStorageType = {}
-const csvData: { [key: string]: any } = {};
 
 const logic = { 
-
     initFn: (storyId: string, experimentId: string, state: TState, context: TModuleContext) => { 
         
         context.log.write(`Init from [${storyId}/${experimentId}]`)
