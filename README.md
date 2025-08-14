@@ -1,4 +1,4 @@
-# Reality Twin EC Asset Simulation Module
+# RealityTwin EC Asset Simulation Module
 
 Fork for BIFROST reality twin adoption of the OpenSwarm energy-community-asset-simulator (https://code.siemens.com/openswarm/energy-community-asset-simulator)
 
@@ -11,20 +11,6 @@ Pull the changes from the `realitytwin` branch with
 git checkout realitytwin
 git pull energy-community-asset-simulator realitytwin
 ```
-
-# EV-STATION
-To write data to this charging poles, the endpoint ```/rest/updateCars``` needs to be satisfied.
-```
-curl --request POST \
-  --url http://127.0.0.1:7032/rest/updateCars \
-  --header 'content-type: application/json' \
-  --data '{
-  "EV-STATION::[4|-2,4|-1,5|-2,5|-1]@EXPERIMENT::FwpXHh6o": [-1,-1,-1],
-  "expId": ["EXPERIMENT::qOPprfAn"]
-}'
-```
-Where the EV-STATION needs to be the full BIFROST id of your wanted EV-STATION and the list describes the car which
-is currently connected to the according slot. For example ```[1,-1,2]``` connects car 1 to slot 1 and car 2 to slot 3.
 
 ## Compile and run your module
 
@@ -78,6 +64,12 @@ Or run the module in a docker container with (along with BIFROST ZERO):
 docker-compose -f ./docker/docker-compose.yml up -d --build
 ```
 
+## Configuration of the Module
+
+The EC Asset Simulation Module uses a flexible configuration system that supports customization of asset parameters through YAML files. 
+The configuration system automatically falls back to sensible defaults for any parameters not specified in your YAML file. This means you only need to define the values you want to change.
+For detailed information about configuration options and default values, see: [Configuration Documentation](docs/configuration-defaults.md)
+
 ## Release a New Version
 
 **ATTENTION**: Be sure before releasing, that all components are tested with the tagged version!
@@ -117,6 +109,24 @@ Please stick to following procedure:
     ```
 
 There is a PowerShell script `releaseNewVersion.ps1` which does the above in one step. Use it with care!
+
+## RealityTwin Extensions
+
+This module version provides additional REST endpoints, which are accessed by the RealityTwin hardware modules.
+
+### EV-STATION
+To write data to this charging poles, the endpoint ```/rest/updateCars``` needs to be satisfied.
+```
+curl --request POST \
+  --url http://127.0.0.1:7032/rest/updateCars \
+  --header 'content-type: application/json' \
+  --data '{
+  "EV-STATION::[4|-2,4|-1,5|-2,5|-1]@EXPERIMENT::FwpXHh6o": [-1,-1,-1],
+  "expId": ["EXPERIMENT::qOPprfAn"]
+}'
+```
+Where the EV-STATION needs to be the full BIFROST id of your wanted EV-STATION and the list describes the car which
+is currently connected to the according slot. For example ```[1,-1,2]``` connects car 1 to slot 1 and car 2 to slot 3.
 
 ## Current Version
 

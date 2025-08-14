@@ -19,8 +19,6 @@ import  {
 import { config } from './src/config.js'
 import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
-    BATTERY_SYSTEM_POWER_MAPPING,
-    BATTERY_SYSTEM_MAX_POWER_MAPPING,
     CHARGING_STATION_POWER_MAPPING,
     PV_SYSTEM_POWER_MAPPING,
     sensorDirections,
@@ -30,6 +28,7 @@ import  {
 import { updateDynamic } from './src/tools.js'
 import * as fs from 'fs'
 import csv from 'csv-parser'
+import { updateBatterySystem } from './src/components/battery-system.js'
 
 async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> {
     return new Promise((resolve, reject) => {
@@ -110,14 +109,16 @@ const logic = {
                                 maxPowerPerSlot : 4,  // Default max power per slot in kW
                                 shiftedEnergy   : 0
                             },
-                            batteryApId       : "",
-                            batteryMaxApId    : "",
-                            batterySoCId      : "",
-                            batteryCapacityId : "",
                             batterySystem     : {
-                                chargePower    : 5,
-                                dischargePower : 5,
-                                capacity       : 10
+                                chargePower    : config.batterySystem.chargePower,
+                                dischargePower : config.batterySystem.dischargePower,
+                                storedEnergy   : -1, // will be updated in the update function, -1 indicates to use the starting values for a initial calculation
+                                dynamicId : {
+                                    activePower : "",
+                                    maxPower    : "",
+                                    soc         : "",
+                                    capacity    : ""
+                                }
                             },
                             parentBuildingId: ""
                         }
@@ -141,6 +142,8 @@ const logic = {
                                     })
                                 }
                                 carAssignmentObject[experimentId][parentBuildingId] = carObj
+                            }else{
+                                carAssignmentObject[experimentId][parentBuildingId].pgc_id = structureId
                             }
                         }
 
@@ -180,16 +183,16 @@ const logic = {
                             } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){
                                 for (const dynId of dynIds){
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_POWER){
-                                        localStorage[experimentId].byPGC[structureId].batteryApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].batterySystem.dynamicId.activePower = dynId
                                     }
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_MAX_POWER){
-                                        localStorage[experimentId].byPGC[structureId].batteryMaxApId = dynId
+                                        localStorage[experimentId].byPGC[structureId].batterySystem.dynamicId.maxPower = dynId
                                     }
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_SOC){
-                                        localStorage[experimentId].byPGC[structureId].batterySoCId = dynId
+                                        localStorage[experimentId].byPGC[structureId].batterySystem.dynamicId.soc = dynId
                                     }
                                     if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_CAPACITY){
-                                        localStorage[experimentId].byPGC[structureId].batteryCapacityId = dynId
+                                        localStorage[experimentId].byPGC[structureId].batterySystem.dynamicId.capacity = dynId
                                     }
                                 }
                             }
@@ -215,12 +218,10 @@ const logic = {
                             // identify Battery-Station
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.BATTERY_STATION){
                                 // set the charge and discharge power and capacity to a higher value
-                                localStorage[experimentId].byPGC[structureId].batterySystem.chargePower = 10
-                                localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = 10
-                                localStorage[experimentId].byPGC[structureId].batterySystem.capacity = 40
-                                initResult.addSeries({dynamicId:localStorage[experimentId].byPGC[structureId].batteryCapacityId,values:[40]})
+                                localStorage[experimentId].byPGC[structureId].batterySystem.chargePower = config.structureTypes.batteryStation.batterySystem.chargePower
+                                localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = config.structureTypes.batteryStation.batterySystem.dischargePower
                                 // switch off the load simulator for the Battery-Station
-                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.batteryStation.load.scaleFactor
                             }
                             // is it a small house?
                             if (state.structures.entities[parentId].typeId == TYPEID.SMALL_HOUSE){
@@ -435,21 +436,22 @@ const logic = {
                             }
                         }
                         
+                        let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
+                        pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                         if (pStruct.evCharger.shiftedEnergy > 0){
                             let newChgPower = chgPowerShifted + pStruct.evCharger.shiftedEnergy
                             if (newChgPower > chgPowerLimit){
                                 newChgPower = chgPowerLimit
                             } 
-
-                            pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
+                            // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy + chgPowerShifted
+                            //pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
                             chgPowerShifted = newChgPower
                         
                         }
                         // check if the resulting charging power is higher than the max power of the charging station
-                        let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
                         if (chgPowerShifted > chgPowerSetPoint){
                             chgPowerActual = chgPowerSetPoint
-                            pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
+                            // pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                         } else {
                             chgPowerActual = chgPowerShifted
                         }
@@ -467,7 +469,7 @@ const logic = {
                             for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
                                 const carId = carObj.ecar_assignment_slots[i].ecar_id
                                 let curCarPower = Number(carStats[carId].carPower)
-                                const chargedPower = curCarPower * partPower
+                                const chargedPower = chgPowerSetPoint * partPower
                                 carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
                                 carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
                             }
@@ -477,59 +479,9 @@ const logic = {
                     }
 
                     // add battery power
-                    if(pStruct.batteryApId){
-                        let batSocCurrent  = dynamicsById[pStruct.batterySoCId]
-                        let batCapacity    = dynamicsById[pStruct.batteryCapacityId]
-                        let batPowerLimit  = dynamicsById[pStruct.batteryMaxApId]
-                        let batPowerResult = [0, 0, 0]
-                        let batPowerActual = 0
-
-                        // calculate the possible charge and discharge power in the current simulation step based on the current SoC and capacity
-                        let batPossibleChargePowerSimulationStep = ( batCapacity * ( (100 - batSocCurrent) / 100 )) / ( m.samplingRate / 3600 )
-                        if (batPossibleChargePowerSimulationStep > pStruct.batterySystem.chargePower){
-                            batPossibleChargePowerSimulationStep = pStruct.batterySystem.chargePower
-                        }
-                        let batPossibleDischargePowerSimulationStep = ( batCapacity * ( batSocCurrent / 100 )) / (m.samplingRate / 3600)
-                        if (batPossibleDischargePowerSimulationStep > pStruct.batterySystem.dischargePower){
-                            batPossibleDischargePowerSimulationStep = pStruct.batterySystem.dischargePower
-                        }
-
-                        // perform the battery operation based on the given power limits (charge and discharge limits are added up, but it is assumed that one of them is zero.)
-                        // Examples: Battery should be charged with 2.5kW:    batPowerLimit = [2.5, 0]  --> results in batPowerActual = 2.5kW
-                        //           Battery should be discharged with 3.5kW: batPowerLimit = [0, -3.5] --> results in batPowerActual = -3.5kW
-                        // But if both limits are set, then the battery is charged or discharged with the resulting power, which is the sum of both limits.
-                        // Example: Battery gets the limits with 2.5kW to charge and 1.5kW to discharge: batPowerLimit = [2.5, -1.5] --> results in batPowerActual = 1kW
-                        batPowerActual = batPowerLimit[BATTERY_SYSTEM_MAX_POWER_MAPPING.Charge_Limit] + batPowerLimit[BATTERY_SYSTEM_MAX_POWER_MAPPING.Discharge_Limit]
-                        if ((batPowerActual > 0) && (batPowerActual > batPossibleChargePowerSimulationStep)){
-                                batPowerActual = batPossibleChargePowerSimulationStep
-                        } else if ((batPowerActual < 0) && (Math.abs(batPowerActual) > batPossibleDischargePowerSimulationStep)){
-                                batPowerActual = -batPossibleDischargePowerSimulationStep
-                        }
-                        batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Actual_Power] = batPowerActual
-                        // update the SoC based on the actual power and the capacity
-                        batSocCurrent += (batPowerActual / batCapacity) * (m.samplingRate / 3600) * 100
-                        // limit the SoC to 0-100%, should only be needed due to numerical errors in the calculations before
-                        if (batSocCurrent > 100){
-                            batSocCurrent = 100
-                        } else if (batSocCurrent < 0){
-                            batSocCurrent = 0
-                        }
-
-                        // again calculate the possible charge and discharge power, now for the next simulation step based on the altered SoC and capacity
-                        batPossibleChargePowerSimulationStep = ( batCapacity * ( (100 - batSocCurrent) / 100 )) / ( m.samplingRate / 3600 )
-                        if (batPossibleChargePowerSimulationStep > pStruct.batterySystem.chargePower){
-                            batPossibleChargePowerSimulationStep = pStruct.batterySystem.chargePower
-                        }
-                        batPossibleDischargePowerSimulationStep = ( batCapacity * ( batSocCurrent / 100 )) / (m.samplingRate / 3600)
-                        if (batPossibleDischargePowerSimulationStep > pStruct.batterySystem.dischargePower){
-                            batPossibleDischargePowerSimulationStep = pStruct.batterySystem.dischargePower
-                        }
-                        batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Charge_Potential] = batPossibleChargePowerSimulationStep
-                        batPowerResult[BATTERY_SYSTEM_POWER_MAPPING.Discharge_Potential] = -batPossibleDischargePowerSimulationStep
-
-                        result.addSeries({dynamicId:pStruct.batterySoCId,values:[batSocCurrent]})
-                        result.addSeries({dynamicId:pStruct.batteryApId,values:[batPowerResult]})
-                        sumLoad += batPowerActual
+                    if(pStruct.batterySystem.dynamicId.activePower){
+                        const batPowerActual = updateBatterySystem (dynamicsById, pStruct.batterySystem, m, result);
+                        sumLoad += batPowerActual;
                     }
                     
                     // calculate the resulting load value
@@ -581,7 +533,6 @@ const logic = {
         } catch (error) {
             context.log.write(`Error: ${error}`, Log.level.ERROR)
         }
-        
         return result
     }
 }
@@ -611,7 +562,7 @@ const m = new BifrostZeroModule({
 })
 
 
-// endpoints accessed by the mc modules
+// REST endpoint accessed by the RealityTwin hardware module "STORAGE BUILDING"
 m.app.post("/rest/updateCapacity", async (request, reply) => {
     const body = request.body as object
     try {
@@ -631,10 +582,9 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
                 message: "fail"
             }))
     }
-   
 })
 
-// should not need file-writing, since everything is in one file/module anyway
+// REST endpoint accessed by the RealityTwin hardware module "E-CAR CHARGING STATION"
 m.app.post("/rest/updateCars", (request, reply) => {
             const body = request.body as object
             // get key from object
@@ -642,6 +592,20 @@ m.app.post("/rest/updateCars", (request, reply) => {
             const experimentId = body["expId"][0] as string
             if (carAssignmentObject[experimentId] == undefined){
                 carAssignmentObject[experimentId] = [] as CarAssignment
+                let carObj:CarObj = {
+                                ecar_assignment_slots_number: 3,
+                                ecar_assignment_slots : [],
+                                pgc_id: ""
+                                }
+                                // init occupation for all slots
+                for(var j = 0; j < 3; j++){
+                    carObj.ecar_assignment_slots.push({ecar_id: body[evStationId][j],
+                                                    charge: config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
+                                                    charge_max:config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
+                                                    shifted_energy: 0
+                    })
+                }
+                carAssignmentObject[experimentId][evStationId] = carObj
             }
             m.context.log.write(`experimentId: ${body[evStationId]}`)
             m.context.log.write(`/rest/updateCars for: ${evStationId}`)
@@ -675,20 +639,31 @@ m.app.post("/rest/updateCars", (request, reply) => {
             // }
             const carObj = carAssignmentObject[experimentId][evStationId] as CarObj
             let i = 0
+            let slotShiftedSum = 0
             for (const slot of carObj.ecar_assignment_slots){
                 // if the car in the slot changed, then reset charge
                 if( slot.ecar_id != body[evStationId][i]){
                     slot.ecar_id = body[evStationId][i]
                     slot.charge_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carMaxCap
                     slot.charge = slot.charge_max*0.15
-                    // reset the shifted energy when it disconnects and also subtract it from the internal struct
-                    if(slot.ecar_id == -1){
-                        const pStruct = localStorage[experimentId].byPGC[carObj.pgc_id]
-                        pStruct.evCharger.shiftedEnergy -= slot.shifted_energy
-                        slot.shifted_energy = 0
+                    if(localStorage[experimentId].byPGC[carObj.pgc_id] != undefined){
+                        // reset the shifted energy when it disconnects and also subtract it from the internal struct
+                        if(slot.ecar_id == -1){
+                            const pStruct = localStorage[experimentId].byPGC[carObj.pgc_id]
+                            pStruct.evCharger.shiftedEnergy -= slot.shifted_energy
+                            // if there was nothing loaded at all because of no PV
+                            slot.shifted_energy = 0
+                        }
                     }
                 }
+                slotShiftedSum += slot.shifted_energy
                 i += 1
+            }
+            if (localStorage[experimentId] != undefined){
+                // if there was nothing loaded at all because of no PV, proper reset
+                if (slotShiftedSum == 0){
+                    localStorage[experimentId].byPGC[carObj.pgc_id].evCharger.shiftedEnergy = 0
+                }
             }
         //     let length = 3;
         //     let carObj:CarObj = {
@@ -721,7 +696,6 @@ m.app.post("/rest/updateCars", (request, reply) => {
                 message: "success"
             }))
         });
-
 
 const csvFilePath = 'data/csv/profile-data.csv';
 readCSVtoDict(csvFilePath)

@@ -49,9 +49,15 @@ export type evChargerSimulatorType = {
 }
 
 export type batterySimulatorType = {
-    chargePower    : number
-    dischargePower : number
-    capacity       : number
+    chargePower     : number
+    dischargePower  : number
+    storedEnergy    : number
+    dynamicId : {
+        activePower : string
+        maxPower    : string
+        soc         : string
+        capacity    : string
+    }
 }
 
 export type powerGridConnectorType = {
@@ -65,10 +71,6 @@ export type powerGridConnectorType = {
         evMaxApId         : string
         evCharger         : evChargerSimulatorType
         parentBuildingId  : string
-        batteryApId       : string
-        batteryMaxApId    : string
-        batterySoCId      : string
-        batteryCapacityId : string
         batterySystem     : batterySimulatorType
     }
 }

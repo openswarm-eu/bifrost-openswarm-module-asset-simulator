@@ -36,7 +36,8 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "MODULE_URL": "http://host.docker.internal:7032",
-                "BIFROST_URL": "http://127.0.0.1:9091"
+                "BIFROST_URL": "http://127.0.0.1:9091",
+                "HOOK": "[100, 200]"
             }
         },
         {
