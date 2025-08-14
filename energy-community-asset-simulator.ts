@@ -562,7 +562,7 @@ const m = new BifrostZeroModule({
 })
 
 
-// endpoints accessed by the mc modules
+// REST endpoint accessed by the RealityTwin hardware module "STORAGE BUILDING"
 m.app.post("/rest/updateCapacity", async (request, reply) => {
     const body = request.body as object
     try {
@@ -584,7 +584,7 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
     }
 })
 
-// should not need file-writing, since everything is in one file/module anyway
+// REST endpoint accessed by the RealityTwin hardware module "E-CAR CHARGING STATION"
 m.app.post("/rest/updateCars", (request, reply) => {
             const body = request.body as object
             // get key from object

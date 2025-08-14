@@ -1,4 +1,4 @@
-# PoC1 EC Asset Simulation Module
+# PoC1 EC Asset Simulation Module - RealityTwin Version
 
 This module simulates all assets of the Energy Community (EC) tackled in the PoC1 use cases of the OpenSwarm project.
 
@@ -7,20 +7,6 @@ This module Reads in data from `./data/csv/profile-data.csv` and adds the PV, ba
   - EV data `CHARGING-POLE`
   - BATTERY system data `BATTERY-SYSTEM`
   - Grid Sensor Measurements requires `GRID-SENSOR`
-
-# EV-STATION
-To write data to this charging poles, the endpoint ```/rest/updateCars``` needs to be satisfied.
-```
-curl --request POST \
-  --url http://127.0.0.1:7032/rest/updateCars \
-  --header 'content-type: application/json' \
-  --data '{
-  "EV-STATION::[4|-2,4|-1,5|-2,5|-1]@EXPERIMENT::FwpXHh6o": [-1,-1,-1],
-  "expId": ["EXPERIMENT::qOPprfAn"]
-}'
-```
-Where the EV-STATION needs to be the full BIFROST id of your wanted EV-STATION and the list describes the car which
-is currently connected to the according slot. For example ```[1,-1,2]``` connects car 1 to slot 1 and car 2 to slot 3.
 
 ## Compile and run your module
 
@@ -132,6 +118,24 @@ git push openswarmgithub vX.Y.Z
 git push openswarmgithub :refs/tags/latest
 git push openswarmgithub latest
 ```
+
+## RealityTwin Extensions
+
+This module version provides additional REST endpoints, which are accessed by the RealityTwin hardware modules.
+
+### EV-STATION
+To write data to this charging poles, the endpoint ```/rest/updateCars``` needs to be satisfied.
+```
+curl --request POST \
+  --url http://127.0.0.1:7032/rest/updateCars \
+  --header 'content-type: application/json' \
+  --data '{
+  "EV-STATION::[4|-2,4|-1,5|-2,5|-1]@EXPERIMENT::FwpXHh6o": [-1,-1,-1],
+  "expId": ["EXPERIMENT::qOPprfAn"]
+}'
+```
+Where the EV-STATION needs to be the full BIFROST id of your wanted EV-STATION and the list describes the car which
+is currently connected to the according slot. For example ```[1,-1,2]``` connects car 1 to slot 1 and car 2 to slot 3.
 
 ## Current Version
 
