@@ -101,9 +101,9 @@ const logic = {
                                 shiftedEnergy   : 0
                             },
                             batterySystem     : {
-                                chargePower    : 5,
-                                dischargePower : 5,
-                                storedEnergy   : 5,
+                                chargePower    : config.batterySystem.chargePower,
+                                dischargePower : config.batterySystem.dischargePower,
+                                storedEnergy   : config.batterySystem.storedEnergy,
                                 dynamicId : {
                                     activePower : "",
                                     maxPower    : "",
@@ -184,10 +184,10 @@ const logic = {
                             // identify Battery-Station
                             if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.BATTERY_STATION){
                                 // set the charge and discharge power and capacity to a higher value
-                                localStorage[experimentId].byPGC[structureId].batterySystem.chargePower = 10
-                                localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = 10
+                                localStorage[experimentId].byPGC[structureId].batterySystem.chargePower = config.structureTypes.batteryStation.batterySystem.chargePower
+                                localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = config.structureTypes.batteryStation.batterySystem.dischargePower
                                 // switch off the load simulator for the Battery-Station
-                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = 0
+                                localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.batteryStation.load.scaleFactor
                             }
                             // is it a small house?
                             if (state.structures.entities[parentId].typeId == TYPEID.SMALL_HOUSE){

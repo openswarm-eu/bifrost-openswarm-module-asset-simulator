@@ -60,6 +60,12 @@ Or run the module in a docker container with (along with BIFROST ZERO):
 docker-compose -f ./docker/docker-compose.yml up -d --build
 ```
 
+## Configuration of the Module
+
+The EC Asset Simulation Module uses a flexible configuration system that supports customization of asset parameters through YAML files. 
+The configuration system automatically falls back to sensible defaults for any parameters not specified in your YAML file. This means you only need to define the values you want to change.
+For detailed information about configuration options and default values, see: [Configuration Documentation](docs/configuration-defaults.md)
+
 ## Release a New Version
 
 **ATTENTION**: Be sure before releasing, that all components are tested with the tagged version!
