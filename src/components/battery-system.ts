@@ -11,6 +11,27 @@ export function updateBatterySystem(dynamicsById, batterySystem: batterySimulato
     let batPowerResult = [0, 0, 0];
     let batPowerActual = 0;
 
+    // adjust the current SOC in case, the capacity was changed
+    if (batterySystem.storedEnergy >= 0) {
+        // calculate the stored energy based on the dynamics
+        let batStoredEnergyCurrent = batSocCurrent * batCapacity / 100;
+        // compare it with the stored energy in the battery system from the previous simulation step
+        if (batStoredEnergyCurrent !== batterySystem.storedEnergy) {
+            // adjust the current SOC of the battery to the stored energy level. This happens, when the capacity of the battery system was changed.
+            if (batCapacity <= 0) {
+                batSocCurrent = 0;
+            } else {
+                batSocCurrent = (batterySystem.storedEnergy / batCapacity) * 100;
+                // limit the SoC to 0-100%
+                if (batSocCurrent > 100) {
+                    batSocCurrent = 100;
+                } else if (batSocCurrent < 0) {
+                    batSocCurrent = 0;
+                }
+            }
+        }
+    }
+
     // calculate the possible charge and discharge power in the current simulation step based on the current SoC and capacity
     let batPossibleChargePowerSimulationStep = ( batCapacity * ( (100 - batSocCurrent) / 100 )) / ( m.samplingRate / 3600 );
     if (batPossibleChargePowerSimulationStep > batterySystem.chargePower){
@@ -58,6 +79,9 @@ export function updateBatterySystem(dynamicsById, batterySystem: batterySimulato
 
     result.addSeries({dynamicId:batterySystem.dynamicId.soc,values:[batSocCurrent]});
     result.addSeries({dynamicId:batterySystem.dynamicId.activePower,values:[batPowerResult]});
+    
+    // update the stored energy based on the current SoC and capacity
+    batterySystem.storedEnergy = batSocCurrent * batCapacity / 100; 
 
     return batPowerActual; // if you need to use it for sumLoad
 }

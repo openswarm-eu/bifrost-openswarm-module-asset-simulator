@@ -103,7 +103,7 @@ const logic = {
                             batterySystem     : {
                                 chargePower    : config.batterySystem.chargePower,
                                 dischargePower : config.batterySystem.dischargePower,
-                                storedEnergy   : config.batterySystem.storedEnergy,
+                                storedEnergy   : -1, // will be updated in the update function, -1 indicates to use the starting values for a initial calculation
                                 dynamicId : {
                                     activePower : "",
                                     maxPower    : "",

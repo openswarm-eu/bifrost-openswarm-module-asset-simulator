@@ -8,7 +8,6 @@ export interface AssetConfig {
     batterySystem: {
         chargePower: number;
         dischargePower: number;
-        storedEnergy: number;
     };
     // Structure-specific configurations
     structureTypes: {
@@ -57,8 +56,7 @@ export interface AssetConfig {
 export const defaultConfig: AssetConfig = {
     batterySystem: {
         chargePower: 5,
-        dischargePower: 5,
-        storedEnergy: 5
+        dischargePower: 5
     },
     structureTypes: {
         solarFarm: {
@@ -181,7 +179,8 @@ export function loadConfig(): AssetConfig {
  * Apply environment variable overrides to configuration
  */
 function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
-    // Override general battery system values with environment variables if present
+    // Override with environment variables if present (highest priority)
+
     if (process.env.BATTERY_CHARGE_POWER) {
         config.batterySystem.chargePower = Number(process.env.BATTERY_CHARGE_POWER);
     }
@@ -190,11 +189,6 @@ function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
         config.batterySystem.dischargePower = Number(process.env.BATTERY_DISCHARGE_POWER);
     }
     
-    if (process.env.BATTERY_STORED_ENERGY) {
-        config.batterySystem.storedEnergy = Number(process.env.BATTERY_STORED_ENERGY);
-    }
-    
-    // Override with environment variables if present (highest priority)
     if (process.env.SOLAR_FARM_SCALE_FACTOR) {
         config.structureTypes.solarFarm.solarSystem.scaleFactor = Number(process.env.SOLAR_FARM_SCALE_FACTOR);
     }
