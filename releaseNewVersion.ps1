@@ -21,7 +21,7 @@ if ($currentBranch -ne "release") {
     Exit
 }
 git pull
-git merge main
+git merge realitytwin
 
 # Step 2: Increase version number and get all information for the new version
 $readmePath = "README.md"
