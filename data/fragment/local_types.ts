@@ -23,7 +23,7 @@ export const TYPEID_LOCAL = {
     GRID_SENSOR_DIRECTION        : "GRID-SENSOR-FLOW-DIRECTION"
 }
 
-export const enum sensorNames {
+export const enum SENSOR_NAMES {
     S1       = "S1",
     S2       = "S2",
     S3       = "S3",
@@ -36,7 +36,7 @@ export const enum sensorNames {
     INACTIVE = "Inactive",
 }
 
-export const enum sensorDirections {
+export const enum SENSOR_DIRECTIONS {
     UP   = "UP",
     DOWN = "DOWN",
 }

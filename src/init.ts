@@ -10,16 +10,17 @@ import {
 } from './types.js'
 import { config } from './config.js'
 import { 
-    sensorNames, 
+    SENSOR_NAMES, 
     TYPEID_LOCAL 
 } from '../data/fragment/local_types.js'
+
+export const localStorage : localStorageType = {}
 
 export function init(
     storyId: string, 
     experimentId: string, 
     state: TState, 
     context: TModuleContext,
-    localStorage: localStorageType
 ): DataFrame {
         
     // initialize the result DataFrame of the init function
@@ -208,7 +209,7 @@ export function init(
                                         // set this sensor to inactive
                                         localStorage[experimentId].byGridSensor[structureId].isActive = false
                                         // set the sensor name to "Inactive"
-                                        initResult.addSeries({dynamicId:localStorage[experimentId].byGridSensor[structureId].nameId,values:[sensorNames.INACTIVE]})
+                                        initResult.addSeries({dynamicId:localStorage[experimentId].byGridSensor[structureId].nameId,values:[SENSOR_NAMES.INACTIVE]})
                                         continue
                                     }
                                     if (cableCounter > 1){
