@@ -1,4 +1,10 @@
-// src/components/update-battery-system.ts
+/**
+ * Battery System Component
+ *
+ * This module handles the simulation and updating of battery system values in the energy community asset simulator.
+ * It processes battery state of charge (SoC), capacity, charge/discharge power, and updates the simulation state accordingly.
+ */
+
 import { BifrostZeroModule } from 'bifrost-zero-sdk';
 import { BATTERY_SYSTEM_POWER_MAPPING, BATTERY_SYSTEM_MAX_POWER_MAPPING } from '../../data/fragment/local_types.js';
 import { DataFrame } from 'bifrost-zero-common';
