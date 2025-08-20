@@ -12,21 +12,21 @@ batterySystem:
 structureTypes:
   smallHouse:
     load:
-      # Load scale factor that represents typical single-family home consumption
+      # Load scale factor in p.u. that represents typical single-family home consumption
       scaleFactor: 2
   
   hugeHouse:
     load:
-      # Load scale factor that represents large residential buildings or small commercial properties
+      # Load scale factor in p.u. that represents large residential buildings or small commercial properties
       scaleFactor: 10
   
   evStation:
     evCharger:
-      # EV stations typically have multiple charging slots
-      # 3 slots allows for multiple vehicles charging simultaneously
+      # Definition of number of charging slots at a EV station
       chargingSlots: 3
     load:
-      # EV stations have no additional load beyond the charging itself
+      # Load scale factor for EV stations in p.u.
+      # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0
       scaleFactor: 0
     carStats:
       # EV station car statistics definition
@@ -66,7 +66,7 @@ structureTypes:
       # Scale factor for the infeed power for solar farms in p.u.
       scaleFactor: 8
     load:
-      # Solar farms have no load consumption (pure generation), thus their load scale factor is 0
+      # Solar farms have no load consumption (pure generation), thus their load scale factor should be 0
       scaleFactor: 0
 
   batteryStation:
@@ -77,5 +77,5 @@ structureTypes:
       dischargePower: 20
     load:
       # Load scale factor for battery stations in p.u.
-      # Battery stations have no additional load consumption, thus their load scale factor is 0
-      scaleFactor: 5
+      # Battery stations have no additional load consumption, thus their load scale factor should be 0
+      scaleFactor: 0
