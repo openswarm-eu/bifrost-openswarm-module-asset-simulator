@@ -97,9 +97,15 @@ export const defaultConfig: AssetConfig = {
     }
 };
 
+// config storage
+export let config: AssetConfig = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
+
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
+import { 
+    Log, 
+    TModuleContext } from 'bifrost-zero-common';
 
 /**
  * Deep merge two objects, with values from the source object taking precedence
@@ -133,9 +139,8 @@ function deepMerge(target: any, source: any): any {
  * 
  * Missing properties in YAML files will automatically fall back to default values
  */
-export function loadConfig(): AssetConfig {
-    let config = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
-    
+export function loadConfig(context: TModuleContext): AssetConfig {
+        
     try {
         const configDir = path.join(process.cwd(), 'config');
         const localYamlPath = path.join(configDir, 'asset-config.local.yaml');
@@ -147,9 +152,9 @@ export function loadConfig(): AssetConfig {
                 const yamlContent = fs.readFileSync(localYamlPath, 'utf8');
                 const yamlConfig = yaml.load(yamlContent) as Partial<AssetConfig>;
                 config = deepMerge(config, yamlConfig);
-                console.log('Loaded local YAML configuration from:', localYamlPath);
+                context.log.write('Loaded local YAML configuration from: ' + localYamlPath);
             } catch (error) {
-                console.warn('Failed to load local YAML config:', error instanceof Error ? error.message : String(error));
+                context.log.write('Failed to load local YAML config: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
             }
         }
         // Try main YAML config
@@ -158,18 +163,18 @@ export function loadConfig(): AssetConfig {
                 const yamlContent = fs.readFileSync(mainYamlPath, 'utf8');
                 const yamlConfig = yaml.load(yamlContent) as Partial<AssetConfig>;
                 config = deepMerge(config, yamlConfig);
-                console.log('Loaded YAML configuration from:', mainYamlPath);
+                context.log.write('Loaded main YAML configuration from: ' + mainYamlPath);
             } catch (error) {
-                console.warn('Failed to load YAML config:', error instanceof Error ? error.message : String(error));
-                console.log('Using default configuration');
+                context.log.write('Failed to load YAML config: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
+                context.log.write('Using default configuration');
             }
         } else {
-            console.log('No YAML configuration file found, using defaults');
+            context.log.write('No YAML configuration file found, using defaults');
         }
         
     } catch (error) {
-        console.warn('Error loading configuration:', error instanceof Error ? error.message : String(error));
-        console.log('Using default configuration');
+        context.log.write('Error loading configuration: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
+        context.log.write('Using default configuration');
     }
     
     return applyEnvironmentOverrides(config);
@@ -215,6 +220,3 @@ function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
     
     return config;
 }
-
-// Export a singleton instance
-export const config = loadConfig();

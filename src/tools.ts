@@ -1,11 +1,14 @@
 import * as fs from 'fs'
 import csv from 'csv-parser'
+import { 
+    Log, 
+    TModuleContext } from 'bifrost-zero-common'
 
     // CSV data storage
     export const csvData: { [key: string]: any } = {};
 
     // CSV reading function
-    export async function readCSVtoDict(filePath: string): Promise<{ [key: string]: any }> {
+    export async function readCSVtoDict(filePath: string, context: TModuleContext): Promise<{ [key: string]: any }> {
         return new Promise((resolve, reject) => {
             fs.createReadStream(filePath)
                 .pipe(csv({separator: ";", }))
@@ -24,9 +27,11 @@ import csv from 'csv-parser'
                     csvData[convertedTs] = numericRow;
                 })
                 .on('end', () => {
+                    context.log.write("CSV Data loaded!");
                     resolve(csvData);
                 })
                 .on('error', (err) => {
+                    context.log.write('Error reading CSV Data: ' + err.message, Log.level.ERROR);
                     reject(err);
                 });
         });

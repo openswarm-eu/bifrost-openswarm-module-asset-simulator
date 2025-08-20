@@ -6,17 +6,21 @@
  * It provides initialization and update logic, loads CSV profile data, and exposes module configuration.
  */
 
-import  { 
+import { 
     DataFrame, 
     TModuleContext, 
-    TState                  } from 'bifrost-zero-common'
-import  { BifrostZeroModule } from 'bifrost-zero-sdk'
-import  { TYPEID_LOCAL      } from './data/fragment/local_types.js'
-import  { TYPEID            } from './src/types.js'
-import  { readCSVtoDict     } from './src/tools.js'
-import  { init              } from './src/init.js'
-import  { update            } from './src/update.js'
+    TState                 } from 'bifrost-zero-common'
+import { BifrostZeroModule } from 'bifrost-zero-sdk'
+import { TYPEID_LOCAL      } from './data/fragment/local_types.js'
+import { TYPEID            } from './src/types.js'
+import { readCSVtoDict     } from './src/tools.js'
+import { init              } from './src/init.js'
+import { update            } from './src/update.js'
+import { loadConfig        } from './src/config.js'
 
+const csvFilePath = 'data/csv/profile-data.csv'
+
+// Module logic
 const logic = { 
     initFn: (storyId: string, experimentId: string, state: TState, context: TModuleContext) => { 
         context.log.write(`Init from [${storyId}/${experimentId}]`)
@@ -31,6 +35,7 @@ const logic = {
     }
 }
 
+// Create the BifrostZero module instance
 const m = new BifrostZeroModule({
     author         : 'anonymous',
     label          : 'OpenSwarm Asset Simulator',
@@ -55,13 +60,11 @@ const m = new BifrostZeroModule({
     hook           : process.env.HOOK ? JSON.parse(process.env.HOOK) : [100, 910]
 })
 
-const csvFilePath = 'data/csv/profile-data.csv';
-readCSVtoDict(csvFilePath)
-    .then(() => {
-        m.context.log.write("CSV Data loaded!");
-    })
-    .catch((error) => {
-        m.context.log.write('Error reading CSV Data:', error);
-    });
+// Load the module config
+loadConfig(m.context);
 
+// Load CSV profile data
+readCSVtoDict(csvFilePath, m.context)
+
+// Start the module
 m.start()
