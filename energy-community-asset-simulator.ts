@@ -23,11 +23,10 @@ import  { BifrostZeroModule } from 'bifrost-zero-sdk'
 import  { 
     CHARGING_STATION_POWER_MAPPING,
     PV_SYSTEM_POWER_MAPPING,
-    SENSOR_DIRECTIONS,
-    SENSOR_NAMES, 
     TYPEID_LOCAL 
         } from './data/fragment/local_types.js'
 import { updateBatterySystem } from './src/components/battery-system.js'
+import { updateGridSensors } from './src/components/sensor.js'
 import { 
     init, 
     localStorage 
@@ -188,41 +187,7 @@ const logic = {
             // update the grid sensor values
             if (localStorage[experimentId].numberUpdate == 2){
                 context.log.write(`Processing hook ${m.hook[localStorage[experimentId].numberUpdate-1]}`, Log.level.DEBUG)
-                for (const sensorId of localStorage[experimentId].allGridSensors){
-                    const sStruct = localStorage[experimentId].byGridSensor[sensorId]
-                    
-                    // if sensor is conected to more than 2 cables, then skip this sensor
-                    if (!sStruct.isActive){
-                        // set the sensor name to "Inactive"
-                        result.addSeries({dynamicId:sStruct.nameId,values:[SENSOR_NAMES.INACTIVE]})
-                        result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[0]})
-                        continue
-                    }
-                    
-                    // get the value of the sensor name
-                    const sensorName = dynamicsById[sStruct.nameId]
-                    if (sensorName == SENSOR_NAMES.INACTIVE){
-                        result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[0]})
-                        continue
-                    } else { 
-                        const cablePower = dynamicsById[sStruct.cablePowerId]
-                        
-                        // get the power flow scaling factor, which is -1 if powerFlowDirection is "DOWN" and 1 if it is "UP"
-                        const powerFlowDirection = dynamicsById[sStruct.powerFlowDirectionId]
-                        let powerFlowScalingFactor = 1
-                        if (powerFlowDirection === SENSOR_DIRECTIONS.DOWN){ 
-                            powerFlowScalingFactor = -1
-                        }
-                        
-                        // calculate the power value 
-                        const measuredPower = powerFlowScalingFactor * (
-                                            cablePower[0] + 
-                                            cablePower[1] + 
-                                            cablePower[2] ) / 3
-                        // write the sensor value
-                        result.addSeries({dynamicId:sStruct.powerMeasurementId,values:[measuredPower]})
-                    } 
-                }
+                updateGridSensors (dynamicsById, experimentId, result, context)
             }
             
         } catch (error) {
