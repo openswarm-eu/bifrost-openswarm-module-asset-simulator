@@ -25,7 +25,7 @@ structureTypes:
       # Scale factor for the infeed power for solar farms in p.u.
       scaleFactor: 8
     load:
-      # Solar farms have no load consumption (pure generation), thus their load scale factor is 0
+      # Solar farms have no load consumption (pure generation), thus their load scale factor should be 0
       scaleFactor: 0
   
   evStation:
@@ -34,7 +34,7 @@ structureTypes:
       chargingSlots: 3
     load:
       # Load scale factor for EV stations in p.u.
-      # EV stations have no additional load beyond the charging itself, thus their load scale factor is 0
+      # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0
       scaleFactor: 0
 
   batteryStation:
@@ -45,5 +45,5 @@ structureTypes:
       dischargePower: 20
     load:
       # Load scale factor for battery stations in p.u.
-      # Battery stations have no additional load consumption, thus their load scale factor is 0
-      scaleFactor: 5
+      # Battery stations have no additional load consumption, thus their load scale factor should be 0
+      scaleFactor: 0
