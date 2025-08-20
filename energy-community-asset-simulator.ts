@@ -64,7 +64,7 @@ const m = new BifrostZeroModule({
 loadConfig(m.context);
 
 // Load CSV profile data
-readCSVtoDict(csvFilePath, m.context)
+readCSVtoDict(csvFilePath, m.context).catch((error) => {});
 
 // Start the module
 m.start()

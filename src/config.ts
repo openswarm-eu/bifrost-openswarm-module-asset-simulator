@@ -169,7 +169,7 @@ export function loadConfig(context: TModuleContext): AssetConfig {
                 context.log.write('Using default configuration');
             }
         } else {
-            context.log.write('No YAML configuration file found, using defaults');
+            context.log.write('No YAML configuration file found, using defaults', Log.level.WARNING);
         }
         
     } catch (error) {
