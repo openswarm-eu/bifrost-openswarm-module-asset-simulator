@@ -187,7 +187,7 @@ export function loadConfig(context: TModuleContext): AssetConfig {
     
     // Reset config to defaults before loading new values
     config = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
-    context.log.write('Configuration reset to defaults');
+    context.log.write('Configuration reset to defaults',Log.level.DEBUG);
         
     try {
         const configDir = path.join(process.cwd(), 'config');
@@ -247,7 +247,7 @@ export function loadConfig(context: TModuleContext): AssetConfig {
         // Log final status
         if (!configLoaded) {
             if (!fs.existsSync(localYamlPath) && !fs.existsSync(mainYamlPath)) {
-                context.log.write('No YAML configuration files found, using built-in defaults', Log.level.INFO);
+                context.log.write('No YAML configuration files found, using built-in defaults', Log.level.WARNING);
             } else {
                 context.log.write('All YAML config loading attempts failed, using built-in defaults', Log.level.WARNING);
             }

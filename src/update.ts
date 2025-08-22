@@ -50,6 +50,7 @@ export function update(
         if (localStorage[experimentId].numberUpdate == 1){
             // give as debug information the hook which is processed here
             context.log.write(`Processing hook ${m.hook[localStorage[experimentId].numberUpdate-1]}`, Log.level.DEBUG)
+            context.log.write('Processing PCG components update (load, pv, ev, battery)', Log.level.DEBUG)
             let   wData = {};
             //  time modulo so day repeats
             const dataTime = (startAt + simulationAt) % 86400
