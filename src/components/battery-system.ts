@@ -5,12 +5,17 @@
  * It processes battery state of charge (SoC), capacity, charge/discharge power, and updates the simulation state accordingly.
  */
 
-import { BifrostZeroModule } from 'bifrost-zero-sdk';
-import { BATTERY_SYSTEM_POWER_MAPPING, BATTERY_SYSTEM_MAX_POWER_MAPPING } from '../../data/fragment/local_types.js';
-import { DataFrame } from 'bifrost-zero-common';
-import { batterySimulatorType } from '../types.js';
+import { BifrostZeroModule           } from 'bifrost-zero-sdk';
+import { 
+    BATTERY_SYSTEM_POWER_MAPPING, 
+    BATTERY_SYSTEM_MAX_POWER_MAPPING } from '../../data/fragment/local_types.js';
+import { 
+    DataFrame, 
+    Log                              } from 'bifrost-zero-common';
+import { batterySimulatorType        } from '../types.js';
 
 export function updateBatterySystem(dynamicsById, batterySystem: batterySimulatorType, m: BifrostZeroModule, result: DataFrame) {
+
     let batSocCurrent  = dynamicsById[batterySystem.dynamicId.soc];
     let batCapacity    = dynamicsById[batterySystem.dynamicId.capacity];
     let batPowerLimit  = dynamicsById[batterySystem.dynamicId.maxPower];

@@ -22,6 +22,7 @@ export function updateGridSensors(
     result: DataFrame,
     context: TModuleContext
 ): void {
+    
     context.log.write('Processing grid sensors update', Log.level.DEBUG)
     
     for (const sensorId of localStorage[experimentId].allGridSensors) {

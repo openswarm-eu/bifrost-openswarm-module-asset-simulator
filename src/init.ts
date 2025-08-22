@@ -11,7 +11,7 @@ import {
     localStorageType,
     TYPEID 
 } from './types.js'
-import { config } from './config.js'
+import { config, loadConfig } from './config.js'
 import { 
     SENSOR_NAMES, 
     TYPEID_LOCAL 
@@ -27,6 +27,10 @@ export function init(
     context: TModuleContext,
 ): DataFrame {
         
+    // Reload configuration to pick up any changes in asset-config.yaml
+    context.log.write(`Reload config for experiment [${experimentId}]`, Log.level.DEBUG);
+    loadConfig(context);
+    
     // initialize the result DataFrame of the init function
     const initResult: DataFrame = new DataFrame()
     initResult.setTime(0)
