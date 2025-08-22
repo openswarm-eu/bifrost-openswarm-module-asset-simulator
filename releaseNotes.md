@@ -1,8 +1,8 @@
 # Release Notes
 
-This document contains the release history and changelog for the Energy Community Asset Simulator.
+This document contains the release history and changelog for the **OpenSwarm Energy Community Asset Simulator**. The **RealityTwin Asset Simulator** version has own tags, but which reflect also releases of the **OpenSwarm Energy Community Asset Simulator**. Therefore the first version number reflects the version of the **RealityTwin Asset Simulator**, the second to the corresponding version of the **OpenSwarm Energy Community Asset Simulator**.
 
-## [v2.2.3] - 2025-08-22 🔧
+## [v1.0.1][v2.2.3] - 2025-08-22 🔧
 
 ### Enhancements
 - **Enhanced Configuration Handling**: Improved configuration loading with validation and dynamic reloading capabilities
@@ -20,7 +20,7 @@ This document contains the release history and changelog for the Energy Communit
 
 ---
 
-## [v2.2.2] - 2025-08-14 🔋
+## [v1.0.0][v2.2.2] - 2025-08-14 🔋
 
 ### Major Features
 - **Battery System Configuration**: Implemented comprehensive battery system configuration with defaults and deep merge functionality
@@ -36,14 +36,14 @@ This document contains the release history and changelog for the Energy Communit
 
 ---
 
-## [v2.2.1] - 2025-08-12 📄
+## [X][v2.2.1] - 2025-08-12 📄
 
 ### Features
 - **Configuration Management**: Added file-based configuration management for the asset simulator
 
 ---
 
-## [v2.2.0] - 2025-07-17 🔋
+## [X][v2.2.0] - 2025-07-17 🔋
 
 ### Major Features
 - **Battery Systems**: Added comprehensive battery system support to asset simulation
@@ -53,7 +53,7 @@ This version marks a significant milestone with the introduction of battery syst
 
 ---
 
-## [v2.1.0] - 2025-07-15 🌐
+## [X][v2.1.0] - 2025-07-15 🌐
 
 ### Major Features
 - **Grid Sensor Flow Direction**: Added GRID-SENSOR-FLOW-DIRECTION structure and integrated power flow direction handling in grid sensor logic
@@ -72,7 +72,7 @@ This version marks a significant milestone with the introduction of battery syst
 
 ---
 
-## [v2.0.0] - 2025-06-18 🚀
+## [X][v2.0.0] - 2025-06-18 🚀
 
 ### Major Release
 This version represents a significant milestone prepared for extended demonstration purposes. It includes major architectural improvements and feature additions that warranted a major version bump.
@@ -84,7 +84,7 @@ This version represents a significant milestone prepared for extended demonstrat
 
 ---
 
-## [v1.2.0] - 2025-06-11 📈
+## [X][v1.2.0] - 2025-06-11 📈
 
 ### Features
 - **Linear Interpolation**: Enhanced asset value updates with linear interpolation for missing data points
@@ -96,7 +96,7 @@ This version represents a significant milestone prepared for extended demonstrat
 
 ---
 
-## [v1.1.0] - 2025-06-04 ⭐
+## [X][v1.1.0] - 2025-06-04 ⭐
 
 ### Features
 - **Enhanced Simulation**: Enhanced simulation capabilities for PV systems and charging stations
@@ -115,6 +115,6 @@ This version represents a significant milestone prepared for extended demonstrat
 
 ---
 
-## [v1.0.0] - Initial Release 🎉
+## [X][v1.0.0] - Initial Release 🎉
 
 The first stable release of the Energy Community Asset Simulator.
