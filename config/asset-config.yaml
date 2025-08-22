@@ -1,14 +1,28 @@
 # Energy Community Asset Simulator Configuration
 # This file contains configurable parameters for different structure types
 
-# General battery system defaults (used for all battery systems unless overridden by structure type)
+# Default configurations for PGC (Power Grid Connector) components (used unless overridden by structure type)
+load:
+  # Default load scale factor in p.u.
+  scaleFactor: 1
+
+solarSystem:
+  # Default solar system scale factor in p.u.
+  scaleFactor: 1
+
+evCharger:
+  # Default number of charging slots
+  chargingSlots: 1
+  # Default maximum power per charging slot in kW
+  maxPowerPerSlot: 4
+
 batterySystem:
   # Default maximum charge power for battery systems in kW
   chargePower: 5
   # Default maximum discharge power for battery systems in kW
   dischargePower: 5
 
-# Structure-specific configurations override built-in defaults
+# Structure-specific configurations override default configurations
 structureTypes:
   smallHouse:
     load:
@@ -25,7 +39,7 @@ structureTypes:
       # Scale factor for the infeed power for solar farms in p.u.
       scaleFactor: 8
     load:
-      # Solar farms have no load consumption (pure generation), thus their load scale factor is 0
+      # Solar farms have no load consumption (pure generation), thus their load scale factor should be 0
       scaleFactor: 0
   
   evStation:
@@ -34,7 +48,7 @@ structureTypes:
       chargingSlots: 3
     load:
       # Load scale factor for EV stations in p.u.
-      # EV stations have no additional load beyond the charging itself, thus their load scale factor is 0
+      # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0
       scaleFactor: 0
 
   batteryStation:
@@ -45,5 +59,5 @@ structureTypes:
       dischargePower: 20
     load:
       # Load scale factor for battery stations in p.u.
-      # Battery stations have no additional load consumption, thus their load scale factor is 0
-      scaleFactor: 5
+      # Battery stations have no additional load consumption, thus their load scale factor should be 0
+      scaleFactor: 0

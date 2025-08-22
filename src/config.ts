@@ -9,6 +9,19 @@ export interface AssetConfig {
         chargePower: number;
         dischargePower: number;
     };
+    // Default load configuration for PGC (Power Grid Connector) components
+    load: {
+        scaleFactor: number;
+    };
+    // Default solar system configuration for PGC (Power Grid Connector) components
+    solarSystem: {
+        scaleFactor: number;
+    };
+    // Default EV charger configuration for PGC (Power Grid Connector) components
+    evCharger: {
+        chargingSlots: number;
+        maxPowerPerSlot: number;
+    };
     // Structure-specific configurations
     structureTypes: {
         solarFarm: {
@@ -58,6 +71,16 @@ export const defaultConfig: AssetConfig = {
         chargePower: 5,
         dischargePower: 5
     },
+    load: {
+        scaleFactor: 1
+    },
+    solarSystem: {
+        scaleFactor: 1
+    },
+    evCharger: {
+        chargingSlots: 1,
+        maxPowerPerSlot: 4
+    },
     structureTypes: {
         solarFarm: {
             solarSystem: {
@@ -97,9 +120,15 @@ export const defaultConfig: AssetConfig = {
     }
 };
 
+// config storage
+export let config: AssetConfig = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
+
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
+import { 
+    Log, 
+    TModuleContext } from 'bifrost-zero-common';
 
 /**
  * Deep merge two objects, with values from the source object taking precedence
@@ -124,6 +153,26 @@ function deepMerge(target: any, source: any): any {
 }
 
 /**
+ * Validate that a configuration object has basic required structure
+ * This helps catch corrupted or malformed YAML files
+ */
+function isValidConfigStructure(config: any): boolean {
+    if (!config || typeof config !== 'object') {
+        return false;
+    }
+    
+    // Check for at least one of the main configuration sections
+    const hasValidSection = 
+        (config.batterySystem && typeof config.batterySystem === 'object') ||
+        (config.load && typeof config.load === 'object') ||
+        (config.solarSystem && typeof config.solarSystem === 'object') ||
+        (config.evCharger && typeof config.evCharger === 'object') ||
+        (config.structureTypes && typeof config.structureTypes === 'object');
+    
+    return hasValidSection;
+}
+
+/**
  * Load configuration from YAML file and environment variables
  * Priority order:
  * 1. Environment Variables (highest priority)
@@ -132,44 +181,81 @@ function deepMerge(target: any, source: any): any {
  * 4. Default values (lowest priority)
  * 
  * Missing properties in YAML files will automatically fall back to default values
+ * This function can be called multiple times to reload configuration dynamically
  */
-export function loadConfig(): AssetConfig {
-    let config = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
+export function loadConfig(context: TModuleContext): AssetConfig {
     
+    // Reset config to defaults before loading new values
+    config = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
+    context.log.write('Configuration reset to defaults',Log.level.DEBUG);
+        
     try {
         const configDir = path.join(process.cwd(), 'config');
         const localYamlPath = path.join(configDir, 'asset-config.local.yaml');
         const mainYamlPath = path.join(configDir, 'asset-config.yaml');
+        
+        let configLoaded = false;
         
         // Try local YAML first (for testing/development)
         if (fs.existsSync(localYamlPath)) {
             try {
                 const yamlContent = fs.readFileSync(localYamlPath, 'utf8');
                 const yamlConfig = yaml.load(yamlContent) as Partial<AssetConfig>;
-                config = deepMerge(config, yamlConfig);
-                console.log('Loaded local YAML configuration from:', localYamlPath);
+                
+                if (yamlConfig && isValidConfigStructure(yamlConfig)) {
+                    config = deepMerge(config, yamlConfig);
+                    context.log.write('Successfully loaded local YAML configuration from: ' + localYamlPath);
+                    configLoaded = true;
+                } else {
+                    context.log.write('Local YAML config file is empty or has invalid structure, using defaults', Log.level.WARNING);
+                }
             } catch (error) {
-                console.warn('Failed to load local YAML config:', error instanceof Error ? error.message : String(error));
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                if (errorMsg.includes('ENOENT') || errorMsg.includes('no such file')) {
+                    context.log.write('Local YAML config file was deleted or moved during read, trying main config', Log.level.WARNING);
+                } else {
+                    context.log.write('Failed to load local YAML config: ' + errorMsg, Log.level.ERROR);
+                }
+                context.log.write('Falling back to main config or defaults', Log.level.INFO);
             }
         }
-        // Try main YAML config
-        else if (fs.existsSync(mainYamlPath)) {
+        
+        // Try main YAML config (if local wasn't loaded successfully)
+        if (!configLoaded && fs.existsSync(mainYamlPath)) {
             try {
                 const yamlContent = fs.readFileSync(mainYamlPath, 'utf8');
                 const yamlConfig = yaml.load(yamlContent) as Partial<AssetConfig>;
-                config = deepMerge(config, yamlConfig);
-                console.log('Loaded YAML configuration from:', mainYamlPath);
+                
+                if (yamlConfig && isValidConfigStructure(yamlConfig)) {
+                    config = deepMerge(config, yamlConfig);
+                    context.log.write('Successfully loaded main YAML configuration from: ' + mainYamlPath);
+                    configLoaded = true;
+                } else {
+                    context.log.write('Main YAML config file is empty or has invalid structure, using defaults', Log.level.WARNING);
+                }
             } catch (error) {
-                console.warn('Failed to load YAML config:', error instanceof Error ? error.message : String(error));
-                console.log('Using default configuration');
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                if (errorMsg.includes('ENOENT') || errorMsg.includes('no such file')) {
+                    context.log.write('Main YAML config file was deleted during read, using defaults', Log.level.WARNING);
+                } else {
+                    context.log.write('Failed to load main YAML config: ' + errorMsg, Log.level.ERROR);
+                }
+                context.log.write('Using default configuration only', Log.level.WARNING);
             }
-        } else {
-            console.log('No YAML configuration file found, using defaults');
+        }
+        
+        // Log final status
+        if (!configLoaded) {
+            if (!fs.existsSync(localYamlPath) && !fs.existsSync(mainYamlPath)) {
+                context.log.write('No YAML configuration files found, using built-in defaults', Log.level.WARNING);
+            } else {
+                context.log.write('All YAML config loading attempts failed, using built-in defaults', Log.level.WARNING);
+            }
         }
         
     } catch (error) {
-        console.warn('Error loading configuration:', error instanceof Error ? error.message : String(error));
-        console.log('Using default configuration');
+        context.log.write('Critical error in configuration loading: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
+        context.log.write('Using built-in default configuration as fallback', Log.level.ERROR);
     }
     
     return applyEnvironmentOverrides(config);
@@ -181,6 +267,22 @@ export function loadConfig(): AssetConfig {
 function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
     // Override with environment variables if present (highest priority)
 
+    if (process.env.DEFAULT_LOAD_SCALE_FACTOR) {
+        config.load.scaleFactor = Number(process.env.DEFAULT_LOAD_SCALE_FACTOR);
+    }
+    
+    if (process.env.DEFAULT_SOLAR_SCALE_FACTOR) {
+        config.solarSystem.scaleFactor = Number(process.env.DEFAULT_SOLAR_SCALE_FACTOR);
+    }
+    
+    if (process.env.DEFAULT_EV_CHARGING_SLOTS) {
+        config.evCharger.chargingSlots = Number(process.env.DEFAULT_EV_CHARGING_SLOTS);
+    }
+    
+    if (process.env.DEFAULT_EV_MAX_POWER_PER_SLOT) {
+        config.evCharger.maxPowerPerSlot = Number(process.env.DEFAULT_EV_MAX_POWER_PER_SLOT);
+    }
+    
     if (process.env.BATTERY_CHARGE_POWER) {
         config.batterySystem.chargePower = Number(process.env.BATTERY_CHARGE_POWER);
     }
@@ -215,6 +317,3 @@ function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
     
     return config;
 }
-
-// Export a singleton instance
-export const config = loadConfig();
