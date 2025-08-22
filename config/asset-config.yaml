@@ -1,14 +1,28 @@
 # Energy Community Asset Simulator Configuration
 # This file contains configurable parameters for different structure types
 
-# General battery system defaults (used for all battery systems unless overridden by structure type)
+# Default configurations for PGC (Power Grid Connector) components (used unless overridden by structure type)
+load:
+  # Default load scale factor in p.u.
+  scaleFactor: 1
+
+solarSystem:
+  # Default solar system scale factor in p.u.
+  scaleFactor: 1
+
+evCharger:
+  # Default number of charging slots
+  chargingSlots: 1
+  # Default maximum power per charging slot in kW
+  maxPowerPerSlot: 4
+
 batterySystem:
   # Default maximum charge power for battery systems in kW
   chargePower: 5
   # Default maximum discharge power for battery systems in kW
   dischargePower: 5
 
-# Structure-specific configurations override built-in defaults
+# Structure-specific configurations override default configurations
 structureTypes:
   smallHouse:
     load:

@@ -9,6 +9,19 @@ export interface AssetConfig {
         chargePower: number;
         dischargePower: number;
     };
+    // Default load configuration for PGC (Power Grid Connector) components
+    load: {
+        scaleFactor: number;
+    };
+    // Default solar system configuration for PGC (Power Grid Connector) components
+    solarSystem: {
+        scaleFactor: number;
+    };
+    // Default EV charger configuration for PGC (Power Grid Connector) components
+    evCharger: {
+        chargingSlots: number;
+        maxPowerPerSlot: number;
+    };
     // Structure-specific configurations
     structureTypes: {
         solarFarm: {
@@ -57,6 +70,16 @@ export const defaultConfig: AssetConfig = {
     batterySystem: {
         chargePower: 5,
         dischargePower: 5
+    },
+    load: {
+        scaleFactor: 1
+    },
+    solarSystem: {
+        scaleFactor: 1
+    },
+    evCharger: {
+        chargingSlots: 1,
+        maxPowerPerSlot: 4
     },
     structureTypes: {
         solarFarm: {
@@ -186,6 +209,22 @@ export function loadConfig(context: TModuleContext): AssetConfig {
 function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
     // Override with environment variables if present (highest priority)
 
+    if (process.env.DEFAULT_LOAD_SCALE_FACTOR) {
+        config.load.scaleFactor = Number(process.env.DEFAULT_LOAD_SCALE_FACTOR);
+    }
+    
+    if (process.env.DEFAULT_SOLAR_SCALE_FACTOR) {
+        config.solarSystem.scaleFactor = Number(process.env.DEFAULT_SOLAR_SCALE_FACTOR);
+    }
+    
+    if (process.env.DEFAULT_EV_CHARGING_SLOTS) {
+        config.evCharger.chargingSlots = Number(process.env.DEFAULT_EV_CHARGING_SLOTS);
+    }
+    
+    if (process.env.DEFAULT_EV_MAX_POWER_PER_SLOT) {
+        config.evCharger.maxPowerPerSlot = Number(process.env.DEFAULT_EV_MAX_POWER_PER_SLOT);
+    }
+    
     if (process.env.BATTERY_CHARGE_POWER) {
         config.batterySystem.chargePower = Number(process.env.BATTERY_CHARGE_POWER);
     }
