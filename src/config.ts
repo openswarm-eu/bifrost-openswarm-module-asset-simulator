@@ -153,6 +153,26 @@ function deepMerge(target: any, source: any): any {
 }
 
 /**
+ * Validate that a configuration object has basic required structure
+ * This helps catch corrupted or malformed YAML files
+ */
+function isValidConfigStructure(config: any): boolean {
+    if (!config || typeof config !== 'object') {
+        return false;
+    }
+    
+    // Check for at least one of the main configuration sections
+    const hasValidSection = 
+        (config.batterySystem && typeof config.batterySystem === 'object') ||
+        (config.load && typeof config.load === 'object') ||
+        (config.solarSystem && typeof config.solarSystem === 'object') ||
+        (config.evCharger && typeof config.evCharger === 'object') ||
+        (config.structureTypes && typeof config.structureTypes === 'object');
+    
+    return hasValidSection;
+}
+
+/**
  * Load configuration from YAML file and environment variables
  * Priority order:
  * 1. Environment Variables (highest priority)
@@ -161,43 +181,81 @@ function deepMerge(target: any, source: any): any {
  * 4. Default values (lowest priority)
  * 
  * Missing properties in YAML files will automatically fall back to default values
+ * This function can be called multiple times to reload configuration dynamically
  */
 export function loadConfig(context: TModuleContext): AssetConfig {
+    
+    // Reset config to defaults before loading new values
+    config = JSON.parse(JSON.stringify(defaultConfig)); // Deep clone of defaults
+    context.log.write('Configuration reset to defaults');
         
     try {
         const configDir = path.join(process.cwd(), 'config');
         const localYamlPath = path.join(configDir, 'asset-config.local.yaml');
         const mainYamlPath = path.join(configDir, 'asset-config.yaml');
         
+        let configLoaded = false;
+        
         // Try local YAML first (for testing/development)
         if (fs.existsSync(localYamlPath)) {
             try {
                 const yamlContent = fs.readFileSync(localYamlPath, 'utf8');
                 const yamlConfig = yaml.load(yamlContent) as Partial<AssetConfig>;
-                config = deepMerge(config, yamlConfig);
-                context.log.write('Loaded local YAML configuration from: ' + localYamlPath);
+                
+                if (yamlConfig && isValidConfigStructure(yamlConfig)) {
+                    config = deepMerge(config, yamlConfig);
+                    context.log.write('Successfully loaded local YAML configuration from: ' + localYamlPath);
+                    configLoaded = true;
+                } else {
+                    context.log.write('Local YAML config file is empty or has invalid structure, using defaults', Log.level.WARNING);
+                }
             } catch (error) {
-                context.log.write('Failed to load local YAML config: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                if (errorMsg.includes('ENOENT') || errorMsg.includes('no such file')) {
+                    context.log.write('Local YAML config file was deleted or moved during read, trying main config', Log.level.WARNING);
+                } else {
+                    context.log.write('Failed to load local YAML config: ' + errorMsg, Log.level.ERROR);
+                }
+                context.log.write('Falling back to main config or defaults', Log.level.INFO);
             }
         }
-        // Try main YAML config
-        else if (fs.existsSync(mainYamlPath)) {
+        
+        // Try main YAML config (if local wasn't loaded successfully)
+        if (!configLoaded && fs.existsSync(mainYamlPath)) {
             try {
                 const yamlContent = fs.readFileSync(mainYamlPath, 'utf8');
                 const yamlConfig = yaml.load(yamlContent) as Partial<AssetConfig>;
-                config = deepMerge(config, yamlConfig);
-                context.log.write('Loaded main YAML configuration from: ' + mainYamlPath);
+                
+                if (yamlConfig && isValidConfigStructure(yamlConfig)) {
+                    config = deepMerge(config, yamlConfig);
+                    context.log.write('Successfully loaded main YAML configuration from: ' + mainYamlPath);
+                    configLoaded = true;
+                } else {
+                    context.log.write('Main YAML config file is empty or has invalid structure, using defaults', Log.level.WARNING);
+                }
             } catch (error) {
-                context.log.write('Failed to load YAML config: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
-                context.log.write('Using default configuration');
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                if (errorMsg.includes('ENOENT') || errorMsg.includes('no such file')) {
+                    context.log.write('Main YAML config file was deleted during read, using defaults', Log.level.WARNING);
+                } else {
+                    context.log.write('Failed to load main YAML config: ' + errorMsg, Log.level.ERROR);
+                }
+                context.log.write('Using default configuration only', Log.level.WARNING);
             }
-        } else {
-            context.log.write('No YAML configuration file found, using defaults', Log.level.WARNING);
+        }
+        
+        // Log final status
+        if (!configLoaded) {
+            if (!fs.existsSync(localYamlPath) && !fs.existsSync(mainYamlPath)) {
+                context.log.write('No YAML configuration files found, using built-in defaults', Log.level.INFO);
+            } else {
+                context.log.write('All YAML config loading attempts failed, using built-in defaults', Log.level.WARNING);
+            }
         }
         
     } catch (error) {
-        context.log.write('Error loading configuration: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
-        context.log.write('Using default configuration');
+        context.log.write('Critical error in configuration loading: ' + (error instanceof Error ? error.message : String(error)), Log.level.ERROR);
+        context.log.write('Using built-in default configuration as fallback', Log.level.ERROR);
     }
     
     return applyEnvironmentOverrides(config);

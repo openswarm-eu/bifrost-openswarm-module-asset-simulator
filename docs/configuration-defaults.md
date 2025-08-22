@@ -2,7 +2,12 @@
 
 ## Overview
 
-The Energy Community Asset Simulator configuration system now supports **automatic fallback to default values** for any parameters not defined in the `asset-config.yaml` file.
+The Energy Community Asset Simulator configuration system now supports **automatic fallback to default values** for any parameters not defined in the `asset-config.yaml` file. Additionally, the system supports **dynamic configuration reloading** - configuration changes are automatically picked up for each new simulation without requiring a module restart.
+
+## Dynamic Configuration Reloading
+
+The configuration system automatically reloads the `asset-config.yaml` file at the start of each simulation (when the `init` function is called). This means:
+
 
 ## How It Works
 
@@ -63,13 +68,6 @@ structureTypes:
 ```
 
 **Result**: All other configuration sections (battery system, other structure types) use their complete default configurations.
-
-## Benefits
-
-1. **Backwards Compatibility**: Existing YAML files continue to work
-2. **Flexibility**: You only need to define values you want to change
-3. **Maintainability**: Adding new default parameters doesn't break existing configs
-4. **Safety**: Missing configurations don't cause runtime errors
 
 ## Default Values Reference
 
