@@ -59,16 +59,16 @@ export function init(
                         pvApId    : "",
                         pvMaxApId : "",
                         load      : {
-                            scaleFactor : 1  // Default load scale factor
+                            scaleFactor : config.load.scaleFactor  // Use config default load scale factor
                         },
                         solarSystem : {
-                            scaleFactor : 1  // Default solar scale factor
+                            scaleFactor : config.solarSystem.scaleFactor  // Use config default solar scale factor
                         },
                         evApId    : "",
                         evMaxApId : "",
                         evCharger : {
-                            chargingSlots   : 1,  // Default charging slots
-                            maxPowerPerSlot : 4,  // Default max power per slot in kW
+                            chargingSlots   : config.evCharger.chargingSlots,  // Use config default charging slots
+                            maxPowerPerSlot : config.evCharger.maxPowerPerSlot,  // Use config default max power per slot in kW
                             shiftedEnergy   : 0
                         },
                         batterySystem     : {

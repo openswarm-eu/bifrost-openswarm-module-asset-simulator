@@ -77,10 +77,19 @@ See `src/config.ts` for the complete list of default values:
 
 ```typescript
 export const defaultConfig: AssetConfig = {
+    load: {
+        scaleFactor: 1       // Default load scale factor in p.u.
+    },
+    solarSystem: {
+        scaleFactor: 1       // Default solar system scale factor in p.u.
+    },
+    evCharger: {
+        chargingSlots: 1,    // Default charging slots
+        maxPowerPerSlot: 4   // Default max power per slot in kW
+    },
     batterySystem: {
-        chargePower: 5,     // kW
-        dischargePower: 5,  // kW  
-        storedEnergy: 5     // kWh
+        chargePower: 5,     // Default maximum charge power for battery systems in kW
+        dischargePower: 5,  // Default maximum discharge power for battery systems in kW  
     },
     structureTypes: {
         solarFarm: {

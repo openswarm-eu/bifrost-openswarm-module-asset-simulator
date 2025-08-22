@@ -25,7 +25,11 @@ import {
     init                   } from './src/init.js'
 import { update            } from './src/update.js'
 import { config            } from './src/config.js'
+import { loadConfig        } from './src/config.js'
 
+const csvFilePath = 'data/csv/profile-data.csv'
+
+// Module logic
 const logic = { 
     initFn: (storyId: string, experimentId: string, state: TState, context: TModuleContext) => { 
         context.log.write(`Init from [${storyId}/${experimentId}]`)
@@ -40,6 +44,7 @@ const logic = {
     }
 }
 
+// Create the BifrostZero module instance
 const m = new BifrostZeroModule({
     author         : 'anonymous',
     label          : 'OpenSwarm Asset Simulator',
@@ -199,14 +204,11 @@ m.app.post("/rest/updateCars", (request, reply) => {
     }))
 });
 
-// Load CSV profile data
-const csvFilePath = 'data/csv/profile-data.csv';
-readCSVtoDict(csvFilePath)
-    .then(() => {
-        m.context.log.write("CSV Data loaded!");
-    })
-    .catch((error) => {
-        m.context.log.write('Error reading CSV Data:', error);
-    });
+// Load the module config
+loadConfig(m.context);
 
+// Load CSV profile data
+readCSVtoDict(csvFilePath, m.context).catch((error) => {});
+
+// Start the module
 m.start()
