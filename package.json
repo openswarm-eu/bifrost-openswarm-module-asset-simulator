@@ -1,6 +1,6 @@
 {
     "name": "energy-community-asset-simulator",
-    "version": "2.2.2",
+    "version": "2.2.3",
     "description": "PV simulator for PoC1",
     "type": "module",
     "scripts": {
