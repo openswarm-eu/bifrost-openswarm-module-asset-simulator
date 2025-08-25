@@ -1,0 +1,18 @@
+meta {
+  name: updateCars
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://127.0.0.1:7032/rest/updateCars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "EV-STATION::[1|1,1|2,2|1,2|2]@EXPERIMENT::IbTdgP59": [-1,-1,-1],
+    "expId": ["EXPERIMENT::IbTdgP59"]
+  }
+}
