@@ -72,6 +72,8 @@ const m = new BifrostZeroModule({
 
 // REST endpoint accessed by the RealityTwin hardware module "STORAGE BUILDING"
 m.app.post("/rest/updateCapacity", async (request, reply) => {
+    m.context.log.write(`Got external REST request for updating "STORAGE BUILDING"...`)
+
     const body = request.body as object
     try {
             const storyId = body["storyId"]
@@ -84,16 +86,22 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
                 message: "success"
             }))
     } catch (e) {
-        var msg = "Error parsing capacity update"
+        var msg = "Error parsing capacity update: "
         m.context.log.write(msg + e, Log.level.ERROR)
         reply.status(400).send(JSON.stringify({
                 message: "fail"
             }))
     }
+
+    const batteryStationId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
+    m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${batteryStationId}`, Log.level.DEBUG)
+    m.context.log.write(`Requested capacity: ${body["dynamicValue"]}`, Log.level.DEBUG)
 })
 
 // REST endpoint accessed by the RealityTwin hardware module "E-CAR CHARGING STATION"
 m.app.post("/rest/updateCars", (request, reply) => {
+    m.context.log.write(`Got external REST request for updating "E-CAR CHARGING STATION"...`)
+
     const body = request.body as object
     // get key from object
     const evStationId = Object.keys(body)[0]
@@ -101,23 +109,24 @@ m.app.post("/rest/updateCars", (request, reply) => {
     if (carAssignmentObject[experimentId] == undefined){
         carAssignmentObject[experimentId] = [] as CarAssignment
         let carObj:CarObj = {
-                        ecar_assignment_slots_number: 3,
-                        ecar_assignment_slots : [],
-                        pgc_id: ""
-                        }
-                        // init occupation for all slots
+            ecar_assignment_slots_number: 3,
+            ecar_assignment_slots : [],
+            pgc_id: ""
+        }
+
+        // update occupation for all slots
         for(var j = 0; j < 3; j++){
-            carObj.ecar_assignment_slots.push({ecar_id: body[evStationId][j],
-                                            charge: config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
-                                            charge_max:config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
-                                            shifted_energy: 0
+            carObj.ecar_assignment_slots.push({
+                ecar_id        : body[evStationId][j],
+                charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
+                charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
+                shifted_energy : 0
             })
         }
         carAssignmentObject[experimentId][evStationId] = carObj
     }
-    m.context.log.write(`experimentId: ${body[evStationId]}`)
-    m.context.log.write(`/rest/updateCars for: ${evStationId}`)
-    m.context.log.write(`car occupation: ${body[evStationId]}`)
+    m.context.log.write(`Rest Call '/rest/updateCars' for: ${evStationId}`, Log.level.DEBUG)
+    m.context.log.write(`Requested car occupation: ${body[evStationId]}`, Log.level.DEBUG)
     if(!body[evStationId]){
         reply.status(200).send(JSON.stringify({
             message: "failure, malformed request"

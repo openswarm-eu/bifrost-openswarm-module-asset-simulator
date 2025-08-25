@@ -23,15 +23,15 @@ import { config                     } from './config.js'
 import { CarObj                     } from './types.js'
 
 export function update(
-    storyId: string, 
-    experimentId: string, 
-    startAt: number, 
-    simulationAt: number, 
-    replayAt: number, 
-    data: DataFrame, 
-    context: TModuleContext,
-    m: BifrostZeroModule
-): DataFrame {
+    storyId      : string, 
+    experimentId : string, 
+    startAt      : number, 
+    simulationAt : number, 
+    replayAt     : number, 
+    data         : DataFrame, 
+    context      : TModuleContext,
+    m            : BifrostZeroModule
+) : DataFrame {
     
     // extract subscriptionData out of dataFrame
     var dynamicsById = {}
@@ -133,6 +133,7 @@ export function update(
                     let chgPowerLimit   = 0
                     let carStats = config.structureTypes.evStation.carStats
                     const chgPowerList: number[] = []
+                    
                     // check if ev-station is in the struct from the mc
                     if (Object.keys(carAssignmentObject[experimentId]).includes(pStruct.parentBuildingId)){
                         const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
@@ -149,7 +150,7 @@ export function update(
                             chgPowerShifted += curCarPower
                             chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
                         }
-                    }else{
+                    } else {
                         // calculate the charging power of each of the charging slots for non-ev-stations
                         for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
                             chgPowerDemand  += wData["EV"]
@@ -166,7 +167,7 @@ export function update(
                             newChgPower = chgPowerLimit
                         }
                         // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy + chgPowerShifted
-                        //pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
+                        // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
                         chgPowerShifted = newChgPower
                     
                     }
@@ -207,7 +208,6 @@ export function update(
                             }
                         }
                     }
-                    console.log(pStruct.evCharger.shiftedEnergy)
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
                 }
