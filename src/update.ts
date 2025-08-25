@@ -161,10 +161,10 @@ export function update(
                     let chgPowerSetPoint = dynamicsById[pStruct.evMaxApId]
                     pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                     if (pStruct.evCharger.shiftedEnergy > 0){
-                        let newChgPower = chgPowerShifted + pStruct.evCharger.shiftedEnergy
+                        let newChgPower = chgPowerSetPoint + pStruct.evCharger.shiftedEnergy
                         if (newChgPower > chgPowerLimit){
                             newChgPower = chgPowerLimit
-                        } 
+                        }
                         // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy + chgPowerShifted
                         //pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
                         chgPowerShifted = newChgPower
@@ -176,26 +176,38 @@ export function update(
                         // pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                     } else {
                         chgPowerActual = chgPowerShifted
+                        if (pStruct.evCharger.shiftedEnergy < 0){
+                            chgPowerActual = pStruct.evCharger.shiftedEnergy + chgPowerSetPoint
+                            pStruct.evCharger.shiftedEnergy = 0
+                        }
                     }
 
                     chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand]   = chgPowerDemand
                     chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]   = chgPowerActual
-                    chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
+                    if (chgPowerShifted > (pStruct.evCharger.shiftedEnergy + chgPowerDemand)){
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = pStruct.evCharger.shiftedEnergy + chgPowerDemand
+                    }else{
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
+                    }
+                    
                     // again, check if it was 
                     if (Object.keys(carAssignmentObject[experimentId]).includes(pStruct.parentBuildingId)){
                         const sumPower = chgPowerList.reduce((acc, current) => acc + current, 0)
-                        const partPower = chgPowerActual/sumPower || 1 
                         const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
                         // need to reduce the power which can be actually charged for the evcars
                         // if partPower != 1 then it should be reduced
-                        for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
-                            const carId = carObj.ecar_assignment_slots[i].ecar_id
-                            let curCarPower = Number(carStats[carId].carPower)
-                            const chargedPower = chgPowerSetPoint * partPower
-                            carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
-                            carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
+                        if (sumPower != 0){
+                            for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
+                                const partPower = chgPowerList[i]/sumPower
+                                const carId = carObj.ecar_assignment_slots[i].ecar_id
+                                let curCarPower = Number(carStats[carId].carPower)
+                                const chargedPower = chgPowerActual * partPower
+                                carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
+                                carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
+                            }
                         }
                     }
+                    console.log(pStruct.evCharger.shiftedEnergy)
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
                 }

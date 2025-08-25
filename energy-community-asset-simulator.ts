@@ -21,7 +21,8 @@ import {
     readCSVtoDict, 
     updateDynamic          } from './src/tools.js'
 import { 
-    carAssignmentObject, 
+    carAssignmentObject,
+    localStorage, 
     init                   } from './src/init.js'
 import { update            } from './src/update.js'
 import { config            } from './src/config.js'
@@ -172,32 +173,6 @@ m.app.post("/rest/updateCars", (request, reply) => {
             localStorage[experimentId].byPGC[carObj.pgc_id].evCharger.shiftedEnergy = 0
         }
     }
-//     let length = 3;
-//     let carObj:CarObj = {
-//         ecar_assignment_slots_number: 3,
-//         ecar_assignment_slots : []
-//     }
-//    // register occupation for all slots
-//     for(var i = 0; i < 3; i++){
-//         carObj.ecar_assignment_slots.push({"ecar_id": parseInt(body[evStationId][i])})
-//     }
-//     if (carAssignmentObject[experimentId].length == 0){
-//         carAssignmentObject[experimentId] = [carObj]
-//     }else{
-//         carAssignmentObject[experimentId][evStationId] = carObj
-//     }
-//     carObj["ecar_assignment_slots_number"] = length
-    // try{
-    //     m.context.log.write('writing')
-    //     fs.writeFileSync(`./data/ev_files/ecar_assignment_${experimentId}.json`, JSON.stringify(carAssignmentObject[experimentId]));
-    //     m.context.log.write(`car assignment for experiment ${experimentId} successfully written`)
-    // }catch(e){
-    //     m.context.log.write(e)
-    //     reply.status(200).send(JSON.stringify({
-    //         message: "failure, try and catch failure"
-    //     }))
-    //     return
-    // }
     // Reply to the frontend
     reply.status(200).send(JSON.stringify({
         message: "success"
