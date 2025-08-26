@@ -119,10 +119,11 @@ m.app.post("/rest/updateCars", (request, reply) => {
         // update occupation for all slots
         for(var j = 0; j < 3; j++){
             carObj.ecar_assignment_slots.push({
-                ecar_id        : body[evStationId][j],
-                charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
-                charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
-                shifted_energy : 0
+                ecar_id          : body[evStationId][j],
+                charge           : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
+                charge_max       : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
+                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower*1.2,
+                shifted_energy   : 0
             })
         }
         carAssignmentObject[experimentId][evStationId] = carObj
@@ -165,6 +166,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
             slot.ecar_id = body[evStationId][i]
             slot.charge_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carMaxCap
             slot.charge = slot.charge_max*0.15
+            slot.charge_power_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carPower*1.2
             if(localStorage[experimentId].byPGC[carObj.pgc_id] != undefined){
                 // reset the shifted energy when it disconnects and also subtract it from the internal struct
                 if(slot.ecar_id == -1){

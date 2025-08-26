@@ -148,7 +148,7 @@ export function update(
                             chgPowerList.push(curCarPower)
                             chgPowerDemand  += curCarPower
                             chgPowerShifted += curCarPower
-                            chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
+                            chgPowerLimit   += carinSlot.charge_power_max
                         }
                     } else {
                         // calculate the charging power of each of the charging slots for non-ev-stations

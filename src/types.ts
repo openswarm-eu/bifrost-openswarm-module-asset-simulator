@@ -31,6 +31,7 @@ export type assignmentSlots = {
     ecar_id: number
     charge: number
     charge_max: number
+    charge_power_max: number
     shifted_energy: number
 }
 
