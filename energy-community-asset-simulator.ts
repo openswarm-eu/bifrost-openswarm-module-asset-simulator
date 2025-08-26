@@ -23,7 +23,8 @@ import {
 import { 
     carAssignmentObject,
     localStorage, 
-    init                   } from './src/init.js'
+    init,                   
+    storageDynToValueMap} from './src/init.js'
 import { update            } from './src/update.js'
 import { config            } from './src/config.js'
 import { loadConfig        } from './src/config.js'
@@ -82,6 +83,7 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
             const dynVal = parseFloat(body["dynamicValue"])
             const bifrostURL = process.env.BIFROST_URL || 'http://localhost:9091'
             const status = await updateDynamic(bifrostURL, storyId, expId, dynId, dynVal, m.context.log, Log)
+            storageDynToValueMap[dynId] = dynVal
             reply.status(status).send(JSON.stringify({
                 message: "success"
             }))
@@ -92,7 +94,7 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
                 message: "fail"
             }))
     }
-
+    
     const batteryStationId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
     m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${batteryStationId}`, Log.level.DEBUG)
     m.context.log.write(`Requested capacity: ${body["dynamicValue"]}`, Log.level.DEBUG)

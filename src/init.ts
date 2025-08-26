@@ -9,6 +9,7 @@ import {
     CarAssignmentObject,
     CarObj,
     localStorageType,
+    storageDynToValueMapType,
     TYPEID 
 } from './types.js'
 import { config, loadConfig } from './config.js'
@@ -19,6 +20,7 @@ import {
 
 export var carAssignmentObject:CarAssignmentObject = {}
 export const localStorage : localStorageType = {}
+export const storageDynToValueMap : storageDynToValueMapType = {}
 
 export function init(
     storyId: string, 
@@ -160,6 +162,11 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_CAPACITY){
                                     localStorage[experimentId].byPGC[structureId].batterySystem.dynamicId.capacity = dynId
+                                    // check if there was something written to the localStorage from the restEndpoint
+                                    // if it is not undefined it means there was a rest call previously
+                                    if (storageDynToValueMap[dynId] != undefined){
+                                        initResult.addSeries({dynamicId:dynId,values:[storageDynToValueMap[dynId]]})
+                                    }
                                 }
                             }
                         }

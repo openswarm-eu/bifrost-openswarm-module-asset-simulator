@@ -85,6 +85,7 @@ export type gridSensorType = {
         powerLimitId         : string
     }
 }
+export type storageDynToValueMapType = {[Key: string]: number}
 
 export type localStorageType = {
     [Key: string]: {
