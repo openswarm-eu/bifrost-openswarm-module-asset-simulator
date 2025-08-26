@@ -23,10 +23,10 @@ export const localStorage : localStorageType = {}
 export const storageDynToValueMap : storageDynToValueMapType = {}
 
 export function init(
-    storyId: string, 
-    experimentId: string, 
-    state: TState, 
-    context: TModuleContext,
+    storyId      : string, 
+    experimentId : string, 
+    state        : TState, 
+    context      : TModuleContext,
 ): DataFrame {
         
     // Reload configuration to pick up any changes in asset-config.yaml
@@ -90,31 +90,6 @@ export function init(
                         },
                         parentBuildingId: ""
                     }
-
-                    // to get the ev-station key for the struct
-                        const parentBuildingId = state.structures.entities[structureId].parentIds[0]
-                        localStorage[experimentId].byPGC[structureId].parentBuildingId = parentBuildingId
-                        // init no cars if it is a EV-STATION
-                        if (state.structures.entities[parentBuildingId].typeId == TYPEID_LOCAL.EV_STATION){
-                            if (carAssignmentObject[experimentId][parentBuildingId] == undefined){
-                                let carObj:CarObj = {
-                                ecar_assignment_slots_number: 3,
-                                ecar_assignment_slots : [],
-                                pgc_id: structureId
-                                }
-                                // init occupation for all slots
-                                for(var i = 0; i < 3; i++){
-                                    carObj.ecar_assignment_slots.push({ecar_id: -1,
-                                                                    charge: 0,
-                                                                    charge_max:0,
-                                                                    shifted_energy: 0
-                                    })
-                                }
-                                carAssignmentObject[experimentId][parentBuildingId] = carObj
-                            }else{
-                                carAssignmentObject[experimentId][parentBuildingId].pgc_id = structureId
-                            }
-                        }
                     
                     // get apId of pgc
                     const pgcDynIds:string[] = entity.dynamicIds
@@ -175,6 +150,8 @@ export function init(
                     // go throught the parents
                     const pgcParentIds:string[] = entity.parentIds
                     for (const parentId of pgcParentIds){
+                        // set the parent building ID
+                        localStorage[experimentId].byPGC[structureId].parentBuildingId = parentId
                         // identfiy Solar-Farms
                         if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.SOLAR_FARM){
                             // set the scaleFactor for the solar system simulator to a higher value
@@ -188,6 +165,27 @@ export function init(
                             localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = config.structureTypes.evStation.evCharger.chargingSlots
                             //switch off the load simulator for the EV-Station
                             localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.evStation.load.scaleFactor
+                            // init cars
+                            if (carAssignmentObject[experimentId][parentId] == undefined){
+                                let carObj:CarObj = {
+                                    ecar_assignment_slots_number: 3,
+                                    ecar_assignment_slots : [],
+                                    pgc_id: structureId
+                                }
+                                // init occupation for all slots
+                                for(var i = 0; i < 3; i++){
+                                    carObj.ecar_assignment_slots.push({
+                                        ecar_id          : -1,
+                                        charge           :  0,
+                                        charge_power_max :  0,
+                                        charge_max       :  0,
+                                        shifted_energy   :  0
+                                    })
+                                }
+                                carAssignmentObject[experimentId][parentId] = carObj
+                            } else {
+                                carAssignmentObject[experimentId][parentId].pgc_id = structureId
+                            }
                         }
                         // identify Battery-Station
                         if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.BATTERY_STATION){
