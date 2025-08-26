@@ -108,26 +108,6 @@ m.app.post("/rest/updateCars", (request, reply) => {
     // get key from object
     const evStationId = Object.keys(body)[0]
     const experimentId = body["expId"][0] as string
-    if (carAssignmentObject[experimentId] == undefined){
-        carAssignmentObject[experimentId] = [] as CarAssignment
-        let carObj:CarObj = {
-            ecar_assignment_slots_number: 3,
-            ecar_assignment_slots : [],
-            pgc_id: ""
-        }
-
-        // update occupation for all slots
-        for(var j = 0; j < 3; j++){
-            carObj.ecar_assignment_slots.push({
-                ecar_id          : body[evStationId][j],
-                charge           : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
-                charge_max       : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
-                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower*1.2,
-                shifted_energy   : 0
-            })
-        }
-        carAssignmentObject[experimentId][evStationId] = carObj
-    }
     m.context.log.write(`Rest Call '/rest/updateCars' for: ${evStationId}`, Log.level.DEBUG)
     m.context.log.write(`Requested car occupation: ${body[evStationId]}`, Log.level.DEBUG)
     if(!body[evStationId]){
@@ -148,16 +128,50 @@ m.app.post("/rest/updateCars", (request, reply) => {
         }))    
         return
     }
-    // remove carAssignment for same element, TODO: MAYBE CHANGE IT SO THAT WE CAN SAVE THE CURRENT SOC AND CHARGING STUFF 
-    // if (carAssignmentObject[experimentId].length){
-    //     for (var evStationKey in Object.keys(carAssignmentObject[experimentId])){
-    //         if (evStationKey === evStationId){
-    //             // remove this element from array carAssignment
-    //             delete carAssignmentObject[experimentId][evStationKey]
-    //         }
-    //     }
-    // }
-    const carObj = carAssignmentObject[experimentId][evStationId] as CarObj
+
+    if (carAssignmentObject[experimentId] == undefined){
+        carAssignmentObject[experimentId] = [] as CarAssignment
+        let carObj:CarObj = {
+            ecar_assignment_slots_number: 3,
+            ecar_assignment_slots : [],
+            pgc_id: ""
+        }
+        // update occupation for all slots
+        for(var j = 0; j < 3; j++){
+            carObj.ecar_assignment_slots.push({
+                ecar_id        : body[evStationId][j],
+                charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
+                charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
+                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower*1.2,
+                shifted_energy : 0
+            })
+        }
+        carAssignmentObject[experimentId][evStationId] = carObj
+    }
+    
+    let carObj: CarObj
+    // if another station was created already and the carAssignmentObject exists but the other stuff does not
+    if (carAssignmentObject[experimentId][evStationId] == undefined){
+        carObj = {
+            ecar_assignment_slots_number: 3,
+            ecar_assignment_slots : [],
+            pgc_id: ""
+        }
+        // update occupation for all slots
+        for(var j = 0; j < 3; j++){
+            carObj.ecar_assignment_slots.push({
+                ecar_id        : body[evStationId][j],
+                charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap*0.15,
+                charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
+                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower*1.2,
+                shifted_energy : 0
+            })
+        }
+        carAssignmentObject[experimentId][evStationId] = carObj
+    }else{
+        carObj = carAssignmentObject[experimentId][evStationId] as CarObj
+    }
+    
     let i = 0
     let slotShiftedSum = 0
     for (const slot of carObj.ecar_assignment_slots){
