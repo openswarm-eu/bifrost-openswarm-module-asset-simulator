@@ -72,6 +72,7 @@ export function init(
                         },
                         evApId    : "",
                         evMaxApId : "",
+                        evSocId   : "",
                         evCharger : {
                             chargingSlots   : config.evCharger.chargingSlots,  // Use config default charging slots
                             maxPowerPerSlot : config.evCharger.maxPowerPerSlot,  // Use config default max power per slot in kW
@@ -122,6 +123,9 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
                                     localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_SOC){
+                                    localStorage[experimentId].byPGC[structureId].evSocId = dynId
                                 }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){

@@ -70,6 +70,7 @@ export type powerGridConnectorType = {
         solarSystem       : solarSimulatorType
         evApId            : string
         evMaxApId         : string
+        evSocId           : string
         evCharger         : evChargerSimulatorType
         parentBuildingId  : string
         batterySystem     : batterySimulatorType
