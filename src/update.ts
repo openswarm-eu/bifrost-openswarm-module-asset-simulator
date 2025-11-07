@@ -138,9 +138,20 @@ export function update(
                     if (Object.keys(carAssignmentObject[experimentId]).includes(pStruct.parentBuildingId)){
                         const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
                         pStruct.evCharger.chargingSlots = carObj.ecar_assignment_slots_number
+                        let slotIndex = 0
                         for (const carinSlot of carObj.ecar_assignment_slots){
-                            const carId = carinSlot.ecar_id
-                            let curCarPower = Number(carStats[carId].carPower)
+                            slotIndex += 1
+                            // get the car id for this slot from the csv data
+                            const ecar_id = wData["EV-ID_Slot"+slotIndex]
+                            if (carinSlot.ecar_id != ecar_id){
+                                carinSlot.ecar_id = ecar_id
+                                carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
+                                carinSlot.charge_power_max = carStats[ecar_id].carPower*1.2
+                                carinSlot.charge = carStats[ecar_id].carMaxCap*0.15
+                                carinSlot.shifted_energy = 0
+                            }
+                            // calculate the charging power for this car
+                            let curCarPower = Number(carStats[carinSlot.ecar_id].carPower)
                             const curCarCharge = carinSlot.charge
                             if (curCarCharge >= carinSlot.charge_max){
                                 curCarPower = 0
