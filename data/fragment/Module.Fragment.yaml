@@ -15,7 +15,7 @@ structures:
     requiredPairing: ['POWERGRID-CONNECTOR', 'CHARGING-POLE']
     forbiddenPairing: ['SOLAR-PANEL', 'BATTERY-SYSTEM']
     dynamics: []
-    flavors: ['38_SBC_ev-station']
+    flavors: ['121_SBC_ev-station']
     renderData: 
       file: 'buildings/'
       image: 
@@ -31,15 +31,24 @@ structures:
       showPlaceholder: true
       geoObject: true
       widgetPosition: 
-        '38_SBC_ev-station': [-0.7, 0.5, 0]
+        '121_SBC_ev-station': [-0.7, 0.5, 0]
       decorators: 
         'SOLAR-PANEL': 
           link: 'buildings/47_SBC_solar-panel'
           flavors: 
-            '38_SBC_ev-station': 
+            '121_SBC_ev-station': 
               position: [-0.8, 0.027, 0.9]
               repeatX: 4
-
+        'CHARGING-POLE':
+          link: 'buildings/63_SBC_ev-ground-charger'
+          flavors:
+            '121_SBC_ev-station':
+              position: [-0.18, 0, -0.58]
+              rotationY: 0.75
+              repeatX: 2
+              repeatXGap: 0.16
+              scale: 0 # "invisible"
+  
   SOLAR-FARM: 
     domain: 'landscape'
     memberOf: ['buildings', 'generators']
@@ -157,6 +166,7 @@ structures:
       - CHGSTATION-POWER
       - CHGSTATION-MAX-POWER
       - EV-STATION-SOC
+      - EV-STATION-SLOT-COLOR
     flavors:
       - 77_SBC_software
     renderData:
@@ -570,6 +580,32 @@ dynamics:
     tags:
       - prosumermodel
 
+  EV-STATION-SLOT-COLOR:
+    domain      : powergrid
+    typeId      : EV-STATION-SLOT-COLOR
+    name        : E-Car Color
+    description : Indicates the current color of the connected cars at a certain charging station
+    unit        : ""
+    visible     : false
+    actionable  : false
+    alwaysUpdate: false
+    dataLabels  :
+      - Color 1
+      - Color 2
+      - Color 3
+    chartType   : TEXT
+    defaultValue: 
+      - "0x0000FF"
+      - "0x00FF00"
+      - "0xFF0000"
+    schema:
+      type: array
+      minItems: 1
+      maxItems: 3
+      items:
+        type: string
+    tags:
+      - prosumermodel
 
 mappings:
 

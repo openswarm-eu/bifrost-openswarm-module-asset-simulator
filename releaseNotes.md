@@ -4,6 +4,9 @@ This document contains the release history and changelog for the **OpenSwarm Ene
 
 ## [v2.0.0][v3.0.0] - 2025-11-18 🚗
 
+### Features
+- **Dynamic Car Color**: Added support for dynamic car color configuration. Car colors can now be specified in the configuration file and are automatically applied to e-car charging stations, enabling visual differentiation of vehicles in the simulation.
+
 ### Enhancements
 - **Slot Simulation**: A new simulation mode was introduced: E-Car charging stations have now a column in the profiles csv where a arrival of cars is defined over their IDs.
 - **ENV for Reality-Twin**: With the environment variable `REALITY_TWIN_MODE` is controlled, if the above slot simulation is used or the input of the hardware modules is used. Set it to "true" if the asset simulator is running within the reality twin set up.
