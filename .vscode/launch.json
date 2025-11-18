@@ -17,7 +17,7 @@
                 "BIFROST_URL": "http://localhost:9091",
                 "HOOK": "[100, 200]",
                 "SAMPLING_RATE": "60",
-                "REALITY_TWIN_MODE": "false"
+                "REALITY_TWIN_MODE": "true"
             }
         },
         {
@@ -33,7 +33,7 @@
                 "BIFROST_URL": "http://127.0.0.1:9091",
                 "HOOK": "[100, 200]",
                 "SAMPLING_RATE": "60",
-                "REALITY_TWIN_MODE": "false"
+                "REALITY_TWIN_MODE": "true"
 
             }
         },
@@ -51,7 +51,7 @@
                 "NODE_ENV": "production",
                 "HOOK": "[100, 200]",
                 "SAMPLING_RATE": "60",
-                "REALITY_TWIN_MODE": "false"
+                "REALITY_TWIN_MODE": "true"
             }
         },
         {
@@ -68,7 +68,7 @@
                 "NODE_ENV": "production",
                 "HOOK": "[100, 200]",
                 "SAMPLING_RATE": "60",
-                "REALITY_TWIN_MODE": "false"
+                "REALITY_TWIN_MODE": "true"
             }
         },
     ]
