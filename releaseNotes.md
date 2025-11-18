@@ -2,6 +2,22 @@
 
 This document contains the release history and changelog for the **OpenSwarm Energy Community Asset Simulator**. The **RealityTwin Asset Simulator** version has own tags, but which reflect also releases of the **OpenSwarm Energy Community Asset Simulator**. Therefore the first version number reflects the version of the **RealityTwin Asset Simulator**, the second to the corresponding version of the **OpenSwarm Energy Community Asset Simulator**.
 
+## [v2.0.0][v3.0.0] - 2025-11-18 🚗
+
+### Enhancements
+- **Slot Simulation**: A new simulation mode was introduced: E-Car charging stations have now a column in the profiles csv where a arrival of cars is defined over their IDs.
+- **ENV for Reality-Twin**: With the environment variable `REALITY_TWIN_MODE` is controlled, if the above slot simulation is used or the input of the hardware modules is used. Set it to "true" if the asset simulator is running within the reality twin set up.
+
+### Configuration
+- **Configurable Initial Charge**: Added `initialChargePercent` configuration parameter for EV charging stations to control the initial charge level of newly connected vehicles (default: 15%)
+- **Configurable Increased Charge Power**: Added `increasedChargePower` configuration parameter to control the increased charging power multiplier (default: 1.2 for 120% of nominal power)
+- Applied initial charge and max power configurations across all car slot initialization points
+- **Environment Variable Support**: Added environment variables:
+  - `EV_STATION_INITIAL_CHARGE_PERCENT` to override initial charge percentage (e.g., `0.20` for 20%)
+  - `EV_STATION_INCREASED_CHARGE_POWER` to override increased charge power multiplier (e.g., `1.5` for 150%)
+
+---
+
 ## [v1.0.1][v2.2.3] - 2025-08-22 🔧
 
 ### Enhancements

@@ -17,6 +17,25 @@ The configuration loading follows this priority order:
 3. **Main YAML config** (`config/asset-config.yaml`)
 4. **Default values** (`src/config.ts`) - lowest priority
 
+### Supported Environment Variables
+
+The following environment variables can override configuration values:
+
+- `DEFAULT_LOAD_SCALE_FACTOR` - Default load scale factor
+- `DEFAULT_SOLAR_SCALE_FACTOR` - Default solar system scale factor
+- `DEFAULT_EV_CHARGING_SLOTS` - Default EV charging slots
+- `DEFAULT_EV_MAX_POWER_PER_SLOT` - Default max power per EV slot
+- `BATTERY_CHARGE_POWER` - Default battery charge power
+- `BATTERY_DISCHARGE_POWER` - Default battery discharge power
+- `SOLAR_FARM_SCALE_FACTOR` - Solar farm scale factor
+- `EV_STATION_CHARGING_SLOTS` - EV station charging slots
+- `EV_STATION_INITIAL_CHARGE_PERCENT` - Initial charge percentage for EVs (e.g., `0.15` for 15%)
+- `EV_STATION_INCREASED_CHARGE_POWER` - Increased charge power multiplier (e.g., `1.2` for 120%)
+- `SMALL_HOUSE_LOAD_SCALE` - Small house load scale factor
+- `HUGE_HOUSE_LOAD_SCALE` - Huge house load scale factor
+- `BATTERY_STATION_CHARGE_POWER` - Battery station charge power
+- `BATTERY_STATION_DISCHARGE_POWER` - Battery station discharge power
+
 ### Deep Merge Behavior
 
 When loading YAML configuration files, the system performs a **deep merge** with the default configuration. This means:
@@ -82,8 +101,10 @@ export const defaultConfig: AssetConfig = {
         scaleFactor: 1       // Default solar system scale factor in p.u.
     },
     evCharger: {
-        chargingSlots: 1,    // Default charging slots
-        maxPowerPerSlot: 4   // Default max power per slot in kW
+        chargingSlots: 1,            // Default charging slots
+        maxPowerPerSlot: 4,          // Default max power per slot in kW
+        initialChargePercent: 0.15,  // Default initial charge percentage (15%)
+        increasedChargePower: 1.2    // Default increased charge power multiplier (120%)
     },
     batterySystem: {
         chargePower: 5,     // Default maximum charge power for battery systems in kW
@@ -95,7 +116,7 @@ export const defaultConfig: AssetConfig = {
             load: { scaleFactor: 0 }
         },
         evStation: {
-            evCharger: { chargingSlots: 3 },
+            evCharger: { chargingSlots: 3, initialChargePercent: 0.15, increasedChargePower: 1.2 },
             load: { scaleFactor: 0 }
         },
         smallHouse: {
