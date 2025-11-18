@@ -121,4 +121,4 @@ git push openswarmgithub latest
 
 ## Current Version
 
-v2.2.3
+v3.0.0
