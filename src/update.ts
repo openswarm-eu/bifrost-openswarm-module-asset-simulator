@@ -219,6 +219,7 @@ export function update(
                         const sumPower = chgPowerList.reduce((acc, current) => acc + current, 0)
                         const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
                         pStruct.evCharger.shiftedEnergy = 0
+                        let evSocResult: number[] = []
                         for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
                             let partPower = 0
                             if (sumPower > 0){
@@ -233,7 +234,14 @@ export function update(
                                 carObj.ecar_assignment_slots[i].charge = carObj.ecar_assignment_slots[i].charge_max
                                 carObj.ecar_assignment_slots[i].shifted_energy = 0
                             }
+                            // calculate SOC for each car slot and prepare result array
+                            let slotSOC = (carObj.ecar_assignment_slots[i].charge / carObj.ecar_assignment_slots[i].charge_max) * 100
+                            if (isNaN(slotSOC)){
+                                slotSOC = 0
+                            }
+                            evSocResult.push(slotSOC)
                         }
+                        result.addSeries({dynamicId:pStruct.evSocId,values:[evSocResult]})
                     }
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
@@ -248,30 +256,6 @@ export function update(
                 // calculate the resulting load value
                 const resultLoad = (sumLoad/3)
                 result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
-            }
-
-            for (const pgcId of localStorage[experimentId].allPGCs){
-                const pStruct = localStorage[experimentId].byPGC[pgcId]
-
-                // calculate SOC for each car slot
-                if(pStruct.evSocId){
-                    for(const carAssignObjItem in carAssignmentObject[experimentId]){
-
-                        if(pStruct.pgcApId.includes(pgcId)){
-
-                            let evSocResult: number[] = []
-
-                            for (const slotItem of carAssignmentObject[experimentId][carAssignObjItem].ecar_assignment_slots){
-                                let slotSOC = (slotItem.charge / slotItem.charge_max) * 100
-                                if (isNaN(slotSOC)){
-                                    slotSOC = 0
-                                }
-                                evSocResult.push(slotSOC)
-                            }
-                            result.addSeries({dynamicId:pStruct.evSocId,values:[evSocResult]})                            
-                        }
-                    }
-                }
             }
         }
         
