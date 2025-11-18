@@ -56,7 +56,7 @@ structureTypes:
       "0":
         # Red car
         carColor: "0x0000FF"
-        carPower: 1
+        carPower: 5
         carMaxCap: 10
       "1":
         # Grey car
@@ -72,7 +72,7 @@ structureTypes:
         # White car
         carColor: "0xFFFFFF"
         carPower: 4
-        carMaxCap: 40
+        carMaxCap: 15
       "4":
         # Currently no car available
         carColor: "0x000000"
@@ -82,17 +82,17 @@ structureTypes:
         # Dark blue car
         carColor: "0xFF0000"
         carPower: 6
-        carMaxCap: 60
+        carMaxCap: 30
       "6":
         # Light blue car
         carColor: "0x00FFFF"
         carPower: 7
-        carMaxCap: 70
+        carMaxCap: 25
       "7":
         # Green car
         carColor: "0x00FF00"
         carPower: 8
-        carMaxCap: 80
+        carMaxCap: 40
       "8":
         # Currently no car available
         carColor: "0x000000"
