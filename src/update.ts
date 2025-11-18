@@ -136,6 +136,7 @@ export function update(
                     let chgPowerDemand  = 0
                     let chgPowerActual  = 0
                     let chgPowerShifted = 0
+                    let newChargePower  = 0
                     let chgPowerLimit   = 0
                     let carStats = config.structureTypes.evStation.carStats
                     const chgPowerList: number[] = []
@@ -154,16 +155,17 @@ export function update(
                                 const ecar_id = wData["EV-ID_Slot"+slotIndex]
                                 if (carinSlot.ecar_id != ecar_id){
                                     carinSlot.ecar_id = ecar_id
+                                    carinSlot.shifted_energy = 0
                                     carinSlot.ecar_color = carStats[ecar_id].carColor
                                     carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
                                     carinSlot.charge_power_max = carStats[ecar_id].carPower * config.structureTypes.evStation.evCharger.increasedChargePower
                                     carinSlot.charge = carStats[ecar_id].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent
-                                    carinSlot.shifted_energy = 0
                                 }
                             }
                             // calculate the charging power for this car
                             let curCarPower = Number(carStats[carinSlot.ecar_id].carPower)
                             const curCarCharge = carinSlot.charge
+                            // check if the car is already fully charged
                             if (curCarCharge >= carinSlot.charge_max){
                                 curCarPower = 0
                                 carinSlot.shifted_energy = 0
@@ -184,25 +186,29 @@ export function update(
                             chgPowerShifted += wData["EV"]
                             chgPowerLimit   += pStruct.evCharger.maxPowerPerSlot
                         }
-                        pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
+                        pStruct.evCharger.shiftedEnergy += chgPowerDemand - chgPowerSetPoint
                     }
                     
                     if (pStruct.evCharger.shiftedEnergy > 0){
-                        let newChgPower = chgPowerSetPoint + pStruct.evCharger.shiftedEnergy
-                        if (newChgPower > chgPowerLimit){
-                            newChgPower = chgPowerLimit
+                        newChargePower = chgPowerSetPoint + pStruct.evCharger.shiftedEnergy
+                        if (newChargePower > chgPowerLimit){
+                            newChargePower = chgPowerLimit
                         }
                         // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy + chgPowerShifted
-                        // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChgPower - chgPowerShifted)
-                        chgPowerShifted = newChgPower
+                        // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChargePower - chgPowerShifted)
                     
                     }
+
+                    // ensure that the shifted charging power is not lower than the demand
+                    if (newChargePower < chgPowerDemand) {
+                        newChargePower = chgPowerDemand
+                    }
+
                     // check if the resulting charging power is higher than the max power of the charging station
-                    if (chgPowerShifted > chgPowerSetPoint){
+                    if (newChargePower > chgPowerSetPoint){
                         chgPowerActual = chgPowerSetPoint
-                        // pStruct.evCharger.shiftedEnergy += chgPowerShifted - chgPowerSetPoint
                     } else {
-                        chgPowerActual = chgPowerShifted
+                        chgPowerActual = newChargePower
                         if (pStruct.evCharger.shiftedEnergy < 0){
                             chgPowerActual = pStruct.evCharger.shiftedEnergy + chgPowerSetPoint
                             pStruct.evCharger.shiftedEnergy = 0
@@ -210,18 +216,17 @@ export function update(
                     }
 
                     chgPowerResult[CHARGING_STATION_POWER_MAPPING.Power_Demand]   = chgPowerDemand
-                    chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]   = chgPowerActual
-                    if (chgPowerShifted > (pStruct.evCharger.shiftedEnergy + chgPowerDemand)){
+                    chgPowerResult[CHARGING_STATION_POWER_MAPPING.Actual_Power]       = chgPowerActual
+                    if (newChargePower > (pStruct.evCharger.shiftedEnergy + chgPowerDemand)){
                         chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = pStruct.evCharger.shiftedEnergy + chgPowerDemand
-                    }else{
-                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = chgPowerShifted
+                    } else {
+                        chgPowerResult[CHARGING_STATION_POWER_MAPPING.Shifted_Demand] = newChargePower
                     }
                     
                     // Update the car charges in the carAssignmentObject
                     if (Object.keys(carAssignmentObject[experimentId]).includes(pStruct.parentBuildingId)){
                         const sumPower = chgPowerList.reduce((acc, current) => acc + current, 0)
                         const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
-                        pStruct.evCharger.shiftedEnergy = 0
                         let evSocResult: number[] = []
                         let evColorResult: string[] = []
                         for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
@@ -232,7 +237,11 @@ export function update(
                             const carId = carObj.ecar_assignment_slots[i].ecar_id
                             let curCarPower = Number(carStats[carId].carPower)
                             const chargedPower = chgPowerActual * partPower
-                            carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
+                            if (pStruct.evCharger.shiftedEnergy == 0) {
+                                carObj.ecar_assignment_slots[i].shifted_energy = 0
+                            } else {
+                                carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
+                            }
                             carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
                             if (carObj.ecar_assignment_slots[i].charge >= carObj.ecar_assignment_slots[i].charge_max){
                                 carObj.ecar_assignment_slots[i].charge = carObj.ecar_assignment_slots[i].charge_max
@@ -248,7 +257,11 @@ export function update(
                         }
                         result.addSeries({dynamicId:pStruct.evSocId,values:[evSocResult]})
                         result.addSeries({dynamicId:pStruct.evColorId,values:[evColorResult]})
+                    } else {
+                    // Update pStruct.evCharger.shiftedEnergy for non EV stations
+                    pStruct.evCharger.shiftedEnergy += (chgPowerDemand - chgPowerActual)
                     }
+
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
                 }
