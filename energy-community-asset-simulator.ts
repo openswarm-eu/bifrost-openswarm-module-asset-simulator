@@ -140,6 +140,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
         for(var j = 0; j < 3; j++){
             carObj.ecar_assignment_slots.push({
                 ecar_id        : body[evStationId][j],
+                ecar_color     : config.structureTypes.evStation.carStats[body[evStationId][j]].carColor,
                 charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent,
                 charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
                 charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower * config.structureTypes.evStation.evCharger.increasedChargePower,
@@ -161,6 +162,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
         for(var j = 0; j < 3; j++){
             carObj.ecar_assignment_slots.push({
                 ecar_id        : body[evStationId][j],
+                ecar_color     : config.structureTypes.evStation.carStats[body[evStationId][j]].carColor,
                 charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent,
                 charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
                 charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower * config.structureTypes.evStation.evCharger.increasedChargePower,
@@ -178,6 +180,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
         // if the car in the slot changed, then reset charge
         if( slot.ecar_id != body[evStationId][i]){
             slot.ecar_id = body[evStationId][i]
+            slot.ecar_color = config.structureTypes.evStation.carStats[body[evStationId][i]].carColor
             slot.charge_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carMaxCap
             slot.charge = slot.charge_max * config.structureTypes.evStation.evCharger.initialChargePercent
             slot.charge_power_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carPower * config.structureTypes.evStation.evCharger.increasedChargePower
