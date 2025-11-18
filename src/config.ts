@@ -43,6 +43,7 @@ export interface AssetConfig {
             };
             carStats: {
                 [key: string]: {
+                    carColor: string
                     carPower: number,
                     carMaxCap: number
                 }
@@ -109,42 +110,52 @@ export const defaultConfig: AssetConfig = {
             },
             carStats: {
                 "-1": {
+                    carColor: "0x000000", // #000000 # No car
                     carPower:0,
                     carMaxCap:0
                 },
                 "0": {
+                    carColor: "0x0000FF", // #0000FF # Dark Blue car
                     carPower:1,
                     carMaxCap:10
                 },
                 "1": {
+                    carColor: "0x808080", // #808080 # Grey car
                     carPower:2,
                     carMaxCap:20
                 },
                 "2": {
+                    carColor: "0x000000", // #000000 # No car
                     carPower:3,
                     carMaxCap:30
                 },
                 "3": {
+                    carColor: "0x787878", // #FFFFFF # White car
                     carPower:4,
                     carMaxCap:40
                 },
                 "4": {
+                    carColor: "0x000000", // #000000 # No car
                     carPower:5,
                     carMaxCap:50
                 },
                 "5": {
+                    carColor: "0xFF0000", // #FF0000 # Red car
                     carPower:6,
                     carMaxCap:60
                 },
                 "6": {
+                    carColor: "0x00FFFF", // #00FFFF # Light blue car
                     carPower:7,
                     carMaxCap:70
                 },
                 "7": {
+                    carColor: "0x00FF00", // #00FF00 # Green car
                     carPower:8,
                     carMaxCap:80
                 },
                 "8": {
+                    carColor: "0x000000", // #000000 # No car
                     carPower:9,
                     carMaxCap:90
                 },
@@ -162,8 +173,8 @@ export const defaultConfig: AssetConfig = {
         },
         batteryStation: {
             batterySystem: {
-                chargePower: 10,
-                dischargePower: 10
+                chargePower: 20,
+                dischargePower: 20
             },
             load: {
                 scaleFactor: 0

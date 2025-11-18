@@ -154,6 +154,7 @@ export function update(
                                 const ecar_id = wData["EV-ID_Slot"+slotIndex]
                                 if (carinSlot.ecar_id != ecar_id){
                                     carinSlot.ecar_id = ecar_id
+                                    carinSlot.ecar_color = carStats[ecar_id].carColor
                                     carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
                                     carinSlot.charge_power_max = carStats[ecar_id].carPower * config.structureTypes.evStation.evCharger.increasedChargePower
                                     carinSlot.charge = carStats[ecar_id].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent
@@ -222,6 +223,7 @@ export function update(
                         const carObj = carAssignmentObject[experimentId][pStruct.parentBuildingId] as CarObj
                         pStruct.evCharger.shiftedEnergy = 0
                         let evSocResult: number[] = []
+                        let evColorResult: string[] = []
                         for (let i = 0; i < pStruct.evCharger.chargingSlots; i++){
                             let partPower = 0
                             if (sumPower > 0){
@@ -242,8 +244,10 @@ export function update(
                                 slotSOC = 0
                             }
                             evSocResult.push(slotSOC)
+                            evColorResult.push(carObj.ecar_assignment_slots[i].ecar_color)
                         }
                         result.addSeries({dynamicId:pStruct.evSocId,values:[evSocResult]})
+                        result.addSeries({dynamicId:pStruct.evColorId,values:[evColorResult]})
                     }
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
