@@ -142,7 +142,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
                 ecar_id        : body[evStationId][j],
                 charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent,
                 charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
-                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower*1.2,
+                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower * config.structureTypes.evStation.evCharger.increasedChargePower,
                 shifted_energy : 0
             })
         }
@@ -163,7 +163,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
                 ecar_id        : body[evStationId][j],
                 charge         : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent,
                 charge_max     : config.structureTypes.evStation.carStats[body[evStationId][j]].carMaxCap,
-                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower*1.2,
+                charge_power_max : config.structureTypes.evStation.carStats[body[evStationId][j]].carPower * config.structureTypes.evStation.evCharger.increasedChargePower,
                 shifted_energy : 0
             })
         }
@@ -180,7 +180,7 @@ m.app.post("/rest/updateCars", (request, reply) => {
             slot.ecar_id = body[evStationId][i]
             slot.charge_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carMaxCap
             slot.charge = slot.charge_max * config.structureTypes.evStation.evCharger.initialChargePercent
-            slot.charge_power_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carPower*1.2
+            slot.charge_power_max = config.structureTypes.evStation.carStats[body[evStationId][i]].carPower * config.structureTypes.evStation.evCharger.increasedChargePower
             if(localStorage[experimentId].byPGC[carObj.pgc_id] != undefined){
                 // reset the shifted energy when it disconnects and also subtract it from the internal struct
                 if(slot.ecar_id == -1){

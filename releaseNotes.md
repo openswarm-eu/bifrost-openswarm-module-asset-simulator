@@ -9,9 +9,12 @@ This document contains the release history and changelog for the Energy Communit
 - **ENV for Reality-Twin**: With the environment variable `REALITY_TWIN_MODE` is controlled, if the above slot simulation is used or the input of the hardware modules is used. Set it to "true" if the asset simulator is running within the reality twin set up.
 
 ### Configuration
-- - **Configurable Initial Charge**: Added `initialChargePercent` configuration parameter for EV charging stations to control the initial charge level of newly connected vehicles (default: 15%)
-- Applied initial charge configuration across all car slot initialization points
-- **Environment Variable Support**: Added `EV_STATION_INITIAL_CHARGE_PERCENT` environment variable to override initial charge percentage (e.g., `EV_STATION_INITIAL_CHARGE_PERCENT=0.20` for 20% initial charge)
+- **Configurable Initial Charge**: Added `initialChargePercent` configuration parameter for EV charging stations to control the initial charge level of newly connected vehicles (default: 15%)
+- **Configurable Increased Charge Power**: Added `increasedChargePower` configuration parameter to control the increased charging power multiplier (default: 1.2 for 120% of nominal power)
+- Applied initial charge and max power configurations across all car slot initialization points
+- **Environment Variable Support**: Added environment variables:
+  - `EV_STATION_INITIAL_CHARGE_PERCENT` to override initial charge percentage (e.g., `0.20` for 20%)
+  - `EV_STATION_INCREASED_CHARGE_POWER` to override increased charge power multiplier (e.g., `1.5` for 150%)
 
 ---
 

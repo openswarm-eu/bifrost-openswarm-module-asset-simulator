@@ -155,7 +155,7 @@ export function update(
                                 if (carinSlot.ecar_id != ecar_id){
                                     carinSlot.ecar_id = ecar_id
                                     carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
-                                    carinSlot.charge_power_max = carStats[ecar_id].carPower
+                                    carinSlot.charge_power_max = carStats[ecar_id].carPower * config.structureTypes.evStation.evCharger.increasedChargePower
                                     carinSlot.charge = carStats[ecar_id].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent
                                     carinSlot.shifted_energy = 0
                                 }

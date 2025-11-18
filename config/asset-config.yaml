@@ -40,6 +40,8 @@ structureTypes:
       chargingSlots: 3
       # Initial charge percentage for newly connected EVs (0.0 to 1.0, where 0.15 = 15%)
       initialChargePercent: 0.15
+      # Increased charge power - multiplier applied to car's nominal power (e.g., 1.2 = 120% of nominal power)
+      increasedChargePower: 1.2
     load:
       # Load scale factor for EV stations in p.u.
       # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0
