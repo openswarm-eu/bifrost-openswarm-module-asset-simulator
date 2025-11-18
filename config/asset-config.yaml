@@ -49,33 +49,43 @@ structureTypes:
     carStats:
       # EV station car statistics definition
       "-1":
+        # No car
         carPower: 0
         carMaxCap: 0
       "0":
+        # Red car
         carPower: 1
         carMaxCap: 10
       "1":
+        # Grey car
         carPower: 2
         carMaxCap: 20
       "2":
+        # Currently no car available
         carPower: 3
         carMaxCap: 30
       "3":
+        # White car
         carPower: 4
         carMaxCap: 40
       "4":
+        # Currently no car available
         carPower: 5
         carMaxCap: 50
       "5":
+        # Dark blue car
         carPower: 6
         carMaxCap: 60
       "6":
+        # Light blue car
         carPower: 7
         carMaxCap: 70
       "7":
+        # Green car
         carPower: 8
         carMaxCap: 80
       "8":
+        # Currently no car available
         carPower: 9
         carMaxCap: 90
   
