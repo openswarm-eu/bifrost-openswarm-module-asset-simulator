@@ -2,6 +2,11 @@
 
 This document contains the release history and changelog for the Energy Community Asset Simulator.
 
+## [v3.0.0] - 2025-11-18  🚗
+
+- **Slot Simulation**: A new simulation mode was introduced: E-Car charging stations have now a column in the profiles csv where a arrival of cars is defined over their IDs.
+- **ENV for Reality-Twin**: With the environment variable `REALITY_TWIN_MODE` is controlled, if the above slot simulation is used or the input of the hardware modules is used. Set it to "true" if the asset simulator is running within the reality twin set up.
+
 ## [v2.2.3] - 2025-08-22 🔧
 
 ### Enhancements

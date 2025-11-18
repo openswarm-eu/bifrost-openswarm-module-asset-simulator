@@ -149,14 +149,16 @@ export function update(
                         let slotIndex = 0
                         for (const carinSlot of carObj.ecar_assignment_slots){
                             slotIndex += 1
-                            // get the car id for this slot from the csv data
-                            const ecar_id = wData["EV-ID_Slot"+slotIndex]
-                            if (carinSlot.ecar_id != ecar_id){
-                                carinSlot.ecar_id = ecar_id
-                                carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
-                                carinSlot.charge_power_max = carStats[ecar_id].carPower*6
-                                carinSlot.charge = carStats[ecar_id].carMaxCap*0.15
-                                carinSlot.shifted_energy = 0
+                            if (process.env.REALITY_TWIN_MODE !== "true"){
+                                // get the car id for this slot from the csv data
+                                const ecar_id = wData["EV-ID_Slot"+slotIndex]
+                                if (carinSlot.ecar_id != ecar_id){
+                                    carinSlot.ecar_id = ecar_id
+                                    carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
+                                    carinSlot.charge_power_max = carStats[ecar_id].carPower*6
+                                    carinSlot.charge = carStats[ecar_id].carMaxCap*0.15
+                                    carinSlot.shifted_energy = 0
+                                }
                             }
                             // calculate the charging power for this car
                             let curCarPower = Number(carStats[carinSlot.ecar_id].carPower)*4
