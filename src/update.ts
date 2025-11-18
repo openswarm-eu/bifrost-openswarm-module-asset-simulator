@@ -259,30 +259,6 @@ export function update(
                 const resultLoad = (sumLoad/3)
                 result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
             }
-
-            for (const pgcId of localStorage[experimentId].allPGCs){
-                const pStruct = localStorage[experimentId].byPGC[pgcId]
-
-                // calculate SOC for each car slot
-                if(pStruct.evSocId){
-                    for(const carAssignObjItem in carAssignmentObject[experimentId]){
-
-                        if(pStruct.pgcApId.includes(pgcId)){
-
-                            let evSocResult: number[] = []
-
-                            for (const slotItem of carAssignmentObject[experimentId][carAssignObjItem].ecar_assignment_slots){
-                                let slotSOC = (slotItem.charge / slotItem.charge_max) * 100
-                                if (isNaN(slotSOC)){
-                                    slotSOC = 0
-                                }
-                                evSocResult.push(slotSOC)
-                            }
-                            result.addSeries({dynamicId:pStruct.evSocId,values:[evSocResult]})                            
-                        }
-                    }
-                }
-            }
         }
         
         // update the grid sensor values
