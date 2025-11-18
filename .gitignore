@@ -1,10 +1,13 @@
+settings.json
+
 **/build
 **/temp
 **/node_modules
 **/dist
+
 # Logs
 logs
 *.log
-npm-debug.log*npmi
+npm-debug.log
 *.exe
 *.code-workspace

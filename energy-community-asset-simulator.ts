@@ -9,13 +9,24 @@
 import { 
     DataFrame, 
     TModuleContext, 
-    TState                 } from 'bifrost-zero-common'
+    TState,
+    Log                    } from 'bifrost-zero-common'
 import { BifrostZeroModule } from 'bifrost-zero-sdk'
 import { TYPEID_LOCAL      } from './data/fragment/local_types.js'
-import { TYPEID            } from './src/types.js'
-import { readCSVtoDict     } from './src/tools.js'
-import { init              } from './src/init.js'
+import { 
+    CarAssignment,
+    CarObj,
+    TYPEID                 } from './src/types.js'
+import { 
+    readCSVtoDict, 
+    updateDynamic          } from './src/tools.js'
+import { 
+    carAssignmentObject,
+    localStorage, 
+    init,                   
+    storageDynToValueMap} from './src/init.js'
 import { update            } from './src/update.js'
+import { config            } from './src/config.js'
 import { loadConfig        } from './src/config.js'
 
 const csvFilePath = 'data/csv/profile-data.csv'
@@ -55,7 +66,7 @@ const m = new BifrostZeroModule({
     ],
     samplingRate   : process.env.SAMPLING_RATE ? Number(process.env.SAMPLING_RATE) : 60,
     docURL         : '',
-    moduleURL      : process.env.MODULE_URL  || 'http://localhost:1808',
+    moduleURL      : process.env.MODULE_URL  || 'http://localhost:7032',
     bifrostURL     : process.env.BIFROST_URL || 'http://localhost:9091',
     hook           : process.env.HOOK ? JSON.parse(process.env.HOOK) : [100, 910]
 })

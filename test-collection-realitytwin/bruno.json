@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "name": "test-collection-realitytwin",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0.00335693359375,
+  "filesCount": 9
+}

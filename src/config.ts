@@ -35,10 +35,18 @@ export interface AssetConfig {
         evStation: {
             evCharger: {
                 chargingSlots: number;
+                initialChargePercent: number;
+                increasedChargePower: number;
             };
             load: {
                 scaleFactor: number;
             };
+            carStats: {
+                [key: string]: {
+                    carPower: number,
+                    carMaxCap: number
+                }
+            }
         };
         smallHouse: {
             load: {
@@ -92,10 +100,54 @@ export const defaultConfig: AssetConfig = {
         },
         evStation: {
             evCharger: {
-                chargingSlots: 3
+                chargingSlots: 3,
+                initialChargePercent: 0.15,
+                increasedChargePower: 1.2
             },
             load: {
                 scaleFactor: 0
+            },
+            carStats: {
+                "-1": {
+                    carPower:0,
+                    carMaxCap:0
+                },
+                "0": {
+                    carPower:1,
+                    carMaxCap:10
+                },
+                "1": {
+                    carPower:2,
+                    carMaxCap:20
+                },
+                "2": {
+                    carPower:3,
+                    carMaxCap:30
+                },
+                "3": {
+                    carPower:4,
+                    carMaxCap:40
+                },
+                "4": {
+                    carPower:5,
+                    carMaxCap:50
+                },
+                "5": {
+                    carPower:6,
+                    carMaxCap:60
+                },
+                "6": {
+                    carPower:7,
+                    carMaxCap:70
+                },
+                "7": {
+                    carPower:8,
+                    carMaxCap:80
+                },
+                "8": {
+                    carPower:9,
+                    carMaxCap:90
+                },
             }
         },
         smallHouse: {
@@ -297,6 +349,14 @@ function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
     
     if (process.env.EV_STATION_CHARGING_SLOTS) {
         config.structureTypes.evStation.evCharger.chargingSlots = Number(process.env.EV_STATION_CHARGING_SLOTS);
+    }
+    
+    if (process.env.EV_STATION_INITIAL_CHARGE_PERCENT) {
+        config.structureTypes.evStation.evCharger.initialChargePercent = Number(process.env.EV_STATION_INITIAL_CHARGE_PERCENT);
+    }
+    
+    if (process.env.EV_STATION_INCREASED_CHARGE_POWER) {
+        config.structureTypes.evStation.evCharger.increasedChargePower = Number(process.env.EV_STATION_INCREASED_CHARGE_POWER);
     }
     
     if (process.env.SMALL_HOUSE_LOAD_SCALE) {

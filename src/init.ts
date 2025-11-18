@@ -5,7 +5,11 @@ import {
     Log
 } from 'bifrost-zero-common'
 import { 
+    CarAssignment,
+    CarAssignmentObject,
+    CarObj,
     localStorageType,
+    storageDynToValueMapType,
     TYPEID 
 } from './types.js'
 import { config, loadConfig } from './config.js'
@@ -14,13 +18,15 @@ import {
     TYPEID_LOCAL 
 } from '../data/fragment/local_types.js'
 
+export var carAssignmentObject:CarAssignmentObject = {}
 export const localStorage : localStorageType = {}
+export const storageDynToValueMap : storageDynToValueMapType = {}
 
 export function init(
-    storyId: string, 
-    experimentId: string, 
-    state: TState, 
-    context: TModuleContext,
+    storyId      : string, 
+    experimentId : string, 
+    state        : TState, 
+    context      : TModuleContext,
 ): DataFrame {
         
     // Reload configuration to pick up any changes in asset-config.yaml
@@ -39,7 +45,13 @@ export function init(
         byPGC          : {},
         allGridSensors : [],
         byGridSensor   : {}
-    }	
+    }
+
+    // initialize struct for EV-STATIONS
+    if (carAssignmentObject[experimentId] == undefined){
+        carAssignmentObject[experimentId] = [] as CarAssignment
+    }
+
     try {
         for (const structureId of state.structures.ids){
             const entity = state.structures.entities[structureId]
@@ -60,6 +72,7 @@ export function init(
                         },
                         evApId    : "",
                         evMaxApId : "",
+                        evSocId   : "",
                         evCharger : {
                             chargingSlots   : config.evCharger.chargingSlots,  // Use config default charging slots
                             maxPowerPerSlot : config.evCharger.maxPowerPerSlot,  // Use config default max power per slot in kW
@@ -76,6 +89,7 @@ export function init(
                                 capacity    : ""
                             }
                         },
+                        parentBuildingId: ""
                     }
                     
                     // get apId of pgc
@@ -110,6 +124,9 @@ export function init(
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_MAX_POWER){
                                     localStorage[experimentId].byPGC[structureId].evMaxApId = dynId
                                 }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_SOC){
+                                    localStorage[experimentId].byPGC[structureId].evSocId = dynId
+                                }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){
                             for (const dynId of dynIds){
@@ -124,6 +141,11 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.BATTERY_CAPACITY){
                                     localStorage[experimentId].byPGC[structureId].batterySystem.dynamicId.capacity = dynId
+                                    // check if there was something written to the localStorage from the restEndpoint
+                                    // if it is not undefined it means there was a rest call previously
+                                    if (storageDynToValueMap[dynId] != undefined){
+                                        initResult.addSeries({dynamicId:dynId,values:[storageDynToValueMap[dynId]]})
+                                    }
                                 }
                             }
                         }
@@ -132,6 +154,8 @@ export function init(
                     // go throught the parents
                     const pgcParentIds:string[] = entity.parentIds
                     for (const parentId of pgcParentIds){
+                        // set the parent building ID
+                        localStorage[experimentId].byPGC[structureId].parentBuildingId = parentId
                         // identfiy Solar-Farms
                         if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.SOLAR_FARM){
                             // set the scaleFactor for the solar system simulator to a higher value
@@ -145,6 +169,27 @@ export function init(
                             localStorage[experimentId].byPGC[structureId].evCharger.chargingSlots = config.structureTypes.evStation.evCharger.chargingSlots
                             //switch off the load simulator for the EV-Station
                             localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.evStation.load.scaleFactor
+                            // init cars
+                            if (carAssignmentObject[experimentId][parentId] == undefined){
+                                let carObj:CarObj = {
+                                    ecar_assignment_slots_number: 3,
+                                    ecar_assignment_slots : [],
+                                    pgc_id: structureId
+                                }
+                                // init occupation for all slots
+                                for(var i = 0; i < 3; i++){
+                                    carObj.ecar_assignment_slots.push({
+                                        ecar_id          : -1,
+                                        charge           :  0,
+                                        charge_power_max :  0,
+                                        charge_max       :  0,
+                                        shifted_energy   :  0
+                                    })
+                                }
+                                carAssignmentObject[experimentId][parentId] = carObj
+                            } else {
+                                carAssignmentObject[experimentId][parentId].pgc_id = structureId
+                            }
                         }
                         // identify Battery-Station
                         if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.BATTERY_STATION){

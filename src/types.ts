@@ -17,6 +17,23 @@ export const TYPEID = {
     POWERED        : "POWERED",
     CABLE_POWER    : "CABLE-POWER-3PF"
 }
+export type CarAssignmentObject = { [Key: string]: CarAssignment }
+
+export type CarAssignment = [CarObj] | []
+
+export type CarObj = {
+    ecar_assignment_slots_number: number,
+    ecar_assignment_slots : assignmentSlots[],
+    pgc_id: string
+}
+
+export type assignmentSlots = {
+    ecar_id: number
+    charge: number
+    charge_max: number
+    charge_power_max: number
+    shifted_energy: number
+}
 
 export type loadSimulatorType = {
     scaleFactor : number
@@ -53,7 +70,9 @@ export type powerGridConnectorType = {
         solarSystem       : solarSimulatorType
         evApId            : string
         evMaxApId         : string
+        evSocId           : string
         evCharger         : evChargerSimulatorType
+        parentBuildingId  : string
         batterySystem     : batterySimulatorType
     }
 }
@@ -68,6 +87,7 @@ export type gridSensorType = {
         powerLimitId         : string
     }
 }
+export type storageDynToValueMapType = {[Key: string]: number}
 
 export type localStorageType = {
     [Key: string]: {

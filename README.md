@@ -1,4 +1,4 @@
-# PoC1 EC Asset Simulation Module
+# PoC1 EC Asset Simulation Module - RealityTwin Version
 
 This module simulates all assets of the Energy Community (EC) tackled in the PoC1 use cases of the OpenSwarm project.
 

@@ -28,4 +28,6 @@ services:
         image: energy-community-asset-simulator:latest
         environment:
             BIFROST_URL: 'http://bifrost-core:9091'
-            MODULE_URL: 'http://energy-community-asset-simulator:1809'
+            MODULE_URL: 'http://energy-community-asset-simulator:7032'
+        ports:
+            - '7032:7032'

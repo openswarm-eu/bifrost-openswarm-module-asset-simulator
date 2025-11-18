@@ -26,13 +26,58 @@ batterySystem:
 structureTypes:
   smallHouse:
     load:
-      # Load scale factor that represents typical single-family home consumption
+      # Load scale factor in p.u. that represents typical single-family home consumption
       scaleFactor: 2
   
   hugeHouse:
     load:
-      # Load scale factor that represents large residential buildings or small commercial properties
+      # Load scale factor in p.u. that represents large residential buildings or small commercial properties
       scaleFactor: 10
+  
+  evStation:
+    evCharger:
+      # Definition of number of charging slots at a EV station
+      chargingSlots: 3
+      # Initial charge percentage for newly connected EVs (0.0 to 1.0, where 0.15 = 15%)
+      initialChargePercent: 0.15
+      # Increased charge power - multiplier applied to car's nominal power (e.g., 1.2 = 120% of nominal power)
+      increasedChargePower: 1.2
+    load:
+      # Load scale factor for EV stations in p.u.
+      # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0
+      scaleFactor: 0
+    carStats:
+      # EV station car statistics definition
+      "-1":
+        carPower: 0
+        carMaxCap: 0
+      "0":
+        carPower: 1
+        carMaxCap: 10
+      "1":
+        carPower: 2
+        carMaxCap: 20
+      "2":
+        carPower: 3
+        carMaxCap: 30
+      "3":
+        carPower: 4
+        carMaxCap: 40
+      "4":
+        carPower: 5
+        carMaxCap: 50
+      "5":
+        carPower: 6
+        carMaxCap: 60
+      "6":
+        carPower: 7
+        carMaxCap: 70
+      "7":
+        carPower: 8
+        carMaxCap: 80
+      "8":
+        carPower: 9
+        carMaxCap: 90
   
   solarFarm:
     solarSystem:
@@ -40,15 +85,6 @@ structureTypes:
       scaleFactor: 8
     load:
       # Solar farms have no load consumption (pure generation), thus their load scale factor should be 0
-      scaleFactor: 0
-  
-  evStation:
-    evCharger:
-      # Definition of number of charging slots at a EV station
-      chargingSlots: 3
-    load:
-      # Load scale factor for EV stations in p.u.
-      # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0
       scaleFactor: 0
 
   batteryStation:

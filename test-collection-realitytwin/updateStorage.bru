@@ -1,0 +1,20 @@
+meta {
+  name: updateStorage
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://127.0.0.1:7032/rest/updateCapacity
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "storyId": "STORY::SmLNFn7z",
+    "experimentId": "EXPERIMENT::IbTdgP59",
+    "dynamicId": "BATTERY-STORAGE-CAPACITY->BATTERY-SYSTEM::[1|5,1|6,2|5,2|6]>hWoMffRZ@EXPERIMENT::IbTdgP59",
+    "dynamicValue": 66
+  }
+}

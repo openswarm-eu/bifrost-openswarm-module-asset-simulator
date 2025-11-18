@@ -156,6 +156,7 @@ structures:
     dynamics:
       - CHGSTATION-POWER
       - CHGSTATION-MAX-POWER
+      - EV-STATION-SOC
     flavors:
       - 77_SBC_software
     renderData:
@@ -541,6 +542,34 @@ dynamics:
         - DOWN
     tags:
       - energyCommunityController
+
+  EV-STATION-SOC:
+    domain      : powergrid
+    typeId      : EV-STATION-SOC
+    name        : E-Car SoC
+    description : Indicates the current state of charge of the connected cars at a certain charging station
+    unit        : "%"
+    visible     : true
+    actionable  : false
+    alwaysUpdate: false
+    dataLabels  :
+      - SoC 1
+      - SoC 2
+      - SoC 3
+    chartType   : LINE
+    defaultValue: 
+      - 0
+      - 0
+      - 0
+    schema:
+      type: array
+      minItems: 1
+      maxItems: 3
+      items:
+        type: number
+    tags:
+      - prosumermodel
+
 
 mappings:
 

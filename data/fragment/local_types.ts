@@ -11,6 +11,7 @@ export const TYPEID_LOCAL = {
     // Dynamics
     CHGSTATION_POWER             : "CHGSTATION-POWER",
     CHGSTATION_MAX_POWER         : "CHGSTATION-MAX-POWER",
+    CHGSTATION_SOC               : "EV-STATION-SOC",
     PV_SYSTEM_POWER              : "PV-SYSTEM-POWER",
     PV_SYSTEM_MAX_POWER          : "PV-SYSTEM-MAX-POWER",
     BATTERY_POWER                : "BATTERY-SYSTEM-POWER",
