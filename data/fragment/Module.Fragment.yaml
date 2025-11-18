@@ -586,7 +586,7 @@ dynamics:
     name        : E-Car Color
     description : Indicates the current color of the connected cars at a certain charging station
     unit        : ""
-    visible     : true
+    visible     : false
     actionable  : false
     alwaysUpdate: false
     dataLabels  :
