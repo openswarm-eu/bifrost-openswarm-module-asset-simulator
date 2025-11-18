@@ -35,6 +35,7 @@ export interface AssetConfig {
         evStation: {
             evCharger: {
                 chargingSlots: number;
+                initialChargePercent: number;
             };
             load: {
                 scaleFactor: number;
@@ -98,7 +99,8 @@ export const defaultConfig: AssetConfig = {
         },
         evStation: {
             evCharger: {
-                chargingSlots: 3
+                chargingSlots: 3,
+                initialChargePercent: 0.15
             },
             load: {
                 scaleFactor: 0
@@ -345,6 +347,10 @@ function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
     
     if (process.env.EV_STATION_CHARGING_SLOTS) {
         config.structureTypes.evStation.evCharger.chargingSlots = Number(process.env.EV_STATION_CHARGING_SLOTS);
+    }
+    
+    if (process.env.EV_STATION_INITIAL_CHARGE_PERCENT) {
+        config.structureTypes.evStation.evCharger.initialChargePercent = Number(process.env.EV_STATION_INITIAL_CHARGE_PERCENT);
     }
     
     if (process.env.SMALL_HOUSE_LOAD_SCALE) {

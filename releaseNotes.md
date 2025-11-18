@@ -4,8 +4,16 @@ This document contains the release history and changelog for the Energy Communit
 
 ## [v3.0.0] - 2025-11-18  🚗
 
+### Enhancements
 - **Slot Simulation**: A new simulation mode was introduced: E-Car charging stations have now a column in the profiles csv where a arrival of cars is defined over their IDs.
 - **ENV for Reality-Twin**: With the environment variable `REALITY_TWIN_MODE` is controlled, if the above slot simulation is used or the input of the hardware modules is used. Set it to "true" if the asset simulator is running within the reality twin set up.
+
+### Configuration
+- - **Configurable Initial Charge**: Added `initialChargePercent` configuration parameter for EV charging stations to control the initial charge level of newly connected vehicles (default: 15%)
+- Applied initial charge configuration across all car slot initialization points
+- **Environment Variable Support**: Added `EV_STATION_INITIAL_CHARGE_PERCENT` environment variable to override initial charge percentage (e.g., `EV_STATION_INITIAL_CHARGE_PERCENT=0.20` for 20% initial charge)
+
+---
 
 ## [v2.2.3] - 2025-08-22 🔧
 

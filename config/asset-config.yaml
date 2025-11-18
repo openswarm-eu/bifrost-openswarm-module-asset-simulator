@@ -38,6 +38,8 @@ structureTypes:
     evCharger:
       # Definition of number of charging slots at a EV station
       chargingSlots: 3
+      # Initial charge percentage for newly connected EVs (0.0 to 1.0, where 0.15 = 15%)
+      initialChargePercent: 0.15
     load:
       # Load scale factor for EV stations in p.u.
       # EV stations have no additional load beyond the charging itself, thus their load scale factor should be 0

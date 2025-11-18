@@ -155,13 +155,13 @@ export function update(
                                 if (carinSlot.ecar_id != ecar_id){
                                     carinSlot.ecar_id = ecar_id
                                     carinSlot.charge_max = Number(carStats[ecar_id].carMaxCap)
-                                    carinSlot.charge_power_max = carStats[ecar_id].carPower*6
-                                    carinSlot.charge = carStats[ecar_id].carMaxCap*0.15
+                                    carinSlot.charge_power_max = carStats[ecar_id].carPower
+                                    carinSlot.charge = carStats[ecar_id].carMaxCap * config.structureTypes.evStation.evCharger.initialChargePercent
                                     carinSlot.shifted_energy = 0
                                 }
                             }
                             // calculate the charging power for this car
-                            let curCarPower = Number(carStats[carinSlot.ecar_id].carPower)*4
+                            let curCarPower = Number(carStats[carinSlot.ecar_id].carPower)
                             const curCarCharge = carinSlot.charge
                             if (curCarCharge >= carinSlot.charge_max){
                                 curCarPower = 0
@@ -228,7 +228,7 @@ export function update(
                                 partPower = chgPowerList[i]/sumPower
                             }
                             const carId = carObj.ecar_assignment_slots[i].ecar_id
-                            let curCarPower = Number(carStats[carId].carPower)*4
+                            let curCarPower = Number(carStats[carId].carPower)
                             const chargedPower = chgPowerActual * partPower
                             carObj.ecar_assignment_slots[i].shifted_energy += curCarPower - chargedPower
                             carObj.ecar_assignment_slots[i].charge += chargedPower*m.samplingRate/3600
