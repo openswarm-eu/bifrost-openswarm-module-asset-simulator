@@ -29,6 +29,7 @@ export type CarObj = {
 
 export type assignmentSlots = {
     ecar_id: number
+    ecar_color: string
     charge: number
     charge_max: number
     charge_power_max: number
@@ -71,6 +72,7 @@ export type powerGridConnectorType = {
         evApId            : string
         evMaxApId         : string
         evSocId           : string
+        evColorId         : string
         evCharger         : evChargerSimulatorType
         parentBuildingId  : string
         batterySystem     : batterySimulatorType

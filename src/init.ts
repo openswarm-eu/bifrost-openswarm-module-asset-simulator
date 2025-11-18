@@ -73,6 +73,7 @@ export function init(
                         evApId    : "",
                         evMaxApId : "",
                         evSocId   : "",
+                        evColorId : "",
                         evCharger : {
                             chargingSlots   : config.evCharger.chargingSlots,  // Use config default charging slots
                             maxPowerPerSlot : config.evCharger.maxPowerPerSlot,  // Use config default max power per slot in kW
@@ -127,6 +128,9 @@ export function init(
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_SOC){
                                     localStorage[experimentId].byPGC[structureId].evSocId = dynId
                                 }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_SLOT_COLOR){
+                                    localStorage[experimentId].byPGC[structureId].evColorId = dynId
+                                }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){
                             for (const dynId of dynIds){
@@ -180,6 +184,7 @@ export function init(
                                 for(var i = 0; i < 3; i++){
                                     carObj.ecar_assignment_slots.push({
                                         ecar_id          : -1,
+                                        ecar_color       : "",
                                         charge           :  0,
                                         charge_power_max :  0,
                                         charge_max       :  0,
