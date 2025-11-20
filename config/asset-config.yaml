@@ -14,7 +14,7 @@ windTurbine:
   # Default wind speed scale factor in p.u.
   windSpeedScaleFactor: 2.5
   # Default conversion (linear) factor from wind speed to power in kW/(m/s)
-  windSpeedToPowerFactor: 10
+  windSpeedToPowerFactor: 1
   # Default maximum wind speed in m/s (defined in module fragment)
   maxWindSpeed: 25
   # Default minimum wind speed in m/s (defined in module fragment)
