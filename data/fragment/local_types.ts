@@ -15,8 +15,8 @@ export const TYPEID_LOCAL = {
     CHGSTATION_MAX_POWER         : "CHGSTATION-MAX-POWER",
     CHGSTATION_SOC               : "EV-STATION-SOC",
     CHGSTATION_SLOT_COLOR        : "EV-STATION-SLOT-COLOR",
-    PV_SYSTEM_POWER              : "PV-SYSTEM-POWER",
-    PV_SYSTEM_MAX_POWER          : "PV-SYSTEM-MAX-POWER",
+    INFEED_PLANT_POWER           : "PV-SYSTEM-POWER",
+    INFEED_PLANT_MAX_POWER       : "PV-SYSTEM-MAX-POWER",
     BATTERY_POWER                : "BATTERY-SYSTEM-POWER",
     BATTERY_MAX_POWER            : "BATTERY-SYSTEM-MAX-POWER",
     BATTERY_SOC                  : "BATTERY-SYSTEM-SOC",
@@ -52,6 +52,7 @@ export const enum WIND_TURBINE_WIND_SPEEDS {
     LOW      = "low",
     MEDIUM   = "medium",
     HIGH     = "high",
+    NONE     = "none",
 }
 
 export const PV_SYSTEM_POWER_MAPPING = {

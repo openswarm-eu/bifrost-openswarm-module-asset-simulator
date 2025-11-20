@@ -213,6 +213,7 @@ structures:
       - PV-SYSTEM-MAX-POWER
       - WIND-VELOCITY
       - WIND-TURBINE-LOCATION
+      - WIND-TURBINE-DAY
     flavors:
       - 76_SBC_plugin
     renderData:
@@ -742,10 +743,9 @@ dynamics:
         - low
         - medium
         - high
+        - none
 
 mappings:
 
   GRID-SENSOR-ASSIGNMENT:
     - POWERGRID-CONNECTOR
-  WIND-TURBINE-DAY:
-    - GLOBAL
