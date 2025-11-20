@@ -142,15 +142,15 @@ export function update(
                     const windSpeedSelected = dynamicsById[pStruct.windSpeedSelectionId]
                     if (windSpeedSelected !== WIND_TURBINE_WIND_SPEEDS.NONE){
                         windPowerPotential = wData["WIND-"+windSpeedSelected] * pStruct.windTurbine.windSpeedScaleFactor * pStruct.windTurbine.windSpeedToPowerFactor
-                        windPowerActual    = windPowerPotential * pStruct.windTurbine.windSpeedToPowerFactor
+                        windPowerActual    = windPowerPotential
                     }
                     
                     if (windPowerActual > dynamicsById[pStruct.windMaxApId]){
                         windPowerActual = dynamicsById[pStruct.windMaxApId]
                     }
 
-                    // Calculate the resulting wind speed based on actual power
-                    let resultingWindSpeed = windPowerActual / (pStruct.windTurbine.windSpeedToPowerFactor * pStruct.windTurbine.windSpeedScaleFactor)
+                    // Calculate the resulting wind speed based on actual power (includes than scaling of windspeed with windSpeedScaleFactor)
+                    let resultingWindSpeed = windPowerActual / (pStruct.windTurbine.windSpeedToPowerFactor)
                     if (resultingWindSpeed > config.windTurbine.maxWindSpeed){
                         resultingWindSpeed = config.windTurbine.maxWindSpeed
                     }
