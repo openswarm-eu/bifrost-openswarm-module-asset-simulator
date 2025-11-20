@@ -44,13 +44,17 @@ export function init(
         allPGCs        : [],
         byPGC          : {},
         allGridSensors : [],
-        byGridSensor   : {}
+        byGridSensor   : {},
+        windSpeedSelectionId : ""
     }
 
     // initialize struct for EV-STATIONS
     if (carAssignmentObject[experimentId] == undefined){
         carAssignmentObject[experimentId] = [] as CarAssignment
     }
+
+    // get the global wind speed selector
+    localStorage[experimentId].windSpeedSelectionId = state.dynamics.ids.filter((id: any) => state.dynamics.entities[id].typeId === TYPEID_LOCAL.WIND_SPEED_SELECTION && state.dynamics.entities[id].experimentId === experimentId)[0]
 
     try {
         for (const structureId of state.structures.ids){
@@ -79,6 +83,10 @@ export function init(
                             maxPowerPerSlot : config.evCharger.maxPowerPerSlot,  // Use config default max power per slot in kW
                             shiftedEnergy   : 0
                         },
+                        windPowerId       : "",
+                        windVelocityId    : "",
+                        windApId          : "",
+                        windMaxApId       : "",
                         batterySystem     : {
                             chargePower    : config.batterySystem.chargePower,
                             dischargePower : config.batterySystem.dischargePower,
@@ -130,6 +138,18 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_SLOT_COLOR){
                                     localStorage[experimentId].byPGC[structureId].evColorId = dynId
+                                }
+                            }
+                        } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.WIND_TURBINE){
+                            for (const dynId of dynIds){
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
+                                    localStorage[experimentId].byPGC[structureId].windApId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_MAX_POWER){
+                                    localStorage[experimentId].byPGC[structureId].windMaxApId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.WIND_VELOCITY){
+                                    localStorage[experimentId].byPGC[structureId].windVelocityId = dynId
                                 }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){

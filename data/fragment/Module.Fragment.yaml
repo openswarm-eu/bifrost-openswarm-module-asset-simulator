@@ -58,8 +58,13 @@ structures:
     size: 4
     replace: false
     defaultPairing: []
-    requiredPairing: ['POWERGRID-CONNECTOR', 'SOLAR-PANEL']
-    forbiddenPairing: ['CHARGING-POLE', 'BATTERY-SYSTEM']
+    requiredPairing: 
+      - POWERGRID-CONNECTOR
+      - SOLAR-PANEL
+    forbiddenPairing: 
+      - CHARGING-POLE
+      - BATTERY-SYSTEM
+      - WIND-POWER
     dynamics: []
     flavors: ['68_SBC_powergrid']
     renderData: 
@@ -81,6 +86,47 @@ structures:
     tags: 
       - 'base' 
       - 'lvgrid'
+  
+  WIND-TURBINE: 
+    domain: 'landscape'
+    memberOf: ['buildings', 'generators']
+    placeOn: ['canvas']
+    name: 'Wind Power Plant'
+    description: 'A ground based wind power plant.'
+    size: 4
+    replace: false
+    defaultPairing: []
+    requiredPairing: 
+      - POWERGRID-CONNECTOR
+      - WIND-POWER
+    forbiddenPairing: []
+    dynamics: []
+    flavors: ['85_SBC_wind_turbin']
+    renderData: 
+      file: 'buildings/'
+      image: 
+        base: 'objects/inactive/buildings/'
+        hover: 'objects/active/buildings/'
+        active: 'objects/active/buildings/'
+      rotationY: 0.75
+      scale: 'default'
+      hideInPanel: false
+      category: 'ELECTRICAL'
+      sorting: 205
+      nightmode: true
+      showPlaceholder: true
+      geoObject: true
+      widgetPosition: 
+        '85_SBC_wind_turbin': [0, 1.8, 0]
+      decorators: 
+        'SOLAR-PANEL': 
+          link: 'buildings/47_SBC_solar-panel'
+          flavors: 
+            '85_SBC_wind_turbin': 
+              position: [0.5, 0.11, 0.5]
+    tags: 
+    - 'base'
+    - 'lvgrid'
 
   BATTERY-STATION: 
     domain: 'landscape'
@@ -149,6 +195,41 @@ structures:
         category: ELECTRICAL
         sorting: 502
 
+  WIND-POWER:
+    domain: powergrid
+    memberOf:
+      - electrical
+    placeOn:
+      - POWERGRID-CONNECTOR
+    name: Wind Turbine
+    description: Wind Turbine
+    size: 1
+    replace: false
+    defaultPairing: []
+    requiredPairing: []
+    forbiddenPairing: []
+    dynamics:
+      - PV-SYSTEM-POWER
+      - PV-SYSTEM-MAX-POWER
+      - WIND-VELOCITY
+      - WIND-TURBINE-LOCATION
+    flavors:
+      - 76_SBC_plugin
+    renderData:
+      file: buildings/
+      image:
+        base: objects/inactive/buildings/
+        hover: objects/active/buildings/
+        active: objects/active/buildings/
+      rotationY: 0.75
+      hideObjectOnCanvas: true
+      scale: default
+      hideInPanel: false
+      nightmode: false
+      emissiveOnConnection: true
+      category: ELECTRICAL
+      sorting: 507
+  
   CHARGING-POLE:
     domain: powergrid
     memberOf:
@@ -293,8 +374,8 @@ dynamics:
 
   PV-SYSTEM-POWER:
     domain: powergrid
-    name: PV System Power
-    description: Power situation of the PV system
+    name: Infeed Power
+    description: Infeed situation of the plant
     visible: true
     actionable: false
     alwaysUpdate: false
@@ -425,8 +506,8 @@ dynamics:
 
   PV-SYSTEM-MAX-POWER:
     domain: powergrid
-    name: PV System Infeed Limit
-    description: The currently limit of the infeed of this PV system
+    name: Infeed Limit
+    description: The currently limit of the infeed of this plant
     visible: true
     actionable: true
     alwaysUpdate: false
@@ -607,7 +688,64 @@ dynamics:
     tags:
       - prosumermodel
 
+  WIND-VELOCITY:
+    domain: powergrid
+    name: Wind Velocity
+    description: Current wind velocity the windturbine is facing
+    visible: true
+    actionable: false
+    unit: m/s
+    defaultValue: 0
+    schema:
+      type: number
+      minimum: 0
+      maximum: 25
+
+  WIND-TURBINE-LOCATION:
+    domain: dominion
+    name: Wind Turbine Location
+    description: Location of the Wind Turbines for data generation purposes
+    visible: false
+    actionable: true
+    alwaysUpdate: false
+    pinnable: true
+    defaultValue: Andau
+    schema:
+      type: string
+      enum:
+        - Gaenserndorf
+        - Klosterneuburg
+        - Krems
+        - Mistelbach
+        - Moedling
+        - Payerbach
+        - Poechlarn
+        - St. Poelten
+        - Stockerau
+        - Tulbinger Kogel
+        - Wiener Neustadt
+        - Wolkersdorf
+        - Andau
+
+  WIND-TURBINE-DAY:
+    domain: dominion
+    name: Wind Speed
+    description: Definition of the current wind speed
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    pinnable: true
+    defaultValue: low
+    schema:
+      type: string
+      enum:
+        - low
+        - medium
+        - high
+
 mappings:
 
   GRID-SENSOR-ASSIGNMENT:
     - POWERGRID-CONNECTOR
+  WIND-TURBINE-DAY:
+    - GLOBAL
