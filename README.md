@@ -120,6 +120,12 @@ git push openswarmgithub :refs/tags/latest
 git push openswarmgithub latest
 ```
 
+## Acknowledgement
+
+Part of the source code in this repository is developed within the frame and for the purpose of the OpenSwarm project. This project has received funding from the European Union's Horizon Europe Framework Program under Grant Agreement No. 101093046.
+
+![OpenSwarm - Funded by the European Union](logos/ack.png)
+
 ## Current Version
 
 v3.1.0
