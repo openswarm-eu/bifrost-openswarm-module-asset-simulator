@@ -2,6 +2,20 @@
 
 This document contains the release history and changelog for the **OpenSwarm Energy Community Asset Simulator**. The **RealityTwin Asset Simulator** version has own tags, but which reflect also releases of the **OpenSwarm Energy Community Asset Simulator**. Therefore the first version number reflects the version of the **RealityTwin Asset Simulator**, the second to the corresponding version of the **OpenSwarm Energy Community Asset Simulator**.
 
+
+## [v2.1.0][v3.1.0] - 2025-11-20  🌬️
+
+### Major Features
+- **Wind Turbine Support**: Added comprehensive wind turbine simulation capabilities to the asset simulator
+  - Introduced WIND-TURBINE structure with support for wind speed and power generation
+  - Added wind turbine configuration in `asset-config.yaml` with customizable parameters
+  - Implemented wind profile data in CSV for realistic wind speed variations
+
+### Bug Fixes
+- **Car Colors**: Fixed car color configuration values in `asset-config.yaml`
+
+---
+
 ## [v2.0.0][v3.0.0] - 2025-11-18 🚗
 
 ### Features

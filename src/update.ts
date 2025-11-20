@@ -14,7 +14,8 @@ import { updateBatterySystem        } from './components/battery-system.js'
 import { updateGridSensors          } from './components/sensor.js'
 import { 
     CHARGING_STATION_POWER_MAPPING,
-    PV_SYSTEM_POWER_MAPPING         } from '../data/fragment/local_types.js'
+    PV_SYSTEM_POWER_MAPPING as INFEED_PLANT_POWER_MAPPING,         
+    WIND_TURBINE_WIND_SPEEDS        } from '../data/fragment/local_types.js'
 import { 
     carAssignmentObject, 
     localStorage                    } from './init.js'
@@ -124,10 +125,47 @@ export function update(
                         pvInfeedActual = -dynamicsById[pStruct.pvMaxApId]
                     }
                     // write the values to the result DataFrame
-                    pvInfeedResult[PV_SYSTEM_POWER_MAPPING.Infeed_Potential] = -pvInfeedPotential
-                    pvInfeedResult[PV_SYSTEM_POWER_MAPPING.Actual_Infeed]    = -pvInfeedActual
+                    pvInfeedResult[INFEED_PLANT_POWER_MAPPING.Infeed_Potential] = -pvInfeedPotential
+                    pvInfeedResult[INFEED_PLANT_POWER_MAPPING.Actual_Infeed]    = -pvInfeedActual
                     result.addSeries({dynamicId:pStruct.pvApId,values:[pvInfeedResult]})
+
+                    // add to total active power
                     sumLoad += pvInfeedActual
+                }
+
+                // add wind power
+                if(pStruct.windApId){
+                    let windPowerResult    = [0, 0]
+                    let windPowerPotential = 0
+                    let windPowerActual    = 0
+
+                    const windSpeedSelected = dynamicsById[pStruct.windSpeedSelectionId]
+                    if (windSpeedSelected !== WIND_TURBINE_WIND_SPEEDS.NONE){
+                        windPowerPotential = wData["WIND-"+windSpeedSelected] * pStruct.windTurbine.windSpeedScaleFactor * pStruct.windTurbine.windSpeedToPowerFactor
+                        windPowerActual    = windPowerPotential
+                    }
+                    
+                    if (windPowerActual > dynamicsById[pStruct.windMaxApId]){
+                        windPowerActual = dynamicsById[pStruct.windMaxApId]
+                    }
+
+                    // Calculate the resulting wind speed based on actual power (includes than scaling of windspeed with windSpeedScaleFactor)
+                    let resultingWindSpeed = windPowerActual / (pStruct.windTurbine.windSpeedToPowerFactor)
+                    if (resultingWindSpeed > config.windTurbine.maxWindSpeed){
+                        resultingWindSpeed = config.windTurbine.maxWindSpeed
+                    }
+                    if (resultingWindSpeed < config.windTurbine.minWindSpeed){
+                        resultingWindSpeed = config.windTurbine.minWindSpeed
+                    }
+
+                    // write the values to the result DataFrame
+                    result.addSeries({dynamicId:pStruct.windVelocityId,values:[resultingWindSpeed]})
+                    windPowerResult[INFEED_PLANT_POWER_MAPPING.Infeed_Potential] = windPowerPotential
+                    windPowerResult[INFEED_PLANT_POWER_MAPPING.Actual_Infeed]    = windPowerActual
+                    result.addSeries({dynamicId:pStruct.windApId,values:[windPowerResult]})
+
+                    // add to total active power (windpower = infeed -> subtract from current power!)
+                    sumLoad -= windPowerActual
                 }
 
                 // add EV charging power
@@ -261,27 +299,6 @@ export function update(
 
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
-                }
-
-                // add wind power
-                if(pStruct.windApId){
-                    let windPowerResult    = [0, 0]
-                    let windPowerSpeed = 0
-                    const windSpeedSelected = dynamicsById[pStruct.windSpeedSelectionId]
-                    if (windSpeedSelected === "none") {
-                        windPowerSpeed = 0
-                    } else if (windSpeedSelected === "low") {
-                        windPowerSpeed = 5
-                        // windPowerSpeed = wData["WIND-"+windSpeedSelected] * pStruct.solarSystem.scaleFactor
-                    } else if (windSpeedSelected === "medium") {
-                        windPowerSpeed = 10
-                    } else if (windSpeedSelected === "high") {
-                        windPowerSpeed = 20
-                    }
-                    
-                    let windPowerActual    = windPowerSpeed
-
-                    result.addSeries({dynamicId:pStruct.windVelocityId,values:[windPowerSpeed]})
                 }
 
                 // add battery power

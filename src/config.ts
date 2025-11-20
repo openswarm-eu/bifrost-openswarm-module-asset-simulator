@@ -22,6 +22,13 @@ export interface AssetConfig {
         chargingSlots: number;
         maxPowerPerSlot: number;
     };
+    // Default wind turbine configuration for PGC (Power Grid Connector) components
+    windTurbine: {
+        windSpeedScaleFactor: number;
+        windSpeedToPowerFactor: number;
+        maxWindSpeed: number;
+        minWindSpeed: number;
+    };
     // Structure-specific configurations
     structureTypes: {
         solarFarm: {
@@ -68,6 +75,15 @@ export interface AssetConfig {
                 scaleFactor: number;
             };
         };
+        windPlant: {
+            windTurbine: {
+                windSpeedScaleFactor: number;
+                windSpeedToPowerFactor: number;
+            };
+            load: {
+                scaleFactor: number;
+            };
+        };
     };
 }
 
@@ -89,6 +105,12 @@ export const defaultConfig: AssetConfig = {
     evCharger: {
         chargingSlots: 1,
         maxPowerPerSlot: 4
+    },
+    windTurbine: {
+        windSpeedScaleFactor: 2.5,
+        windSpeedToPowerFactor: 10,
+        maxWindSpeed: 25,
+        minWindSpeed: 0
     },
     structureTypes: {
         solarFarm: {
@@ -115,7 +137,7 @@ export const defaultConfig: AssetConfig = {
                     carMaxCap:0
                 },
                 "0": {
-                    carColor: "0x0000FF", // #0000FF # Dark Blue car
+                    carColor: "0xFF0000", // #FF0000 # Red car
                     carPower:1,
                     carMaxCap:10
                 },
@@ -140,7 +162,7 @@ export const defaultConfig: AssetConfig = {
                     carMaxCap:50
                 },
                 "5": {
-                    carColor: "0xFF0000", // #FF0000 # Red car
+                    carColor: "0x0000FF", // #0000FF # Blue car
                     carPower:6,
                     carMaxCap:60
                 },
@@ -175,6 +197,15 @@ export const defaultConfig: AssetConfig = {
             batterySystem: {
                 chargePower: 20,
                 dischargePower: 20
+            },
+            load: {
+                scaleFactor: 0
+            }
+        },
+        windPlant: {
+            windTurbine: {
+                windSpeedScaleFactor: 1,
+                windSpeedToPowerFactor: 10
             },
             load: {
                 scaleFactor: 0
@@ -354,6 +385,14 @@ function applyEnvironmentOverrides(config: AssetConfig): AssetConfig {
         config.batterySystem.dischargePower = Number(process.env.BATTERY_DISCHARGE_POWER);
     }
     
+    if (process.env.DEFAULT_WIND_TURBINE_WIND_SPEED_SCALE_FACTOR) {
+        config.windTurbine.windSpeedScaleFactor = Number(process.env.DEFAULT_WIND_TURBINE_WIND_SPEED_SCALE_FACTOR);
+    }
+
+    if (process.env.DEFAULT_WIND_TURBINE_WIND_SPEED_TO_POWER_FACTOR) {
+        config.windTurbine.windSpeedToPowerFactor = Number(process.env.DEFAULT_WIND_TURBINE_WIND_SPEED_TO_POWER_FACTOR);
+    }
+
     if (process.env.SOLAR_FARM_SCALE_FACTOR) {
         config.structureTypes.solarFarm.solarSystem.scaleFactor = Number(process.env.SOLAR_FARM_SCALE_FACTOR);
     }

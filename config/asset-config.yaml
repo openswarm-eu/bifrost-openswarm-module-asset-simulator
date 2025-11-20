@@ -10,6 +10,16 @@ solarSystem:
   # Default solar system scale factor in p.u.
   scaleFactor: 1
 
+windTurbine:
+  # Default wind speed scale factor in p.u.
+  windSpeedScaleFactor: 2.5
+  # Default conversion (linear) factor from wind speed to power in kW/(m/s)
+  windSpeedToPowerFactor: 1
+  # Default maximum wind speed in m/s (defined in module fragment)
+  maxWindSpeed: 25
+  # Default minimum wind speed in m/s (defined in module fragment)
+  minWindSpeed: 0
+
 evCharger:
   # Default number of charging slots
   chargingSlots: 1
@@ -105,6 +115,11 @@ structureTypes:
       scaleFactor: 8
     load:
       # Solar farms have no load consumption (pure generation), thus their load scale factor should be 0
+      scaleFactor: 0
+  
+  windPlant:
+    load:
+      # Wind plants have no load consumption (pure generation), thus their load scale factor should be 0
       scaleFactor: 0
 
   batteryStation:

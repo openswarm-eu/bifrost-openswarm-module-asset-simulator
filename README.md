@@ -1,16 +1,11 @@
 # RealityTwin EC Asset Simulation Module
 
-Fork for BIFROST reality twin adoption of the OpenSwarm energy-community-asset-simulator (https://code.siemens.com/openswarm/energy-community-asset-simulator)
-
-To get the the latest changes you have to set an additional remote connection with
-```bash
-git remote add energy-community-asset-simulator git@code.siemens.com:openswarm/energy-community-asset-simulator.git
-```
-Pull the changes from the `realitytwin` branch with
-```bash
-git checkout realitytwin
-git pull energy-community-asset-simulator realitytwin
-```
+This module Reads in data from `./data/csv/profile-data.csv` and adds the PV, battery system or electro vehicle (EV) data to the buildings depending on their stackable for the `POWERGRID-CONNECTOR`. It also provides measurement data and limits for feeder line grid sensors.
+  - PV data requires `SOLAR-PANEL`
+  - WIND data requires `WIND-POWER`
+  - EV data `CHARGING-POLE`
+  - BATTERY system data `BATTERY-SYSTEM`
+  - Grid Sensor Measurements requires `GRID-SENSOR`
 
 ## Compile and run your module
 
