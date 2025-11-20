@@ -123,6 +123,12 @@ curl --request POST \
 Where the EV-STATION needs to be the full BIFROST id of your wanted EV-STATION and the list describes the car which
 is currently connected to the according slot. For example ```[1,-1,2]``` connects car 1 to slot 1 and car 2 to slot 3.
 
+## Acknowledgement
+
+Part of the source code in this repository is developed within the frame and for the purpose of the OpenSwarm project. This project has received funding from the European Union's Horizon Europe Framework Program under Grant Agreement No. 101093046.
+
+![OpenSwarm - Funded by the European Union](logos/ack.png)
+
 ## Current Version
 
 vX.Y.Z (see `release` branch. `vX.Y.Z-A` indicates a re-release of a version (mostly fixes), the flag `-A` can be ignored when docker images are used)
