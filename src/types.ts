@@ -78,6 +78,7 @@ export type powerGridConnectorType = {
         windVelocityId     : string
         windApId           : string
         windMaxApId        : string
+        windSpeedSelectionId : string
         parentBuildingId   : string
         batterySystem      : batterySimulatorType
     }
@@ -102,7 +103,6 @@ export type localStorageType = {
         allPGCs            : string[],
         byPGC              : powerGridConnectorType,
         allGridSensors     : string[],
-        byGridSensor       : gridSensorType,
-        windSpeedSelectionId : string
+        byGridSensor       : gridSensorType
     }
 }

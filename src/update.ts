@@ -266,11 +266,22 @@ export function update(
                 // add wind power
                 if(pStruct.windApId){
                     let windPowerResult    = [0, 0]
-                    const windSpeedSelected = dynamicsById[localStorage[experimentId].windSpeedSelectionId]
-                    let windPowerPotential = wData["WIND-"+windSpeedSelected] * pStruct.solarSystem.scaleFactor
-                    let windPowerActual    = windPowerPotential
+                    let windPowerSpeed = 0
+                    const windSpeedSelected = dynamicsById[pStruct.windSpeedSelectionId]
+                    if (windSpeedSelected === "none") {
+                        windPowerSpeed = 0
+                    } else if (windSpeedSelected === "low") {
+                        windPowerSpeed = 5
+                        // windPowerSpeed = wData["WIND-"+windSpeedSelected] * pStruct.solarSystem.scaleFactor
+                    } else if (windSpeedSelected === "medium") {
+                        windPowerSpeed = 10
+                    } else if (windSpeedSelected === "high") {
+                        windPowerSpeed = 20
+                    }
+                    
+                    let windPowerActual    = windPowerSpeed
 
-                    result.addSeries({dynamicId:pStruct.windVelocityId,values:[windPowerPotential]})
+                    result.addSeries({dynamicId:pStruct.windVelocityId,values:[windPowerSpeed]})
                 }
 
                 // add battery power

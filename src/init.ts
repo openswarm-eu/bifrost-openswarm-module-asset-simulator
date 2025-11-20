@@ -45,16 +45,12 @@ export function init(
         byPGC          : {},
         allGridSensors : [],
         byGridSensor   : {},
-        windSpeedSelectionId : ""
     }
 
     // initialize struct for EV-STATIONS
     if (carAssignmentObject[experimentId] == undefined){
         carAssignmentObject[experimentId] = [] as CarAssignment
     }
-
-    // get the global wind speed selector
-    localStorage[experimentId].windSpeedSelectionId = state.dynamics.ids.filter((id: any) => state.dynamics.entities[id].typeId === TYPEID_LOCAL.WIND_SPEED_SELECTION && state.dynamics.entities[id].experimentId === experimentId)[0]
 
     try {
         for (const structureId of state.structures.ids){
@@ -87,6 +83,7 @@ export function init(
                         windVelocityId    : "",
                         windApId          : "",
                         windMaxApId       : "",
+                        windSpeedSelectionId: "",
                         batterySystem     : {
                             chargePower    : config.batterySystem.chargePower,
                             dischargePower : config.batterySystem.dischargePower,
@@ -150,6 +147,9 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.WIND_VELOCITY){
                                     localStorage[experimentId].byPGC[structureId].windVelocityId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.WIND_SPEED_SELECTION){
+                                    localStorage[experimentId].byPGC[structureId].windSpeedSelectionId = dynId
                                 }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){
