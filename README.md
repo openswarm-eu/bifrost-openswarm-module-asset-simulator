@@ -53,7 +53,7 @@ npm run debug:docker
 
 To build a docker image of the module, use
 ```sh
-docker build -f ./docker/Dockerfile.module -t energy-community-asset-simulator:latest .
+docker build -f ./docker/Dockerfile.module -t energy-community-asset-simulator:local .
 ```
 
 Or run the module in a docker container with (along with BIFROST ZERO):
