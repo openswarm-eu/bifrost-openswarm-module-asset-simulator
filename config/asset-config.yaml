@@ -55,7 +55,7 @@ structureTypes:
         carMaxCap: 0
       "0":
         # Red car
-        carColor: "0x0000FF"
+        carColor: "0xFF0000"
         carPower: 5
         carMaxCap: 10
       "1":
@@ -80,7 +80,7 @@ structureTypes:
         carMaxCap: 50
       "5":
         # Dark blue car
-        carColor: "0xFF0000"
+        carColor: "0x0000FF"
         carPower: 6
         carMaxCap: 30
       "6":

@@ -64,18 +64,22 @@ export type batterySimulatorType = {
 
 export type powerGridConnectorType = {
     [Key: string]:{
-        pgcApId           : string
-        pvApId            : string
-        pvMaxApId         : string
-        load              : loadSimulatorType
-        solarSystem       : solarSimulatorType
-        evApId            : string
-        evMaxApId         : string
-        evSocId           : string
-        evColorId         : string
-        evCharger         : evChargerSimulatorType
-        parentBuildingId  : string
-        batterySystem     : batterySimulatorType
+        pgcApId            : string
+        pvApId             : string
+        pvMaxApId          : string
+        load               : loadSimulatorType
+        solarSystem        : solarSimulatorType
+        evApId             : string
+        evMaxApId          : string
+        evSocId            : string
+        evColorId          : string
+        evCharger          : evChargerSimulatorType
+        windPowerId        : string
+        windVelocityId     : string
+        windApId           : string
+        windMaxApId        : string
+        parentBuildingId   : string
+        batterySystem      : batterySimulatorType
     }
 }
 
@@ -93,11 +97,12 @@ export type storageDynToValueMapType = {[Key: string]: number}
 
 export type localStorageType = {
     [Key: string]: {
-        lastUpdate     : number,
-        numberUpdate   : number,
-        allPGCs        : string[],
-        byPGC          : powerGridConnectorType,
-        allGridSensors : string[],
-        byGridSensor   : gridSensorType,
+        lastUpdate         : number,
+        numberUpdate       : number,
+        allPGCs            : string[],
+        byPGC              : powerGridConnectorType,
+        allGridSensors     : string[],
+        byGridSensor       : gridSensorType,
+        windSpeedSelectionId : string
     }
 }

@@ -194,9 +194,6 @@ export function update(
                         if (newChargePower > chgPowerLimit){
                             newChargePower = chgPowerLimit
                         }
-                        // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy + chgPowerShifted
-                        // pStruct.evCharger.shiftedEnergy = pStruct.evCharger.shiftedEnergy - (newChargePower - chgPowerShifted)
-                    
                     }
 
                     // ensure that the shifted charging power is not lower than the demand
@@ -264,6 +261,16 @@ export function update(
 
                     result.addSeries({dynamicId:pStruct.evApId,values:[chgPowerResult]})
                     sumLoad += chgPowerActual
+                }
+
+                // add wind power
+                if(pStruct.windApId){
+                    let windPowerResult    = [0, 0]
+                    const windSpeedSelected = dynamicsById[localStorage[experimentId].windSpeedSelectionId]
+                    let windPowerPotential = wData["WIND-"+windSpeedSelected] * pStruct.solarSystem.scaleFactor
+                    let windPowerActual    = windPowerPotential
+
+                    result.addSeries({dynamicId:pStruct.windVelocityId,values:[windPowerPotential]})
                 }
 
                 // add battery power
