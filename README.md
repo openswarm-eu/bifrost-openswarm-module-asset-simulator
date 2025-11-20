@@ -128,4 +128,8 @@ Part of the source code in this repository is developed within the frame and for
 
 ## Current Version
 
+<<<<<<< HEAD
 v3.1.0
+=======
+vX.Y.Z (see `release` branch. `vX.Y.Z-A` indicates a re-release of a version (mostly fixes), the flag `-A` can be ignored when docker images are used)
+>>>>>>> main
