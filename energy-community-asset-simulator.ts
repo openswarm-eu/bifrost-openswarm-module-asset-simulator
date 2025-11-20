@@ -210,6 +210,32 @@ m.app.post("/rest/updateCars", (request, reply) => {
     }))
 });
 
+// REST endtpoint accessed by the RealityTwin hardware module "WIND-TURBINE"
+m.app.post("/rest/configWindData", async (request, reply) => {
+    m.context.log.write(`Got external REST request for updating "WIND-TURBINE"...`)
+
+    const body = request.body as object
+    try {
+        const storyId = body["storyId"]
+        const expId = body["experimentId"]
+        const strId = body["structureId"]
+        const dynId = body["dynamicId"]
+        const dynVal = body["dynamicValue"]
+        const bifrostURL = process.env.BIFROST_URL || 'http://localhost:9091'
+        // const status = await updateDynamic(m.bifrostURL, storyId, expId, strId, dynId, dynVal)
+        const status = await updateDynamic(bifrostURL, storyId, expId, dynId, dynVal, m.context.log, Log)
+        reply.status(status).send(JSON.stringify({
+            message: "success"
+        }))
+    } catch (e) {
+        var msg = "Error parsing wind-turbine update"
+        m.context.log.write(msg + e, Log.level.ERROR)
+        reply.status(400).send(JSON.stringify({
+            message: "fail"
+        }))
+    }
+})
+
 // Load the module config
 loadConfig(m.context);
 
