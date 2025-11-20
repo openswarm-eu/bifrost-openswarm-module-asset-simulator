@@ -2,6 +2,19 @@
 
 This document contains the release history and changelog for the Energy Community Asset Simulator.
 
+## [v3.1.0] - 2025-11-20  🌬️
+
+### Major Features
+- **Wind Turbine Support**: Added comprehensive wind turbine simulation capabilities to the asset simulator
+  - Introduced WIND-TURBINE structure with support for wind speed and power generation
+  - Added wind turbine configuration in `asset-config.yaml` with customizable parameters
+  - Implemented wind profile data in CSV for realistic wind speed variations
+
+### Bug Fixes
+- **Car Colors**: Fixed car color configuration values in `asset-config.yaml`
+
+---
+
 ## [v3.0.0] - 2025-11-18  🚗
 
 ### Features

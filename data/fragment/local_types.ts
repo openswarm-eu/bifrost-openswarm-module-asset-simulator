@@ -7,14 +7,16 @@ export const TYPEID_LOCAL = {
     SOLAR_PANEL                  : "SOLAR-PANEL",
     GRID_SENSOR                  : "GRID-SENSOR",
     BATTERY_SYSTEM               : "BATTERY-SYSTEM",
+    WIND_TURBINE                 : "WIND-POWER",
+    WIND_POWER_PLANT             : "WIND-TURBINE",
 
     // Dynamics
     CHGSTATION_POWER             : "CHGSTATION-POWER",
     CHGSTATION_MAX_POWER         : "CHGSTATION-MAX-POWER",
     CHGSTATION_SOC               : "EV-STATION-SOC",
     CHGSTATION_SLOT_COLOR        : "EV-STATION-SLOT-COLOR",
-    PV_SYSTEM_POWER              : "PV-SYSTEM-POWER",
-    PV_SYSTEM_MAX_POWER          : "PV-SYSTEM-MAX-POWER",
+    INFEED_PLANT_POWER           : "PV-SYSTEM-POWER",
+    INFEED_PLANT_MAX_POWER       : "PV-SYSTEM-MAX-POWER",
     BATTERY_POWER                : "BATTERY-SYSTEM-POWER",
     BATTERY_MAX_POWER            : "BATTERY-SYSTEM-MAX-POWER",
     BATTERY_SOC                  : "BATTERY-SYSTEM-SOC",
@@ -22,7 +24,10 @@ export const TYPEID_LOCAL = {
     GRID_SENSOR_POWERMEASUREMENT : "GRID-SENSOR-POWERMEASUREMENT",
     GRID_SENSOR_POWERLIMIT       : "GRID-SENSOR-POWERLIMIT",
     GRID_SENSOR_NAME             : "GRID-SENSOR-NAME",
-    GRID_SENSOR_DIRECTION        : "GRID-SENSOR-FLOW-DIRECTION"
+    GRID_SENSOR_DIRECTION        : "GRID-SENSOR-FLOW-DIRECTION",
+    WIND_VELOCITY                : "WIND-VELOCITY",
+    WIND_TURBINE_LOCATION        : "WIND-TURBINE-LOCATION",
+    WIND_SPEED_SELECTION         : "WIND-TURBINE-DAY",
 }
 
 export const enum SENSOR_NAMES {
@@ -41,6 +46,13 @@ export const enum SENSOR_NAMES {
 export const enum SENSOR_DIRECTIONS {
     UP   = "UP",
     DOWN = "DOWN",
+}
+
+export const enum WIND_TURBINE_WIND_SPEEDS {
+    LOW      = "low",
+    MEDIUM   = "medium",
+    HIGH     = "high",
+    NONE     = "none",
 }
 
 export const PV_SYSTEM_POWER_MAPPING = {

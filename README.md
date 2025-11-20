@@ -4,6 +4,7 @@ This module simulates all assets of the Energy Community (EC) tackled in the PoC
 
 This module Reads in data from `./data/csv/profile-data.csv` and adds the PV, battery system or electro vehicle (EV) data to the buildings depending on their stackable for the `POWERGRID-CONNECTOR`. It also provides measurement data and limits for feeder line grid sensors.
   - PV data requires `SOLAR-PANEL`
+  - WIND data requires `WIND-POWER`
   - EV data `CHARGING-POLE`
   - BATTERY system data `BATTERY-SYSTEM`
   - Grid Sensor Measurements requires `GRID-SENSOR`

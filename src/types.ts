@@ -62,20 +62,30 @@ export type batterySimulatorType = {
     }
 }
 
+export type windTurbineSimulatorType = {
+    windSpeedScaleFactor    : number
+    windSpeedToPowerFactor  : number
+}
+
 export type powerGridConnectorType = {
     [Key: string]:{
-        pgcApId           : string
-        pvApId            : string
-        pvMaxApId         : string
-        load              : loadSimulatorType
-        solarSystem       : solarSimulatorType
-        evApId            : string
-        evMaxApId         : string
-        evSocId           : string
-        evColorId         : string
-        evCharger         : evChargerSimulatorType
-        parentBuildingId  : string
-        batterySystem     : batterySimulatorType
+        pgcApId              : string
+        pvApId               : string
+        pvMaxApId            : string
+        load                 : loadSimulatorType
+        solarSystem          : solarSimulatorType
+        evApId               : string
+        evMaxApId            : string
+        evSocId              : string
+        evColorId            : string
+        evCharger            : evChargerSimulatorType
+        windVelocityId       : string
+        windApId             : string
+        windMaxApId          : string
+        windSpeedSelectionId : string
+        windTurbine          : windTurbineSimulatorType
+        parentBuildingId     : string
+        batterySystem        : batterySimulatorType
     }
 }
 
@@ -93,11 +103,11 @@ export type storageDynToValueMapType = {[Key: string]: number}
 
 export type localStorageType = {
     [Key: string]: {
-        lastUpdate     : number,
-        numberUpdate   : number,
-        allPGCs        : string[],
-        byPGC          : powerGridConnectorType,
-        allGridSensors : string[],
-        byGridSensor   : gridSensorType,
+        lastUpdate         : number,
+        numberUpdate       : number,
+        allPGCs            : string[],
+        byPGC              : powerGridConnectorType,
+        allGridSensors     : string[],
+        byGridSensor       : gridSensorType,
     }
 }

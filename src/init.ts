@@ -44,7 +44,7 @@ export function init(
         allPGCs        : [],
         byPGC          : {},
         allGridSensors : [],
-        byGridSensor   : {}
+        byGridSensor   : {},
     }
 
     // initialize struct for EV-STATIONS
@@ -79,7 +79,15 @@ export function init(
                             maxPowerPerSlot : config.evCharger.maxPowerPerSlot,  // Use config default max power per slot in kW
                             shiftedEnergy   : 0
                         },
-                        batterySystem     : {
+                        windVelocityId       : "",
+                        windApId             : "",
+                        windMaxApId          : "",
+                        windSpeedSelectionId : "",
+                        windTurbine          : {
+                            windSpeedScaleFactor    : config.windTurbine.windSpeedScaleFactor,
+                            windSpeedToPowerFactor  : config.windTurbine.windSpeedToPowerFactor
+                        },
+                        batterySystem        : {
                             chargePower    : config.batterySystem.chargePower,
                             dischargePower : config.batterySystem.dischargePower,
                             storedEnergy   : -1, // will be updated in the update function, -1 indicates to use the starting values for a initial calculation
@@ -110,10 +118,10 @@ export function init(
                         }
                         if (state.structures.entities[childId].typeId == TYPEID_LOCAL.SOLAR_PANEL){
                             for (const dynId of dynIds){
-                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_POWER){
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_POWER){
                                     localStorage[experimentId].byPGC[structureId].pvApId = dynId
                                 }
-                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.PV_SYSTEM_MAX_POWER){
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_MAX_POWER){
                                     localStorage[experimentId].byPGC[structureId].pvMaxApId = dynId
                                 }
                             }
@@ -130,6 +138,21 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.CHGSTATION_SLOT_COLOR){
                                     localStorage[experimentId].byPGC[structureId].evColorId = dynId
+                                }
+                            }
+                        } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.WIND_TURBINE){
+                            for (const dynId of dynIds){
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_POWER){
+                                    localStorage[experimentId].byPGC[structureId].windApId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_MAX_POWER){
+                                    localStorage[experimentId].byPGC[structureId].windMaxApId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.WIND_VELOCITY){
+                                    localStorage[experimentId].byPGC[structureId].windVelocityId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.WIND_SPEED_SELECTION){
+                                    localStorage[experimentId].byPGC[structureId].windSpeedSelectionId = dynId
                                 }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.BATTERY_SYSTEM){
@@ -203,6 +226,14 @@ export function init(
                             localStorage[experimentId].byPGC[structureId].batterySystem.dischargePower = config.structureTypes.batteryStation.batterySystem.dischargePower
                             // switch off the load simulator for the Battery-Station
                             localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.batteryStation.load.scaleFactor
+                        }
+                        // identify Wind-Turbine
+                        if (state.structures.entities[parentId].typeId == TYPEID_LOCAL.WIND_TURBINE){
+                            // set the scaleFactor for the wind turbine simulator to a higher value
+                            localStorage[experimentId].byPGC[structureId].windTurbine.windSpeedScaleFactor = config.structureTypes.windPlant.windTurbine.windSpeedScaleFactor
+                            localStorage[experimentId].byPGC[structureId].windTurbine.windSpeedToPowerFactor = config.structureTypes.windPlant.windTurbine.windSpeedToPowerFactor
+                            // switch off the load simulator for the Wind-Turbine
+                            localStorage[experimentId].byPGC[structureId].load.scaleFactor = config.structureTypes.windPlant.load.scaleFactor
                         }
                         // is it a small house?
                         if (state.structures.entities[parentId].typeId == TYPEID.SMALL_HOUSE){
