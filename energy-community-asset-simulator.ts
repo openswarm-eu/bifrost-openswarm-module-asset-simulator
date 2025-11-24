@@ -222,10 +222,8 @@ m.app.post("/rest/configWindData", async (request, reply) => {
         const dynId = body["dynamicId"]
         const dynVal = body["dynamicValue"]
         m.context.log.write(`Updating "WIND-TURBINE": ${dynId}:${dynVal}`,Log.level.DEBUG)
-        const bifrostURL = process.env.BIFROST_URL || 'http://localhost:9091'
-        // const status = await updateDynamic(m.bifrostURL, storyId, expId, strId, dynId, dynVal)
-        const status = await updateDynamic(bifrostURL, storyId, expId, dynId, dynVal, m.context.log, Log)
-        reply.status(status).send(JSON.stringify({
+        storageDynToValueMap[dynId] = dynVal
+        reply.status(200).send(JSON.stringify({
             message: "success"
         }))
     } catch (e) {

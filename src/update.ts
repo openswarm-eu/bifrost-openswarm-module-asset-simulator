@@ -18,7 +18,8 @@ import {
     WIND_TURBINE_WIND_SPEEDS        } from '../data/fragment/local_types.js'
 import { 
     carAssignmentObject, 
-    localStorage                    } from './init.js'
+    localStorage,
+    storageDynToValueMap            } from './init.js'
 import { csvData                    } from './tools.js'
 import { config                     } from './config.js'
 import { CarObj                     } from './types.js'
@@ -315,6 +316,11 @@ export function update(
                 // calculate the resulting load value
                 const resultLoad = (sumLoad/3)
                 result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
+                
+                // add stored dynamic values from REST endpoints (e.g., wind speed selection)
+                if (pStruct.windSpeedSelectionId && storageDynToValueMap[pStruct.windSpeedSelectionId] !== undefined){
+                    result.addSeries({dynamicId:pStruct.windSpeedSelectionId, values:[storageDynToValueMap[pStruct.windSpeedSelectionId]]})
+                }
             }
         }
         
