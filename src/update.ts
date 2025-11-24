@@ -158,6 +158,11 @@ export function update(
                         resultingWindSpeed = config.windTurbine.minWindSpeed
                     }
 
+                    // When windspeed is greater than 0, set it to 2 m/s minimum for visualisation purposes
+                    if (resultingWindSpeed > 0 && resultingWindSpeed < 2){
+                        resultingWindSpeed = 2
+                    }
+                    
                     // write the values to the result DataFrame
                     result.addSeries({dynamicId:pStruct.windVelocityId,values:[resultingWindSpeed]})
                     windPowerResult[INFEED_PLANT_POWER_MAPPING.Infeed_Potential] = windPowerPotential
