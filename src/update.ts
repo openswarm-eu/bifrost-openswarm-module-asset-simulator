@@ -153,9 +153,11 @@ export function update(
                     // Calculate the resulting wind speed based on actual power (includes than scaling of windspeed with windSpeedScaleFactor)
                     let resultingWindSpeed = windPowerActual / (pStruct.windTurbine.windSpeedToPowerFactor)
                     if (resultingWindSpeed > config.windTurbine.maxWindSpeed){
+                        // Limit to max wind speed
                         resultingWindSpeed = config.windTurbine.maxWindSpeed
                     }
-                    if (resultingWindSpeed < config.windTurbine.minWindSpeed){
+                    if ((windPowerActual > 0) && (resultingWindSpeed < config.windTurbine.minWindSpeed)){
+                        // Ensure minimum wind speed if there is any power
                         resultingWindSpeed = config.windTurbine.minWindSpeed
                     }
                     
