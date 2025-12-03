@@ -16,9 +16,9 @@ windTurbine:
   # Default conversion (linear) factor from wind speed to power in kW/(m/s)
   windSpeedToPowerFactor: 1
   # Default maximum wind speed in m/s (defined in module fragment)
-  maxWindSpeed: 25
+  maxWindSpeed: 24
   # Default minimum wind speed in m/s (defined in module fragment)
-  minWindSpeed: 0
+  minWindSpeed: 2
 
 evCharger:
   # Default number of charging slots
@@ -66,8 +66,8 @@ structureTypes:
       "0":
         # Red car
         carColor: "0xFF0000"
-        carPower: 5
-        carMaxCap: 10
+        carPower: 10
+        carMaxCap: 60
       "1":
         # Grey car
         carColor: "0x808080"
@@ -101,8 +101,8 @@ structureTypes:
       "7":
         # Green car
         carColor: "0x00FF00"
-        carPower: 8
-        carMaxCap: 40
+        carPower: 5
+        carMaxCap: 10
       "8":
         # Currently no car available
         carColor: "0x000000"

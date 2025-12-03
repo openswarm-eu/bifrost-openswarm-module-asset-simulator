@@ -693,7 +693,7 @@ dynamics:
     domain: powergrid
     name: Wind Velocity
     description: Current wind velocity the windturbine is facing
-    visible: true
+    visible: false
     actionable: false
     unit: m/s
     defaultValue: 0
