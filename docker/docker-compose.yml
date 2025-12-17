@@ -33,9 +33,6 @@ services:
             HOOK: '[100, 200]'
             NODE_ENV: 'production'
             REALITY_TWIN_MODE: 'false'
-        volumes:
-            - ../configs/asset-simulator/:/opt/energy-community-asset-simulator/config/
-            - ../data/asset-simulator/:/opt/energy-community-asset-simulator/data/csv/
         depends_on:
             - bifrost-core
         ports:
