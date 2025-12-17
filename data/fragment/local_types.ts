@@ -55,7 +55,7 @@ export const enum WIND_TURBINE_WIND_SPEEDS {
     NONE     = "none",
 }
 
-export const PV_SYSTEM_POWER_MAPPING = {
+export const INFEED_POWER_MAPPING = {
     Infeed_Potential : 0,
     Actual_Infeed    : 1,   
 }

@@ -3,6 +3,25 @@
 This document contains the release history and changelog for the **OpenSwarm Energy Community Asset Simulator**. The **RealityTwin Asset Simulator** version has own tags, but which reflect also releases of the **OpenSwarm Energy Community Asset Simulator**. Therefore the first version number reflects the version of the **RealityTwin Asset Simulator**, the second to the corresponding version of the **OpenSwarm Energy Community Asset Simulator**.
 
 
+## [v2.1.1][v3.1.1] - 2025-12-17  ⚡
+
+### Major Features
+- **EV Component**: Added dedicated EV (Electric Vehicle) component module for better code organization and maintainability
+- **PV Component**: Introduced standalone PV (Photovoltaic) component module with enhanced solar power generation logic
+- **Wind Component**: Created dedicated wind turbine component module for improved wind energy simulation
+
+### Enhancements
+- **Data Interpolation**: Enhanced data interpolation utilities for more accurate profile data processing
+- **Code Refactoring**: Restructured update logic by extracting component-specific functionality into separate modules
+- Improved wind turbine logic with better speed limit handling and power calculation
+
+### Bug Fixes
+- Fixed wind speed calculation issues when wind turbine is not feeding in
+- Adjusted wind turbine speed limits and car configurations for more realistic simulations
+- Updated log messages for wind data processing for better debugging
+
+---
+
 ## [v2.1.0][v3.1.0] - 2025-11-20  🌬️
 
 ### Major Features

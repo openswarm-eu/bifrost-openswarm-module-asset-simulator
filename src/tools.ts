@@ -59,6 +59,51 @@ import {
         });
     }
 
+    // Get interpolated data for a given time
+    export function getInterpolatedData(dataTime: number, context: TModuleContext): any {
+        // check if the dataTime is in the csvData
+        if (csvData.hasOwnProperty(dataTime)) {
+            return csvData[dataTime];
+        }
+
+        // if not, make a linear interpolation
+        const keys = Object.keys(csvData).map(Number).sort((a, b) => a - b);
+        let lowerKey = keys[0];
+        let upperKey = keys[keys.length - 1];
+        for (let i = 0; i < keys.length; i++) {
+            if (keys[i] <= dataTime) {
+                lowerKey = keys[i];
+            }
+            if (keys[i] > dataTime) {
+                upperKey = keys[i];
+                break;
+            }
+        }
+        if (lowerKey === undefined || upperKey === undefined) {
+            context.log.write(`No data available for time ${dataTime}`, Log.level.WARNING);
+            return null; // No data available for this time
+        }
+
+        // perform linear interpolation
+        const lowerData = csvData[lowerKey];
+        const upperData = csvData[upperKey];
+        const interpolationFactor = (dataTime - lowerKey) / (upperKey - lowerKey);
+        const wData: any = {};
+        for (const key in lowerData) {
+            if (lowerData.hasOwnProperty(key) && upperData.hasOwnProperty(key)) {
+                wData[key] = lowerData[key] + interpolationFactor * (upperData[key] - lowerData[key]);
+            }
+        }
+
+        // except for EV-IDs, which cannot be interpolated
+        for (let slotIndex = 1; slotIndex <= 3; slotIndex++) {
+            const evIdKey = "EV-ID_Slot" + slotIndex;
+            wData[evIdKey] = lowerData[evIdKey];
+        }
+
+        return wData;
+    }
+
     // Data generators.
     export const generators = {
         // Helper functions
