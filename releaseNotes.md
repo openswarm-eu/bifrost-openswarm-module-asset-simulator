@@ -2,6 +2,25 @@
 
 This document contains the release history and changelog for the Energy Community Asset Simulator.
 
+## [v3.1.1] - 2025-12-17  ⚡
+
+### Major Features
+- **EV Component**: Added dedicated EV (Electric Vehicle) component module for better code organization and maintainability
+- **PV Component**: Introduced standalone PV (Photovoltaic) component module with enhanced solar power generation logic
+- **Wind Component**: Created dedicated wind turbine component module for improved wind energy simulation
+
+### Enhancements
+- **Data Interpolation**: Enhanced data interpolation utilities for more accurate profile data processing
+- **Code Refactoring**: Restructured update logic by extracting component-specific functionality into separate modules
+- Improved wind turbine logic with better speed limit handling and power calculation
+
+### Bug Fixes
+- Fixed wind speed calculation issues when wind turbine is not feeding in
+- Adjusted wind turbine speed limits and car configurations for more realistic simulations
+- Updated log messages for wind data processing for better debugging
+
+---
+
 ## [v3.1.0] - 2025-11-20  🌬️
 
 ### Major Features
