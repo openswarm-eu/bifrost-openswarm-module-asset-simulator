@@ -112,7 +112,7 @@ structureTypes:
   solarFarm:
     solarSystem:
       # Scale factor for the infeed power for solar farms in p.u.
-      scaleFactor: 8
+      scaleFactor: 20 # This value is compatible with the "SOLAR-FARM" hardware module (all panles installed --> 100kW max power with the current pv profiles)
     load:
       # Solar farms have no load consumption (pure generation), thus their load scale factor should be 0
       scaleFactor: 0

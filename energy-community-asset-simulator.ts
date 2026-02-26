@@ -221,7 +221,7 @@ m.app.post("/rest/configWindData", async (request, reply) => {
         const expId = body["experimentId"]
         const strId = body["structureId"]
         const dynId = body["dynamicId"]
-        const dynVal = body["dynamicValue"]
+        const dynVal = parseFloat(body["dynamicValue"])
         m.context.log.write(`Updating "WIND-TURBINE": ${dynId}:${dynVal}`,Log.level.DEBUG)
         storageDynToValueMap[dynId] = dynVal
         reply.status(200).send(JSON.stringify({
