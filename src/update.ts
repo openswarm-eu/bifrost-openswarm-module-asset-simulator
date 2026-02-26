@@ -132,9 +132,12 @@ export function update(
                 const resultLoad = (sumLoad/3)
                 result.addSeries({dynamicId:pStruct.pgcApId,values:[[resultLoad,resultLoad,resultLoad]]})
                 
-                // add stored dynamic values from REST endpoints (e.g., wind speed selection)
+                // add stored dynamic values from REST endpoints
                 if (pStruct.windSpeedSelectionId && storageDynToValueMap[pStruct.windSpeedSelectionId] !== undefined){
                     result.addSeries({dynamicId:pStruct.windSpeedSelectionId, values:[storageDynToValueMap[pStruct.windSpeedSelectionId]]})
+                }
+                if (pStruct.pvInstalledPowerApId && storageDynToValueMap[pStruct.pvInstalledPowerApId] !== undefined){
+                    result.addSeries({dynamicId:pStruct.pvInstalledPowerApId, values:[storageDynToValueMap[pStruct.pvInstalledPowerApId]]}) 
                 }
             }
         }
