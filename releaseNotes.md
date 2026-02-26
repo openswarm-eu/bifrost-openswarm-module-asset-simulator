@@ -2,6 +2,13 @@
 
 This document contains the release history and changelog for the Energy Community Asset Simulator.
 
+## [v3.2.0] - 2026-02-26  ☀️
+
+### Major Features
+- **PV Installed Power**: Added `installedPower` attribute to PV system component for more accurate power generation tracking and configuration
+
+---
+
 ## [v3.1.1] - 2025-12-17  ⚡
 
 ### Major Features
