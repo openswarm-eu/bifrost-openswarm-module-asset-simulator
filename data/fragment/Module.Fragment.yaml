@@ -178,6 +178,7 @@ structures:
     dynamics:
       - PV-SYSTEM-POWER
       - PV-SYSTEM-MAX-POWER
+      - PV-SYSTEM-INSTALLED-POWER
     flavors: 
       - 76_SBC_plugin
     renderData: 
@@ -395,6 +396,24 @@ dynamics:
       maxItems: 2
       items:
         type: number
+    tags:
+      - energyCommunityController
+
+  PV-SYSTEM-INSTALLED-POWER:
+    domain: powergrid
+    name: Installed Power
+    description: Installed power of the plant
+    visible: true
+    actionable: true
+    alwaysUpdate: false
+    defaultValue: 1
+    pinnable: true
+    dataLabels:
+      - 'Installed Power'
+    chartType: LINE
+    unit: kWp
+    schema:
+      type: number
     tags:
       - energyCommunityController
 

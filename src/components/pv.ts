@@ -16,7 +16,7 @@ export function updatePvSystem(
     result: DataFrame
 ): number {
     let pvInfeedResult    = [0, 0]
-    let pvInfeedPotential = wData["PV-"+seasonCode] * pStruct.solarSystem.scaleFactor
+    let pvInfeedPotential = wData["PV-"+seasonCode] * pStruct.solarSystem.scaleFactor * dynamicsById[pStruct.pvInstalledPowerApId]
     let pvInfeedActual    = pvInfeedPotential
     
     if (-pvInfeedPotential > dynamicsById[pStruct.pvMaxApId]){

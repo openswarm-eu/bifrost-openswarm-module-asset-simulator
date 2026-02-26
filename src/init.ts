@@ -64,6 +64,7 @@ export function init(
                         pgcApId   : "",
                         pvApId    : "",
                         pvMaxApId : "",
+                        pvInstalledPowerApId : "",
                         load      : {
                             scaleFactor : config.load.scaleFactor  // Use config default load scale factor
                         },
@@ -123,6 +124,9 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_MAX_POWER){
                                     localStorage[experimentId].byPGC[structureId].pvMaxApId = dynId
+                                }
+                                if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_INSTALLED_POWER){
+                                    localStorage[experimentId].byPGC[structureId].pvInstalledPowerApId = dynId
                                 }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.CHARGING_POLE){
