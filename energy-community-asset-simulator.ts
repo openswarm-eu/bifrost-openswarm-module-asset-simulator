@@ -235,6 +235,31 @@ m.app.post("/rest/configWindData", async (request, reply) => {
     }
 })
 
+// TEST endpoint accessed by the RealityTwin hardware module "SOLAR-FARM"
+m.app.post("/rest/updateInstalledPower", async (request, reply) => {
+    m.context.log.write(`Got external REST request for updating "SOLAR-FARM"...`)
+
+    const body = request.body as object
+    try {
+        const storyId = body["storyId"]
+        const expId = body["experimentId"]
+        const strId = body["structureId"]
+        const dynId = body["dynamicId"]
+        const dynVal = body["dynamicValue"]
+        m.context.log.write(`Updating "SOLAR-FARM": ${dynId}:${dynVal}`,Log.level.DEBUG)
+        storageDynToValueMap[dynId] = dynVal
+        reply.status(200).send(JSON.stringify({
+            message: "success"
+        }))
+    } catch (e) {
+        var msg = "Error parsing solar-farm update"
+        m.context.log.write(msg + e, Log.level.ERROR)
+        reply.status(400).send(JSON.stringify({
+            message: "fail"
+        }))
+    }
+})
+
 // Load the module config
 loadConfig(m.context);
 

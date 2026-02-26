@@ -127,6 +127,11 @@ export function init(
                                 }
                                 if (state.dynamics.entities[dynId].typeId == TYPEID_LOCAL.INFEED_PLANT_INSTALLED_POWER){
                                     localStorage[experimentId].byPGC[structureId].pvInstalledPowerApId = dynId
+                                    // check if there was something written to the localStorage from the restEndpoint
+                                    // if it is not undefined it means there was a rest call previously
+                                    if (storageDynToValueMap[dynId] != undefined){
+                                        initResult.addSeries({dynamicId:dynId,values:[storageDynToValueMap[dynId]]})
+                                    }
                                 }
                             }
                         } else if (state.structures.entities[childId].typeId == TYPEID_LOCAL.CHARGING_POLE){
