@@ -2,6 +2,12 @@
 
 This document contains the release history and changelog for the **OpenSwarm Energy Community Asset Simulator**. The **RealityTwin Asset Simulator** version has own tags, but which reflect also releases of the **OpenSwarm Energy Community Asset Simulator**. Therefore the first version number reflects the version of the **RealityTwin Asset Simulator**, the second to the corresponding version of the **OpenSwarm Energy Community Asset Simulator**.
 
+## [v2.2.0][v3.2.0] - 2026-02-26  ☀️
+
+### Major Features
+- **PV Installed Power**: Added `installedPower` attribute to PV system component for more accurate power generation tracking and configuration
+
+---
 
 ## [v2.1.1][v3.1.1] - 2025-12-17  ⚡
 
