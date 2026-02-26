@@ -6,6 +6,8 @@ This document contains the release history and changelog for the **OpenSwarm Ene
 
 ### Major Features
 - **PV Installed Power**: Added `installedPower` attribute to PV system component for more accurate power generation tracking and configuration
+- **REST API Integration**: Added REST endpoint for RealityTwin hardware module integration:
+  - `/rest/updateInstalledPower` - Update solar farm installed power (SOLAR-FARM module)
 
 ---
 
