@@ -73,7 +73,7 @@ structures:
         base: 'objects/inactive/buildings/'
         hover: 'objects/active/buildings/'
         active: 'objects/active/buildings/'
-      rotationY: 0.75
+      rotationY: 0
       scale: 'default'
       hideInPanel: false
       category: 'ELECTRICAL'
