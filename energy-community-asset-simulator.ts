@@ -226,7 +226,7 @@ m.app.post("/rest/configWindData", async (request, reply) => {
         const expId = body["experimentId"]
         const strId = body["structureId"]
         const dynId = body["dynamicId"]
-        const dynVal = parseFloat(body["dynamicValue"])
+        const dynVal = body["dynamicValue"]
         
         const windTurbineId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
         m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${windTurbineId}`, Log.level.DEBUG)
@@ -255,7 +255,7 @@ m.app.post("/rest/updateInstalledPower", async (request, reply) => {
         const expId = body["experimentId"]
         const strId = body["structureId"]
         const dynId = body["dynamicId"]
-        const dynVal = body["dynamicValue"]
+        const dynVal = parseFloat(body["dynamicValue"])
         
         const solarFarmId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
         m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${solarFarmId}`, Log.level.DEBUG)
