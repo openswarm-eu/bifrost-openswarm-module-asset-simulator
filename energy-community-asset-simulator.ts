@@ -83,6 +83,11 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
             const expId = body["experimentId"]
             const dynId = body["dynamicId"]
             const dynVal = parseFloat(body["dynamicValue"])
+
+            const batteryStationId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
+            m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${batteryStationId}`, Log.level.DEBUG)
+            m.context.log.write(`Requested capacity: ${body["dynamicValue"]}`, Log.level.DEBUG)
+
             const bifrostURL = process.env.BIFROST_URL || 'http://localhost:9091'
             const status = await updateDynamic(bifrostURL, storyId, expId, dynId, dynVal, m.context.log, Log)
             storageDynToValueMap[dynId] = dynVal
@@ -97,9 +102,7 @@ m.app.post("/rest/updateCapacity", async (request, reply) => {
             }))
     }
     
-    const batteryStationId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
-    m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${batteryStationId}`, Log.level.DEBUG)
-    m.context.log.write(`Requested capacity: ${body["dynamicValue"]}`, Log.level.DEBUG)
+
 })
 
 // REST endpoint accessed by the RealityTwin hardware module "E-CAR CHARGING STATION"
@@ -110,8 +113,10 @@ m.app.post("/rest/updateCars", (request, reply) => {
     // get key from object
     const evStationId = Object.keys(body)[0]
     const experimentId = body["expId"][0] as string
+
     m.context.log.write(`Rest Call '/rest/updateCars' for: ${evStationId}`, Log.level.DEBUG)
     m.context.log.write(`Requested car occupation: ${body[evStationId]}`, Log.level.DEBUG)
+
     if(!body[evStationId]){
         reply.status(200).send(JSON.stringify({
             message: "failure, malformed request"
@@ -222,7 +227,11 @@ m.app.post("/rest/configWindData", async (request, reply) => {
         const strId = body["structureId"]
         const dynId = body["dynamicId"]
         const dynVal = parseFloat(body["dynamicValue"])
-        m.context.log.write(`Updating "WIND-TURBINE": ${dynId}:${dynVal}`,Log.level.DEBUG)
+        
+        const windTurbineId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
+        m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${windTurbineId}`, Log.level.DEBUG)
+        m.context.log.write(`Requested wind speed: ${body["dynamicValue"]}`, Log.level.DEBUG)
+
         storageDynToValueMap[dynId] = dynVal
         reply.status(200).send(JSON.stringify({
             message: "success"
@@ -247,7 +256,11 @@ m.app.post("/rest/updateInstalledPower", async (request, reply) => {
         const strId = body["structureId"]
         const dynId = body["dynamicId"]
         const dynVal = body["dynamicValue"]
-        m.context.log.write(`Updating "SOLAR-FARM": ${dynId}:${dynVal}`,Log.level.DEBUG)
+        
+        const solarFarmId = body["dynamicId"].split('->')[1].split('>')[0] + '@' + body["dynamicId"].split('@')[1];
+        m.context.log.write(`Rest Call '/rest/updateCapacitys' for: ${solarFarmId}`, Log.level.DEBUG)
+        m.context.log.write(`Requested power: ${body["dynamicValue"]}`, Log.level.DEBUG)
+
         storageDynToValueMap[dynId] = dynVal
         reply.status(200).send(JSON.stringify({
             message: "success"
